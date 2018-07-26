@@ -23,10 +23,10 @@ objects:
     resources: {}
     runPolicy: Serial
     source:
-      contextDir: maven
+      contextDir: jenkins-slaves/maven
       git:
         ref: production
-        uri: ${REPO_BASE}/opendevstack/jenkins-slaves-dockerimages.git
+        uri: ${REPO_BASE}/opendevstack/ods-project-quickstarters.git
       sourceSecret:
         name: cd-user-token
       type: Git

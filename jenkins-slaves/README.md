@@ -2,7 +2,7 @@
 
 Jenkins slaves that are not part of the OpenShift distribution.
 
-All slaves should inherit from the [slave-base](https://github.com/opendevstack/cicd/tree/master/jenkins/slave-base).
+All slaves should inherit from the [slave-base](https://github.com/opendevstack/ods-core/tree/master/jenkins/slave-base).
 
 ## OCP config
 

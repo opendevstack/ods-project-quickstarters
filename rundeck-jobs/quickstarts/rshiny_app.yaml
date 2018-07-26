@@ -31,13 +31,13 @@
         git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
         package_name: ${option.package_name}'
     - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout -b production origin/production
     - script: |-
         #!/bin/bash
         mkdir /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
         cd /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
         echo "copy rshiny files from quickstart to generated project"
-        cp -rv /tmp/rundeck_@job.id@_@job.execid@/ocp-quickstarters/boilerplates/rshiny/* .
+        cp -rv /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/rshiny/* .
     - description: setup quickstarter for continuous integration
       jobref:
         args: -component_id ${option.component_id} -project_id ${option.project_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}

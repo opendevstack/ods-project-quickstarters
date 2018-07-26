@@ -35,11 +35,11 @@
         git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
         package_name: ${option.package_name}'
     - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout -b production origin/production
     - description: generate docker container for node express server
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/boilerplates/be-node-express && ./build.sh --registry ${globals.openshift_dockerregistry} --user ${globals.openshift_user} --token ${option.openshift_api_token}
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/be-node-express && ./build.sh --registry ${globals.openshift_dockerregistry} --user ${globals.openshift_user} --token ${option.openshift_api_token}
     - description: init node express project
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/boilerplates/be-node-express && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/be-node-express && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: setup quickstarter for continuous integration
       jobref:
         args: -component_type be-node-express -component_id ${option.component_id} -project_id ${option.project_id} -group_id ${option.group_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}

@@ -27,6 +27,7 @@
     required: true
     secure: true
     storagePath: keys/openshift-api-token
+    valueExposed: true
   scheduleEnabled: true
   sequence:
     commands:

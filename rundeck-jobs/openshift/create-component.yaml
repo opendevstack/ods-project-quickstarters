@@ -36,11 +36,11 @@
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project
-      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-templates.git && cd ocp-templates && git checkout -b production origin/production
+      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/ocp-templates && git checkout -b production origin/production
     - description: create docker container for openshift client
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-templates && sudo docker build -t oc .
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
     - description: create openshift components within projects
-      exec: echo "Token --> ${option.openshift_api_token}" && cd /tmp/rundeck_${job.id}_${job.execid}/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./create-component.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -r ${option.route} -ne "${globals.nexus_host}"'
+      exec: echo "Token --> ${option.openshift_api_token}" && cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./create-component.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -r ${option.route} -ne "${globals.nexus_host}"'
     keepgoing: false
     pluginConfig:
       WorkflowStrategy:

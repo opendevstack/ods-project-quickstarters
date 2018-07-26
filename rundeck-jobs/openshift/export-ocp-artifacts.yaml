@@ -12,7 +12,7 @@
       the rest will be inferred by the project settings
     name: git_uri
     required: true
-    value: https://<user>:<pw>@192.168.56.31:7990/scm/
+    value: https://<user>:<pw>@<bitbucket repo host>/scm/
   - description: the service account token for the source OCP
     name: openshift_api_token
     required: true
@@ -34,9 +34,9 @@
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project
-      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-templates.git && cd ocp-templates && git checkout -b production origin/production
-    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-templates && sudo docker build -t oc .
-    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-templates && sudo docker run --rm oc /bin/bash -c "./export_ocp_project_metadata.sh -h ${globals.openshift_apihost} -t ${option.openshift_api_token} -p ${option.project-prefix} -e ${option.project-environments} -g ${option.git_uri}"
+      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/ocp-templates && git checkout -b production origin/production
+    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
+    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker run --rm oc /bin/bash -c "./export_ocp_project_metadata.sh -h ${globals.openshift_apihost} -t ${option.openshift_api_token} -p ${option.project-prefix} -e ${option.project-environments} -g ${option.git_uri}"
     keepgoing: false
     pluginConfig:
       WorkflowStrategy:

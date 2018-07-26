@@ -23,6 +23,7 @@
     required: true
     secure: true
     storagePath: keys/openshift-api-token
+    valueExposed: true
   scheduleEnabled: true
   sequence:
     commands:
@@ -32,7 +33,7 @@
     - description: checkout quickstart
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
     - description: init jupyter notebook
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/jupyter-notebook && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/boilerplates/jupyter-notebook && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: setup quickstarter for continuous integration
       jobref:
         args: -component_id ${option.component_id} -project_id ${option.project_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}

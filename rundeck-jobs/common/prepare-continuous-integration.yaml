@@ -41,13 +41,14 @@
     required: true
     secure: true
     storagePath: keys/openshift-api-token
+    valueExposed: true
   - description: group id for maven style projects (i.e. org.opendevstack.bhw for bhw project)
     name: group_id
   scheduleEnabled: true
   sequence:
     commands:
     - description: clone quickstarter project
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/boilerplates && git checkout -b production origin/production
     - description: create component in openshift
       jobref:
         args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
@@ -57,7 +58,7 @@
     - description: add Jenkinsfile to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
-        cd /tmp/rundeck_@job.id@_@job.execid@/ocp-quickstarters 
+        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates 
         ./renderJenkinsTemplate.sh \
           --target @option.quickstarter_directory@/Jenkinsfile \
           --url @option.git_url_http@ \
@@ -68,14 +69,14 @@
     - description: add sonar-project.properties to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
-        cd /tmp/rundeck_@job.id@_@job.execid@/ocp-quickstarters
+        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
         ./renderSonarqubeTemplate.sh \
           --target @option.quickstarter_directory@/sonar-project.properties \
           --project-id @option.project_id@ \
           --component-id @option.component_id@  \
           --component-type @option.component_type@
     - description: push repository to github
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters && ./git_push.sh --dir ${option.quickstarter_directory} --url ${option.git_url_ssh}
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates && ./git_push.sh --dir ${option.quickstarter_directory} --url ${option.git_url_ssh}
     keepgoing: false
     pluginConfig:
       WorkflowStrategy:

@@ -37,7 +37,7 @@
     - description: checkout quickstart
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
     - description: init python flask project
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/be-python-flask && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/boilerplates/be-python-flask && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: setup quickstarter for continuous integration
       jobref:
         args: -component_type be-python-flask -component_id ${option.component_id} -project_id ${option.project_id} -group_id ${option.group_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http} -openshift_api_token ${option.openshift_api_token}

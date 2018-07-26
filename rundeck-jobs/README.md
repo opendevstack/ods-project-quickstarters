@@ -9,6 +9,8 @@ project.globals.bitbucket_sshhost=<your bitbucket repository url, eg: ssh\://git
 project.globals.nexus_host=<nexus host url>
 project.globals.openshift_apihost=<openshift API host url>
 project.globals.rundeck_os_user=<rundeck OS user incl group e.g. rundeck:rundeck>
+project.globals.openshift_dockerregistry=<registry host without protocol and port>
+project.globals.openshift_user=<user that has pull rights against the internal registry>
 
 c) configure scm import against this repository - against branch rundeck-changes pattern *.yaml
 d) disable scm import, and configure scm export - ensure the file path does NOT contain rundeck directory

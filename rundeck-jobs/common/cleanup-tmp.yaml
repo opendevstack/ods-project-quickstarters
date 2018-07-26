@@ -32,7 +32,7 @@
         echo $found_dirs  | xargs sudo rm -rf
 
         echo "Pruning unused Docker data"
-        sudo docker system prune --force --all
+        sudo docker system prune --force
     keepgoing: false
     pluginConfig:
       WorkflowStrategy:

@@ -22,9 +22,8 @@ RUN yum install -y centos-release-scl-rh && \
 
 COPY npmrc $HOME/.npm-global/etc/npmrc
 	
-RUN sed -i .bak -e "s|NEXUS_HOST|$NEXUS_HOST|g" $HOME/.npm-global/etc/npmrc && \
-    sed -i .bak -e "s|NEXUS_AUTH|$(echo -n $NEXUS_AUTH | base64)|g" $HOME/.npm-global/etc/npmrc && \
-    rm $HOME/.npm-global/etc/npmrc.bak
+RUN sed -i "s|NEXUS_HOST|$NEXUS_HOST|g" $HOME/.npm-global/etc/npmrc && \
+    sed -i "s|NEXUS_AUTH|$(echo -n $NEXUS_AUTH | base64)|g" $HOME/.npm-global/etc/npmrc
 	
 # Install packages to edit images
 ENV LIBVIPS_VERSION_MAJOR=8

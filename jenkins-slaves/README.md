@@ -10,7 +10,7 @@ Config can be created / updated / deleted with Tailor.
 
 Example:
 ```
-tailor -n cd --template-dir maven/ocp-config --param-dir ../ods-configuration/jenkins-slaves-dockerimages/maven/ocp-config status --selector app=jenkins-slave-maven
+cd maven/ocp-config && tailor status
 ```
 
 

@@ -23,7 +23,7 @@ objects:
     resources: {}
     runPolicy: Serial
     source:
-      contextDir: nodejs-8-angular
+      contextDir: nodejs8-angular
       git:
         ref: production
         uri: ${REPO_BASE}/opendevstack/jenkins-slaves-dockerimages.git

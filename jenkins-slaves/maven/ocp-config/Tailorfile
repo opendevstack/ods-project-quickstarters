@@ -1,0 +1,5 @@
+namespace cd
+selector app=jenkins-slave-maven
+param-dir ../../../ods-configuration/jenkins-slaves-dockerimages/maven/ocp-config
+
+bc,is

@@ -23,7 +23,7 @@ objects:
     resources: {}
     runPolicy: Serial
     source:
-      contextDir: nodejs-8-vips
+      contextDir: nodejs8-vips
       git:
         ref: production
         uri: ${REPO_BASE}/opendevstack/jenkins-slaves-dockerimages.git
@@ -38,9 +38,6 @@ objects:
             value: ${NEXUS_URL}
           - name: NEXUS_AUTH
             value: ${NEXUS_AUTH}
-        from:
-          kind: ImageStreamTag
-          name: jenkins-slave-base:latest
       type: Docker
     triggers: []
 parameters:

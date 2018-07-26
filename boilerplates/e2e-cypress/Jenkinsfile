@@ -1,0 +1,36 @@
+def final projectId = '@project_id@'
+def final componentId = '@component_id@'
+def final groupId = '@group_id@'
+def final credentialsId = "${projectId}-cd-cd-user-with-password"
+def sharedLibraryRepository
+def dockerRegistry
+node {
+  sharedLibraryRepository = env.SHARED_LIBRARY_REPOSITORY
+  dockerRegistry = env.DOCKER_REGISTRY
+}
+
+library identifier: 'ods-library@latest', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: sharedLibraryRepository,
+   credentialsId: credentialsId])
+
+// See readme of shared library for usage and customization.
+odsPipeline(
+  image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
+  projectId: projectId,
+  componentId: componentId,
+  groupId: groupId,
+  verbose: true
+) { context ->
+  stageTest(context)
+}
+
+def stageTest(def context) {
+  stage('Test') {
+    withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}"]) {
+      sh "npm install"
+      sh "npm run lint"
+      sh "npm run build"
+    }
+  }
+}

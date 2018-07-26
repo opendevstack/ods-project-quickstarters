@@ -1,0 +1,46 @@
+- description: Export OC yaml artifacts of a given namespace to git
+  executionEnabled: true
+  group: openshift
+  id: 099c320b-f2bc-4152-93f3-eb49be941d30
+  loglevel: INFO
+  name: export-ocp-artifacts
+  nodeFilterEditable: false
+  options:
+  - description: |-
+      the URL to git - format as below 
+      https://<user>:<pw>@192.168.56.31:7990/scm/
+      the rest will be inferred by the project settings
+    name: git_uri
+    required: true
+    value: https://<user>:<pw>@192.168.56.31:7990/scm/
+  - description: the service account token for the source OCP
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+    valueExposed: true
+  - description: underscore separated list of envs (e.g. cd_dev_test)
+    name: project-environments
+    required: true
+    value: cd_dev_test
+  - description: the name of the project (e.g. prov) WITHOUT environment (-dev,... )
+    name: project-prefix
+    required: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: 'echo project: ${option.project-prefix} project-envs: ${option.project-environments}
+        openshift_api_token: bb${globals.openshift_apihost}bb'
+    - description: create tmp dir for job
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
+    - description: clone oc script project
+      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-templates.git && cd ocp-templates && git checkout -b production origin/production
+    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-templates && sudo docker build -t oc .
+    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-templates && sudo docker run --rm oc /bin/bash -c "./export_ocp_project_metadata.sh -h ${globals.openshift_apihost} -t ${option.openshift_api_token} -p ${option.project-prefix} -e ${option.project-environments} -g ${option.git_uri}"
+    keepgoing: false
+    pluginConfig:
+      WorkflowStrategy:
+        node-first: null
+    strategy: node-first
+  uuid: 099c320b-f2bc-4152-93f3-eb49be941d30
+

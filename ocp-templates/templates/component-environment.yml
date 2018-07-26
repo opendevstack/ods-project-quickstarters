@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: component-environment
+  annotations:
+    description: This templates performs the basic setup for applications.
+    iconClass: icon-nodejs
+    openshift.io/display-name: Component Template
+    template.openshift.io/long-description: >-
+      This template defines resources needed to develop an application,
+      including a build configuration, application deployment configuration.
+objects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        description: Exposes and load balances the application pods
+        service.alpha.openshift.io/dependencies: '[]'
+      labels:
+        app: '${PROJECT}'
+        branch: '${BRANCH}'
+        component: '${COMPONENT}'
+        env: '${ENV}'
+      name: '${COMPONENT}'
+      namespace: '${PROJECT}-${ENV}'
+    spec:
+      ports:
+        - name: 8080-tcp
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app: '${PROJECT}'
+        component: '${COMPONENT}'
+        deploymentconfig: '${COMPONENT}'
+        env: '${ENV}'
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      annotations:
+        description: Keeps track of changes in the application image
+      labels:
+        app: '${PROJECT}'
+        component: '${COMPONENT}'
+        env: '${ENV}'
+      name: '${COMPONENT}'
+      namespace: '${PROJECT}-${ENV}'
+    spec:
+      dockerImageRepository: '${COMPONENT}'
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: '${PROJECT}'
+        branch: '${BRANCH}'
+        component: '${COMPONENT}'
+        env: '${ENV}'
+      name: '${COMPONENT}'
+      namespace: '${PROJECT}-${ENV}'
+    spec:
+      replicas: 1
+      selector:
+        app: '${PROJECT}'
+        component: '${COMPONENT}'
+        deploymentconfig: '${COMPONENT}'
+        env: '${ENV}'
+      strategy:
+        resources: {}
+        rollingParams:
+          intervalSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
+          updatePeriodSeconds: 1
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: '${PROJECT}'
+            component: '${COMPONENT}'
+            deploymentconfig: '${COMPONENT}'
+            env: '${ENV}'
+        spec:
+          containers:
+            - image: '${PROJECT}-${ENV}/${COMPONENT}:latest'
+              imagePullPolicy: IfNotPresent
+              name: '${COMPONENT}'
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              resources:
+                limits:
+                  memory: '${MEMORY_LIMIT}'
+                requests:
+                  memory: 100Mi
+              terminationMessagePath: /dev/termination-log
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - '${COMPONENT}'
+            from:
+              kind: ImageStreamTag
+              name: '${COMPONENT}:latest'
+              namespace: '${PROJECT}-${ENV}'
+          type: ImageChange
+parameters:
+  - name: PROJECT
+    displayName: Application
+    description: The name of the application project.
+    required: true
+  - name: COMPONENT
+    displayName: Component
+    description: The name of the application component.
+    required: true
+  - name: ENV
+    displayName: Environment
+    description: The environment stage.
+    required: true
+  - name: BRANCH
+    displayName: Branch
+    description: The branch (either 'feature' or 'master').
+    value: feature
+    required: true
+  - name: MEMORY_LIMIT
+    displayName: Memory Limit
+    description: Maxiroutemum amount of memory the Node.js container can use.
+    value: 1024Mi
+    required: true
+labels:
+  template: component-template

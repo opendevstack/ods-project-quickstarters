@@ -1,0 +1,25 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body{
+  font-family: 'Roboto', sans-serif !important;
+}
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #efefef;
+  padding: 5px 0;
+}
+
+.AppLoader {
+  text-align: center;
+}
+
+.container {
+  margin-left: 20px;
+  margin-right: 20px;
+}

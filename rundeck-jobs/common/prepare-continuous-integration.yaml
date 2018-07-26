@@ -1,0 +1,85 @@
+- description: 'Setup Jenkins pipeline and openshift and push to bitbucket '
+  executionEnabled: true
+  group: common
+  id: ffa290f1-eaa0-4f7b-92fe-1f1c169b6349
+  loglevel: INFO
+  name: prepare-continuous-integration
+  nodeFilterEditable: false
+  options:
+  - description: |-
+      the type of component to create (i.e. springboot-be, angular-frontend). 
+      The component type must be created first in the quickstarter project
+    enforced: true
+    name: component_type
+    required: true
+    values:
+    - be-database
+    - be-node-express
+    - be-python-flask
+    - be-scala-akka
+    - be-springboot
+    - fe-angular
+    - fe-ionic
+    - fe-react
+  - description: location of the generated quickstarter project
+    name: quickstarter_directory
+    required: true
+  - description: id of the project (i.e.  bhw for basic hello world)
+    name: project_id
+    required: true
+  - description: id of the component to create (i.e. bhw-be for bhw backend)
+    name: component_id
+    required: true
+  - description: git url to access target repository via http
+    name: git_url_http
+    required: true
+  - description: git url to access target repository via ssh
+    name: git_url_ssh
+    required: true
+  - description: openshift api token to log on to open shift
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+  - description: group id for maven style projects (i.e. org.opendevstack.bhw for bhw project)
+    name: group_id
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - description: clone quickstarter project
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
+    - description: create component in openshift
+      jobref:
+        args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
+        group: openshift
+        name: create-component
+        nodeStep: 'true'
+    - description: add Jenkinsfile to generated project
+      script: |-
+        sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
+        cd /tmp/rundeck_@job.id@_@job.execid@/ocp-quickstarters 
+        ./renderJenkinsTemplate.sh \
+          --target @option.quickstarter_directory@/Jenkinsfile \
+          --url @option.git_url_http@ \
+          --project-id @option.project_id@ \
+          --component-id @option.component_id@  \
+          --component-type @option.component_type@ \
+          --group-id @option.group_id@
+    - description: add sonar-project.properties to generated project
+      script: |-
+        sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
+        cd /tmp/rundeck_@job.id@_@job.execid@/ocp-quickstarters
+        ./renderSonarqubeTemplate.sh \
+          --target @option.quickstarter_directory@/sonar-project.properties \
+          --project-id @option.project_id@ \
+          --component-id @option.component_id@  \
+          --component-type @option.component_type@
+    - description: push repository to github
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters && ./git_push.sh --dir ${option.quickstarter_directory} --url ${option.git_url_ssh}
+    keepgoing: false
+    pluginConfig:
+      WorkflowStrategy:
+        node-first: null
+    strategy: node-first
+  uuid: ffa290f1-eaa0-4f7b-92fe-1f1c169b6349
+

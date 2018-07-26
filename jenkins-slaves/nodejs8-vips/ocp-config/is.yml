@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Template
+metadata:
+  annotations: {}
+  creationTimestamp: null
+  name: jenkins-slave-nodejs8-vips
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    name: jenkins-slave-nodejs8-vips
+    labels:
+      app: jenkins-slave-nodejs8-vips
+  spec:
+    dockerImageRepository: jenkins-slave-nodejs8-vips
+    lookupPolicy:
+      local: false

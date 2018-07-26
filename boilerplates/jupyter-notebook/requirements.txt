@@ -1,0 +1,9 @@
+jupyter
+ipywidgets
+# jupyterlab
+numpy
+scipy
+scikit-learn
+pandas
+seaborn
+nltk

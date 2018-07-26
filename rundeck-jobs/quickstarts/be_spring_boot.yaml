@@ -1,0 +1,56 @@
+- description: Service Backend implemented with Spring Boot
+  executionEnabled: true
+  group: quickstarts
+  id: e5b77f0f-262a-42f9-9d06-5d9052c1f394
+  loglevel: INFO
+  name: be_spring_boot
+  nodeFilterEditable: false
+  options:
+  - description: id of the project (i.e. bhw for basic hello world)
+    name: project_id
+    required: true
+  - description: group id for maven style projects (i.e. org.opendevstack.bhw for bhw project)
+    name: group_id
+  - description: id of the component to create (i.e. bhw-be for bhw backend)
+    name: component_id
+    required: true
+  - description: git url to access target repository via http
+    name: git_url_http
+    required: true
+  - description: git url to access target repository via ssh
+    name: git_url_ssh
+    required: true
+  - description: name of the source code root package
+    name: package_name
+  - description: openshift api token to log on to open shift
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: 'echo project_id: ${option.project_id},  component_id: ${option.component_id},
+        git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
+        package_name: ${option.package_name}'
+    - description: checkout springboot quickstart
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ocp-quickstarters.git && cd ocp-quickstarters && git checkout -b production origin/production
+    - description: generate docker container for spring cli
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/be-springboot && ./build.sh --registry ${globals.openshift_dockerregistry} --user ${globals.openshift_user} --token ${option.openshift_api_token}
+    - description: init spring boot project
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ocp-quickstarters/be-springboot && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --package "${option.package_name}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
+    - description: setup quickstarter for continuous integration
+      jobref:
+        args: '-component_type be-springboot -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id}
+          -project_id ${option.project_id} -component_id ${option.component_id} -group_id
+          ${option.group_id}  -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http} '
+        group: common
+        name: prepare-continuous-integration
+        nodeStep: 'true'
+    keepgoing: false
+    pluginConfig:
+      WorkflowStrategy:
+        node-first: null
+    strategy: node-first
+  uuid: e5b77f0f-262a-42f9-9d06-5d9052c1f394
+

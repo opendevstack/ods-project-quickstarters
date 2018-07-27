@@ -31,7 +31,7 @@
   sequence:
     commands:
     - description: clone quickstarter project
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters/ocp-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters && git checkout -b production origin/production
     - description: create rshiny app in openshift
       jobref:
         args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}

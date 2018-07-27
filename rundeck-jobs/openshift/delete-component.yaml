@@ -10,12 +10,11 @@
   - description: the global project id (i.e. bhw for basic hello world)
     name: project_id
     required: true
-  - description: the id of the component to create
+  - description: the id of the component to delete
     name: component_id
     required: true
   - description: git url of the component to delete
     name: git_url_http
-    required: true
   - description: openshift token to log on to openshift
     name: openshift_api_token
     secure: true
@@ -33,7 +32,7 @@
     - description: create docker container for openshift client
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
     - description: delete openshift component
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && ./delete-component.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" '
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && ./delete-component.sh -p ${option.project_id} -c "${option.component_id}" -b "https://fake-domain.com" '
     keepgoing: false
     pluginConfig:
       WorkflowStrategy:

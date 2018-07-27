@@ -1,0 +1,4 @@
+colorama
+coverage
+nose2
+pinocchio

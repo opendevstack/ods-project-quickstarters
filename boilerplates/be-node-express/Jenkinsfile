@@ -1,0 +1,69 @@
+def final projectId = '@project_id@'
+def final componentId = '@component_id@'
+def final groupId = '@group_id@'
+def final credentialsId = "${projectId}-cd-cd-user-with-password"
+def sharedLibraryRepository
+def dockerRegistry
+node {
+  sharedLibraryRepository = env.SHARED_LIBRARY_REPOSITORY
+  dockerRegistry = env.DOCKER_REGISTRY
+}
+
+library identifier: 'ods-library@latest', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: sharedLibraryRepository,
+   credentialsId: credentialsId])
+
+// See readme of shared library for usage and customization.
+odsPipeline(
+  image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
+  projectId: projectId,
+  componentId: componentId,
+  groupId: groupId,
+  verbose: true
+) { context ->
+  stageBuild(context)
+  stageUnitTest(context)
+  stageScanForSonarqube(context)
+  stageUploadToNexus(context)
+  stageCreateOpenshiftEnvironment(context)
+  stageUpdateOpenshiftBuild(context)
+  stageDeployToOpenshift(context)
+  stageTriggerAllBuilds(context)
+}
+
+def stageBuild(def context) {
+  stage('Build') {
+    sh "npm install"
+    sh "npm run build"
+    archiveBuild(context)
+  }
+}
+
+def stageUnitTest(def context) {
+  stage('Unit Test') {
+    sh "npm test -- --progress false"
+    sh "npm run coverage"
+    if (false) {
+      junit 'artifacts/xunit.xml'
+      step([
+        $class: 'CoberturaPublisher',
+        autoUpdateHealth: false,
+        autoUpdateStability: false,
+        coberturaReportFile: 'artifacts/cobertura-coverage.xml',
+        failNoReports: false,
+        failUnhealthy: false,
+        failUnstable: false,
+        maxNumberOfBuilds: 0,
+        onlyStable: false,
+        sourceEncoding: 'UTF_8',
+        zoomCoverageChart: false
+      ])
+    }
+  }
+}
+
+def archiveBuild(def context) {
+  def distFile = "${context.componentId}-${context.tagversion}.tar.gz"
+  sh "tar --exclude=${distFile} --exclude=docker -czf ${distFile} *"
+}

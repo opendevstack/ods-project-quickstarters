@@ -1,0 +1,42 @@
+- description: remove all tmp directories older than specified days
+  executionEnabled: true
+  group: common
+  id: 5cc8e676-b38d-4f2c-82b4-59ea2d7c0261
+  loglevel: INFO
+  name: cleanup-tmp
+  nodeFilterEditable: false
+  options:
+  - description: number of days to retain (+1 for last day etc, -1 for everyting)
+    name: days_to_retain
+    required: true
+    value: '+7'
+  schedule:
+    month: '*'
+    time:
+      hour: '07'
+      minute: '00'
+      seconds: '0'
+    weekday:
+      day: '*'
+    year: '*'
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - description: find and delete directorys /tmp/rundeck_* older than ${option.days_to_retain}
+      script: |-
+        #!/bin/bash
+
+        found_dirs=$(sudo find /tmp -name "rundeck_*" -mtime @option.days_to_retain@ -type d)
+        echo "Directories to delete:"
+        echo $found_dirs
+        echo $found_dirs  | xargs sudo rm -rf
+
+        echo "Pruning unused Docker data"
+        sudo docker system prune --force
+    keepgoing: false
+    pluginConfig:
+      WorkflowStrategy:
+        node-first: null
+    strategy: node-first
+  uuid: 5cc8e676-b38d-4f2c-82b4-59ea2d7c0261
+

@@ -1,0 +1,5 @@
+namespace cd
+selector app=jenkins-slave-python
+param-dir ../../../../ods-configuration/ods-project-quickstarters/jenkins-slaves/python/ocp-config
+
+bc,is

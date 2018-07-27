@@ -1,0 +1,8 @@
+plotly
+tensorflow
+statsmodels
+pymc
+
+
+# JDBC client for hive connection
+JayDeBeApi

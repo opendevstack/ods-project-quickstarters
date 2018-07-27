@@ -1,0 +1,5 @@
+namespace cd
+selector app=jenkins-slave-scala
+param-dir ../../../../ods-configuration/ods-project-quickstarters/jenkins-slaves/scala/ocp-config
+
+bc,is

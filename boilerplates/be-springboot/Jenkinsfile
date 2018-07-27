@@ -1,0 +1,45 @@
+def final projectId = '@project_id@'
+def final componentId = '@component_id@'
+def final groupId = '@group_id@'
+def final credentialsId = "${projectId}-cd-cd-user-with-password"
+def sharedLibraryRepository
+def dockerRegistry
+node {
+  sharedLibraryRepository = env.SHARED_LIBRARY_REPOSITORY
+  dockerRegistry = env.DOCKER_REGISTRY
+}
+
+library identifier: 'ods-library@latest', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: sharedLibraryRepository,
+   credentialsId: credentialsId])
+
+// See readme of shared library for usage and customization.
+odsPipeline(
+  image: "${dockerRegistry}/cd/jenkins-slave-maven",
+  projectId: projectId,
+  componentId: componentId,
+  groupId: groupId,
+  verbose: true
+) { context ->
+  stageBuild(context)
+  stageScanForSonarqube(context)
+  stageCreateOpenshiftEnvironment(context)
+  stageUpdateOpenshiftBuild(context)
+  stageDeployToOpenshift(context)
+  stageTriggerAllBuilds(context)
+}
+
+def stageBuild(def context) {
+  def javaOpts = "-Xmx512m"
+  def gradleTestOpts = "-Xmx128m"
+  def springBootEnv = context.environment
+  if (springBootEnv.contains('-dev')) {
+    springBootEnv = 'dev'
+  }
+  stage('Build') {
+    withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}", "NEXUS_USERNAME=${context.nexusUsername}", "NEXUS_PASSWORD=${context.nexusPassword}", "JAVA_OPTS=${javaOpts}","GRADLE_TEST_OPTS=${gradleTestOpts}","ENVIRONMENT=${springBootEnv}"]) {
+      sh "./gradlew clean build --stacktrace --no-daemon uploadArchives"
+    }
+  }
+}

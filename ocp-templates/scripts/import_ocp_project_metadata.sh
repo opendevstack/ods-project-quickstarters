@@ -243,12 +243,18 @@ fi
 if [[ -f "ocp_config" ]]; then
 	sourceHost=$(grep export ocp_config | cut -d '=' -f2)
 	sourceconfig=$(grep -H $sourceHost $scriptdir/migration_config/ocp_project_config_source | cut -d ':' -f1)
+	
+	echo "sourcehost : $sourceHost sourceconfig : $sourceconfig"
+	
 	if [[ -f "$sourceconfig" ]]; then
 		echo "> sourcing env source config from $sourceconfig"
 		source $sourceconfig
+	else 
+		echo "Cannot find $sourceconfig aborting"
+		exit  1
 	fi
 else
-	echo "ERROR: no config was found"
+	echo "ERROR: no config directory was found"
 	exit 1
 fi
 

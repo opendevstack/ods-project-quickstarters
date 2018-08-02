@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -19,15 +18,13 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true
 ) { context ->
   stageBuild(context)
   stageUnitTest(context)
   stageScanForSonarqube(context)
-  stageUploadToNexus(context)
   stageCreateOpenshiftEnvironment(context)
-  stageUpdateOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
   stageTriggerAllBuilds(context)
 }
@@ -36,7 +33,9 @@ def stageBuild(def context) {
   stage('Build') {
     sh "npm install"
     sh "npm run build"
-    archiveBuild(context)
+    sh "mkdir -p docker/dist"
+    sh "cp -r lib docker/dist/lib"
+    sh "cp -r node_modules docker/dist/node_modules"
   }
 }
 
@@ -61,9 +60,4 @@ def stageUnitTest(def context) {
       ])
     }
   }
-}
-
-def archiveBuild(def context) {
-  def distFile = "${context.componentId}-${context.tagversion}.tar.gz"
-  sh "tar --exclude=${distFile} --exclude=docker -czf ${distFile} *"
 }

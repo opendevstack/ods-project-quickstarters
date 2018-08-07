@@ -34,9 +34,6 @@
         echo "Pruning unused Docker data"
         sudo docker system prune --force
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: 5cc8e676-b38d-4f2c-82b4-59ea2d7c0261
 

@@ -78,9 +78,6 @@
     - description: push repository to github
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates && ./git_push.sh --dir ${option.quickstarter_directory} --url ${option.git_url_ssh}
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: ffa290f1-eaa0-4f7b-92fe-1f1c169b6349
 

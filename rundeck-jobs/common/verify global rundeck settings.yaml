@@ -31,9 +31,6 @@
     - description: verify openshift registry access
       exec: sudo docker login -u ${globals.openshift_user} -p ${option.openshift_api_token} ${globals.openshift_dockerregistry}
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: ec883e36-6ede-4017-8750-1aa0014cc1e3
 

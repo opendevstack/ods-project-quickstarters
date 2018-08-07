@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -19,15 +18,13 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-maven",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true,
   openshiftBuildTimeout: 25
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)
-  stageUploadToNexus(context)
   stageCreateOpenshiftEnvironment(context)
-  stageUpdateOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
   stageTriggerAllBuilds(context)
 }
@@ -37,11 +34,6 @@ def stageBuild(def context) {
     withEnv(["TAGVERSION=${context.tagversion}"]) {
       sh "python src/tests.py"
     }
-    archiveBuild(context)
+    sh "cp -r src docker/dist"
   }
-}
-
-def archiveBuild(def context) {
-  def distFile = "${context.componentId}-${context.tagversion}.tar.gz"
-  sh "tar -czf ${distFile} src"
 }

@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -19,13 +18,12 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-maven",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)
   stageCreateOpenshiftEnvironment(context)
-  stageUpdateOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
   stageTriggerAllBuilds(context)
 }
@@ -39,7 +37,8 @@ def stageBuild(def context) {
   }
   stage('Build') {
     withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}", "NEXUS_USERNAME=${context.nexusUsername}", "NEXUS_PASSWORD=${context.nexusPassword}", "JAVA_OPTS=${javaOpts}","GRADLE_TEST_OPTS=${gradleTestOpts}","ENVIRONMENT=${springBootEnv}"]) {
-      sh "./gradlew clean build --stacktrace --no-daemon uploadArchives"
+      sh "./gradlew clean build --stacktrace --no-daemon"
     }
+    sh "cp build/libs/${context.componentId}-*.jar docker/app.jar"
   }
 }

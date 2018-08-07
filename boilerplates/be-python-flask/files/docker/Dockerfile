@@ -6,13 +6,6 @@ MAINTAINER "Andras Gyacsok" <andras.gyacsok@boehringer-ingelheim.com>
 
 EXPOSE 8080
 
-ARG nexusHost
-ARG nexusUsername
-ARG nexusPassword
-ARG projectId
-ARG componentId
-ARG tagversion
-
 ENV PYTHON_VERSION=2.7 \
     PATH=$HOME/.local/bin/:$PATH \
     PYTHONUNBUFFERED=1 \
@@ -34,12 +27,6 @@ RUN yum install -y centos-release-scl && \
     rpm -e --nodeps centos-logos && \
     yum clean all -y
 
-# Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH.
-#COPY ./s2i/bin/ $STI_SCRIPTS_PATH
-
-# Copy extra files to the image.
-#COPY ./root/ /
-
 # Create a Python virtual environment for use by any application to avoid
 # potential conflicts with Python packages preinstalled in the main Python
 # installation.
@@ -50,22 +37,14 @@ RUN unset BASH_ENV PROMPT_COMMAND ENV && \
     source scl_source enable python27 && \
     source /opt/app-root/bin/activate
 
-COPY  * /opt/app-root/src/
+COPY dist /opt/app-root/src/
+COPY run.sh /opt/app-root/src/
 
-WORKDIR /tmp
-
-RUN curl --fail -s -o odsflsk.tar.gz -u ${nexusUsername}:${nexusPassword} ${nexusHost}/repository/candidates/org/opendevstack/projectId/${componentId}/${tagversion}/${componentId}-${tagversion}.tar.gz && \
-     tar xzf odsflsk.tar.gz && \
-     mv  -v /tmp/src/* /opt/app-root/src/
-
-# In order to drop the root user, we have to make some directories world
-# writable as OpenShift default security model is to run the container under
-# random UID.
-RUN chown -R 1001:0 /opt/app-root && chmod -R ug+rwx /opt/app-root
+RUN chown -R 1001:0 /opt/app-root && \
+    chmod -R ug+rwx /opt/app-root
 
 USER 1001
 
 WORKDIR /opt/app-root/src/
 
-# Set the default CMD to print the usage of the language image.
 CMD ["./run.sh"]

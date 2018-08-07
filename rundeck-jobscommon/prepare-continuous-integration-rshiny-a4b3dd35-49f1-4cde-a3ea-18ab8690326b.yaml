@@ -1,0 +1,46 @@
+- description: 'Setup Jenkins and openshift and push to github '
+  executionEnabled: true
+  group: common
+  id: a4b3dd35-49f1-4cde-a3ea-18ab8690326b
+  loglevel: INFO
+  name: prepare-continuous-integration-rshiny
+  nodeFilterEditable: false
+  options:
+  - description: location of the generated quickstarter project
+    name: quickstarter_directory
+    required: true
+  - description: id of the project (i.e. bhw for basic hello world)
+    name: project_id
+    required: true
+  - description: id of the component to create (i.e. bhw-be for bhw backend)
+    name: component_id
+    required: true
+  - description: git url to access target repository via http
+    name: git_url_http
+    required: true
+  - description: git url to access target repository via ssh
+    name: git_url_ssh
+    required: true
+  - description: openshift api token to log on to open shift
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+    valueExposed: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - description: clone quickstarter project
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters && git checkout -b production origin/production
+    - description: create rshiny app in openshift
+      jobref:
+        args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
+        group: openshift
+        name: create-rshiny
+        nodeStep: 'true'
+    - description: push repository to github
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates && ./git_push.sh --dir ${option.quickstarter_directory} --url ${option.git_url_ssh}
+    keepgoing: false
+    strategy: node-first
+  uuid: a4b3dd35-49f1-4cde-a3ea-18ab8690326b
+

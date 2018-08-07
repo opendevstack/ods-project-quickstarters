@@ -1,0 +1,49 @@
+- description: 'A generic database creation. '
+  executionEnabled: true
+  group: quickstarts
+  id: a3f068de-7aab-480a-a291-cae27fe3d4cc
+  loglevel: INFO
+  name: be_database
+  nodeFilterEditable: false
+  options:
+  - description: id of the project (i.e. bhw for basic hellow world)
+    name: project_id
+    required: true
+  - description: group id for maven style projects (i.e. org.opendevstack.bhw for bhw project)
+    name: group_id
+  - description: id of the component to create (i.e. bhw-be for bhw backend)
+    name: component_id
+    required: true
+  - description: git url to access target repository via http
+    name: git_url_http
+    required: true
+  - description: git url to access target repository via ssh
+    name: git_url_ssh
+    required: true
+  - description: name of the source code root package
+    name: package_name
+  - description: openshift api token to log on to open shift
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: 'echo project_id: ${option.project_id},  component_id: ${option.component_id},
+        git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
+        package_name: ${option.package_name}'
+    - description: checkout quickstart
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout -b production origin/production
+    - description: init database project
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}ods-project-quickstarters/boilerplates/be-database && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
+    - description: setup quickstarter for continuous integration
+      jobref:
+        args: -component_type be-database -component_id ${option.component_id} -project_id ${option.project_id} -group_id ${option.group_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}
+        group: common
+        name: prepare-continuous-integration
+        nodeStep: 'true'
+    keepgoing: false
+    strategy: node-first
+  uuid: a3f068de-7aab-480a-a291-cae27fe3d4cc
+

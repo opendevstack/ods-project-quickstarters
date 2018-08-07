@@ -5,6 +5,12 @@ MAINTAINER "Andreas Bellmann" <andreas.bellmann@opitz-consulting.com>
 ENV OS_CLI_VERSION_MAJOR 3.4
 ENV OS_CLI_VERSION_MINOR 1.2-1
 
+COPY root.ca /root.ca
+RUN ls /etc/ssl/certs/ && \
+        cat root.ca/ca-bundle.crt >> /etc/ssl/certs/ca-bundle.crt && \
+        cat root.ca/ca-bundle.trust.crt >> /etc/ssl/certs/ca-bundle.trust.crt && \
+        cat /etc/ssl/certs/ca-bundle.crt
+
 RUN yum -y install curl ca-certificates bash-completion vim git && \
     curl -s -L https://mirror.openshift.com/pub/openshift-v3/clients/3.7.0-0.198.0/linux/oc.tar.gz -o /tmp/oc.tar.gz && \
     tar zxvf /tmp/oc.tar.gz -C /tmp/ && \ 
@@ -15,5 +21,4 @@ RUN yum -y install curl ca-certificates bash-completion vim git && \
     oc version
 
 WORKDIR /data
-COPY scripts /data
-
+COPY scripts /data/

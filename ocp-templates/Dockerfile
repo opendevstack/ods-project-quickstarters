@@ -2,13 +2,16 @@ FROM centos:7
 
 MAINTAINER "Andreas Bellmann" <andreas.bellmann@opitz-consulting.com>
 
+ARG OC_IP=localhost
+
 ENV OS_CLI_VERSION_MAJOR 3.4
 ENV OS_CLI_VERSION_MINOR 1.2-1
 
-COPY root.ca /root.ca
+RUN yum -y install openssl
+
 RUN ls /etc/ssl/certs/ && \
-        cat root.ca/ca-bundle.crt >> /etc/ssl/certs/ca-bundle.crt && \
-        cat root.ca/ca-bundle.trust.crt >> /etc/ssl/certs/ca-bundle.trust.crt && \
+        openssl s_client -connect ${OC_IP} < /dev/null | \
+        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.crt && \
         cat /etc/ssl/certs/ca-bundle.crt
 
 RUN yum -y install curl ca-certificates bash-completion vim git && \

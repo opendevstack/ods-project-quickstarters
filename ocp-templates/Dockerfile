@@ -9,7 +9,7 @@ ENV OS_CLI_VERSION_MINOR 1.2-1
 
 COPY root.ca /root.ca
 RUN ls /etc/ssl/certs/ && \
-        openssl s_client -connect $OC_IP < /dev/null | \
+        openssl s_client -connect ${OC_IP} < /dev/null | \
         sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.crt
         cat /etc/ssl/certs/ca-bundle.crt
 

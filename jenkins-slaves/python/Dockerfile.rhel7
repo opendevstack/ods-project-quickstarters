@@ -32,5 +32,5 @@ USER 1001
 ENV PATH=~/.local/bin:$PATH
 
 # Install packages
-RUN pip3.6 install --user requests boto3 argparse botocore awscli \
+RUN pip3.6 install --user requests boto3 argparse botocore awscli pycodestyle \
     && aws --version

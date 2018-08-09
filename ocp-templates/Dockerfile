@@ -11,7 +11,8 @@ RUN yum -y install openssl
 
 RUN ls /etc/ssl/certs/ && \
         openssl s_client -connect ${OC_IP} < /dev/null | \
-        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.trust.crt
+        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.trust.crt \
+		cat /etc/ssl/certs/ca-bundle.trust.crt
 
 RUN yum -y install curl ca-certificates bash-completion vim git && \
     curl -s -L https://mirror.openshift.com/pub/openshift-v3/clients/3.7.0-0.198.0/linux/oc.tar.gz -o /tmp/oc.tar.gz && \

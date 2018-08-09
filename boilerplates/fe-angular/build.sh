@@ -39,5 +39,7 @@ sudo docker tag \
   ${OCP_DOCKER_REGISTRY}/${JENKINS_SLAVE} ${JENKINS_SLAVE}
   
 sudo docker build \
+  --rm \
   -t ng:latest -t ng:$ANGULAR_CLI_VERSION \
-  --build-arg ANGULAR_CLI_VERSION=$ANGULAR_CLI_VERSION .
+  --build-arg ANGULAR_CLI_VERSION=$ANGULAR_CLI_VERSION \
+  .

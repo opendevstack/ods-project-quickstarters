@@ -6,8 +6,8 @@ MAINTAINER "Andras Gyacsok" <andras.gyacsok@boehringer-ingelheim.com>
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
-ARG PROJECT_HOME=/opt/app-root/src
-ARG HOME=${PROJECT_HOME}
+ARG projectHome=/opt/app-root/src
+ARG home=${projectHome}
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -42,29 +42,27 @@ RUN set -ex  && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
     # PROJECT
     mkdir /opt/app-root && \
-    useradd -ms /bin/bash -d ${PROJECT_HOME} -u 1001 prophet && \
+    useradd -ms /bin/bash -d ${projectHome} -u 1001 prophet && \
     # CLEAN UP
     apt-get autoremove -yqq --purge && \
     apt-get clean
 
 
-COPY run.sh ${PROJECT_HOME}
-COPY dist ${PROJECT_HOME}
+COPY run.sh ${projectHome}
+COPY dist ${projectHome}
 
-
-RUN chown -R prophet: ${PROJECT_HOME} && \
-    chgrp -R 0 ${PROJECT_HOME} && \
-    chmod -R g=u ${PROJECT_HOME} && \
+RUN chown -R prophet: ${projectHome} && \
+    chgrp -R 0 ${projectHome} && \
+    chmod -R g=u ${projectHome} && \
     chmod g=u /etc/passwd && \
-    chmod u+x ${PROJECT_HOME}/run.sh
+    chmod u+x ${projectHome}/run.sh
 
 EXPOSE 8080
 
-ENV HOME=${PROJECT_HOME}
-WORKDIR ${PROJECT_HOME}
+ENV HOME=${projectHome}
+WORKDIR ${projectHome}
 
 
 USER 1001
 
 CMD ["./run.sh"]
-

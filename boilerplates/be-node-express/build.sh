@@ -36,4 +36,8 @@ sudo docker pull \
 sudo docker tag \
   ${OCP_DOCKER_REGISTRY}/${JENKINS_SLAVE} ${JENKINS_SLAVE}
   
-sudo docker build -t yo:latest -t yo:$YO_VERSION --build-arg YO_VERSION=$YO_VERSION .
+sudo docker build \
+  --rm \
+  -t yo:latest -t yo:$YO_VERSION \
+  --build-arg YO_VERSION=$YO_VERSION \
+  .

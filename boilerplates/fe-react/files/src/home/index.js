@@ -8,7 +8,7 @@ class Home extends Component {
     return (
       <div id="home">
         <Container>
-          <h2 className="text-center">BI X Digital Lab</h2>
+          <h2 className="text-center">OpenDevStack</h2>
           <UserRepos/>
         </Container>
       </div>

@@ -6,19 +6,8 @@ metadata:
 objects:
 - apiVersion: v1
   data:
-    password: b3BlbmRldnN0YWNr=
-    username: b3BlbmRldnN0YWNr=
-  kind: Secret
-  metadata:
-    creationTimestamp: 2017-06-29T19:42:06Z
-    name: hive-user
-    namespace: ${PROJECT}-${ENV}
-  type: kubernetes.io/basic-auth
-- apiVersion: v1
-  data:
-  #you have to set a proper base64 encoded password and user
-    password: cnNoaW55
-    username: cnNoaW55
+    password: ${CROWD_RSHINY_REALM_PW}
+    username: ${CROWD_RSHINY_REALM_USER}
   kind: Secret
   metadata:
     creationTimestamp: 2017-06-29T19:42:06Z
@@ -96,18 +85,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: HIVE_URL
-            value: ${HIVE_URL}
-          - name: HIVE_USER
-            valueFrom:
-              secretKeyRef:
-                key: username
-                name: ${HIVE_USER_SECRET}
-          - name: HIVE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: ${HIVE_USER_SECRET}
           name: ${COMPONENT}
           ports:
           - containerPort: 8080
@@ -194,7 +171,6 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: shared-services
-
           name: 'nginx-authproxy:1.0'
       type: ImageChange
   status: {}
@@ -268,15 +244,7 @@ parameters:
   displayName: Environment
   name: ENV
   required: true
-- description: The Hive URL
-  displayName: hive Url
-  name: HIVE_URL
-  value: jdbc:hive2://192.168.56.31:10000/default
-- description: The Hive User secret containing user / pwd
-  displayName: hive user secret
-  name: HIVE_USER_SECRET
-  value: hive-user
-- description: Bitbucket url of app
+- description: The bitbucket URL  
   displayName: Bitbucket URL
   name: BITBUCKET_URL
   required: true
@@ -286,8 +254,16 @@ parameters:
 - description: Authantication Realm
   displayName: Name of Authantication Realm for users.
   name: CROWD_REALM_NAME
-  value: Shiny Test
+  value: CROWD_RSHINY_REALM_NAME
 - description: Crowd authentication service URL
   displayName: Crowd service URL
   name: CROWD_URL
-  value: http://192.168.56.31:8095/crowd
+  value: CROWD_URL
+- description: Authentication Crowd user
+  displayName: crowd user
+  name: CROWD_RSHINY_REALM_USER
+  value: CROWD_RSHINY_REALM_USER
+- description: Authentication Crowd pw
+  displayName: crowd pw
+  name: CROWD_RSHINY_REALM_PW
+  value: CROWD_RSHINY_REALM_PW

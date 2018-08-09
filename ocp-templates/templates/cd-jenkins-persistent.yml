@@ -33,6 +33,15 @@ objects:
     name: sonarqube
   type: opaque
 - apiVersion: v1
+  data:
+    password: '${NEXUS_PASSWORD}'
+  kind: Secret
+  metadata:
+    labels:
+      app: jenkins
+    name: nexus
+  type: opaque
+- apiVersion: v1
   kind: Route
   metadata:
     creationTimestamp: null
@@ -96,6 +105,13 @@ objects:
               value: '${JNLP_SERVICE_NAME}'
             - name: NEXUS_HOST
               value: '${NEXUS_URL}'
+            - name: NEXUS_USERNAME
+              value: '${NEXUS_USERNAME}'
+            - name: NEXUS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: nexus
             - name: JENKINS_HOME
               value: '${JENKINS_HOME}'
             - name: COPY_REFERENCE_FILE_LOG
@@ -108,7 +124,11 @@ objects:
                   key: auth-token
                   name: sonarqube
             - name: SHARED_LIBRARY_REPOSITORY
-              value: '${SHARED_LIBRARY_REPOSITORY}'
+              value: '${REPO_BASE}/${SHARED_LIBRARY_REPOSITORY}'
+            - name: DOCKER_REGISTRY
+              value: '${DOCKER_REGISTRY}'
+            - name: BITBUCKET_HOST
+              value: '${BITBUCKET_HOST}'
           image: ' '
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -217,7 +237,6 @@ parameters:
 - name: MEMORY_LIMIT
   value: 2Gi
 - name: VOLUME_CAPACITY
-  required: true
   value: 5Gi
 - name: NAMESPACE
   value: cd
@@ -229,6 +248,10 @@ parameters:
   value: CD_USER_PWD
 - name: NEXUS_URL
   value: NEXUS_URL
+- name: NEXUS_USERNAME
+  value: NEXUS_USERNAME
+- name: NEXUS_PASSWORD
+  value: NEXUS_PASSWORD
 - name: JENKINS_HOME
   value: /var/lib/jenkins
 - name: SONARQUBE_URL
@@ -236,6 +259,10 @@ parameters:
 - name: SONAR_SERVER_AUTH_TOKEN
   value: SONAR_SERVER_AUTH_TOKEN
 - name: SHARED_LIBRARY_REPOSITORY
-  value: opendevstack/jenkins-shared-library.git
+  value: opendevstack/ods-jenkins-shared-library.git
+- name: DOCKER_REGISTRY
+  value: DOCKER_REGISTRY
+- name: BITBUCKET_HOST
+  value: BITBUCKET_HOST
 - name: REPO_BASE
   value: REPO_BASE

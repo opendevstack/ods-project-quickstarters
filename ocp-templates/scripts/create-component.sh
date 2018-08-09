@@ -79,7 +79,7 @@ for devenv in dev test ; do
         else
             echo "ROUTE_NAME=${ROUTE_NAME}";
         fi
-        oc process cd//component-route PROJECT=${PROJECT} COMPONENT=${COMPONENT} ROUTE_NAME=${ROUTE_NAME} COMPONENT_DOMAIN=${COMPONENT}-${devenv}-${PROJECT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
+        oc process cd//component-route PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
     fi
 
     # create build pipelines

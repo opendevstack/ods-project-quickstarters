@@ -172,7 +172,7 @@ fi
 scriptdir=$(pwd)
 
 # find the right configuration to use based on the target API host passed parameter
-targetconfig=$(grep -H $OD_OCP_TARGET_HOST $scriptdir/migration_config/ocp_project_config_target_* | cut -d ':' -f1)
+targetconfig=$(grep -H $OD_OCP_TARGET_HOST $scriptdir/migration_config/ocp_project_config_target | cut -d ':' -f1)
 
 if [[ -f "$targetconfig" ]]; then
 	echo "> sourcing env target config from $targetconfig"
@@ -242,14 +242,20 @@ fi
 # find the right configuration based on the API host source config
 if [[ -f "ocp_config" ]]; then
 	sourceHost=$(grep export ocp_config | cut -d '=' -f2)
-	sourceconfig=$(grep -H $sourceHost $scriptdir/migration_config/ocp_project_config_source_* | cut -d ':' -f1)
+	sourceconfig=$(grep -H $sourceHost $scriptdir/migration_config/ocp_project_config_source | cut -d ':' -f1)
+	
+	echo "sourcehost : $sourceHost sourceconfig : $sourceconfig"
+	
 	if [[ -f "$sourceconfig" ]]; then
 		echo "> sourcing env source config from $sourceconfig"
 		source $sourceconfig
+	else 
+		echo "Cannot find $sourceconfig aborting"
+		exit  1
 	fi
 else
-	echo "> sourcing env source config from BI X cluster config as no other config was found"
-	source $scriptdir/migration_config/ocp_project_config_source_OD
+	echo "ERROR: no config directory was found"
+	exit 1
 fi
 
 OD_PRJ_ADMINS=$OD_PRJ_ADMINS,$OD_OCP_CD_SA_TARGET

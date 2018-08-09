@@ -99,8 +99,12 @@ fi
 
 for devenv in dev test ; do
 	oc project ${PROJECT}-${devenv}
+	echo "deleting component environment"
     oc process cd//component-environment PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
-    oc process cd//component-route PROJECT=${PROJECT} COMPONENT=${COMPONENT} ROUTE_NAME=${ROUTE_NAME} COMPONENT_DOMAIN=${COMPONENT}-${devenv}-${PROJECT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
+	echo "deleting route"
+    oc process cd//component-route PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
+	echo "deleting cd pipeline"
     oc process cd//component-pipeline PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} BITBUCKET_REPO=${BITBUCKET_REPO} | oc delete -n ${PROJECT}-cd -f-
-    oc process cd//bc-${BUILD_CONFIG:-docker} PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} NEXUS_HOST=x | oc delete -n ${PROJECT}-${devenv} -f-
+	echo "deleting environment bc"
+    oc process cd//bc-${BUILD_CONFIG:-docker} PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
 done

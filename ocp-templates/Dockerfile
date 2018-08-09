@@ -10,9 +10,10 @@ ENV OS_CLI_VERSION_MINOR 1.2-1
 RUN yum -y install openssl
 
 RUN ls /etc/ssl/certs/ && \
-        openssl s_client -connect ${OC_IP} --insecure-skip-tls-verify < /dev/null | \
-        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.crt && \
-        cat /etc/ssl/certs/ca-bundle.crt
+        openssl s_client -connect ${OC_IP} < /dev/null | \
+        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> ca-bundle.crt
+
+COPY ca-bundle.crt /etc/ssl/certs/ca-bundle.crt 
 
 RUN yum -y install curl ca-certificates bash-completion vim git && \
     curl -s -L https://mirror.openshift.com/pub/openshift-v3/clients/3.7.0-0.198.0/linux/oc.tar.gz -o /tmp/oc.tar.gz && \

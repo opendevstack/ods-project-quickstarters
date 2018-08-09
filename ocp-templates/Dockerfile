@@ -26,5 +26,4 @@ RUN yum -y install curl ca-certificates bash-completion vim git && \
     oc version
 
 WORKDIR /data
-COPY scripts /data
-
+COPY scripts /data/

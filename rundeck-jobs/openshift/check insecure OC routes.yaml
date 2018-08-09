@@ -1,5 +1,4 @@
-- defaultTab: summary
-  description: check OCP for insecure routes
+- description: check OCP for insecure routes
   executionEnabled: true
   group: openshift
   id: f7ef4a51-6417-4b97-a658-f85527185447
@@ -12,7 +11,6 @@
         attachLog: true
         recipients: administrator@opendevstack.org
         subject: OpenDevsStack OCP security alert!
-  notifyAvgDurationThreshold: null
   options:
   - description: the openshift token to access OpenDevsStack OCP
     name: openshift_api_token

@@ -1,5 +1,4 @@
-- defaultTab: summary
-  description: Export OC yaml artifacts of a given namespace to git
+- description: Export OC yaml artifacts of a given namespace to git
   executionEnabled: true
   group: openshift
   id: 099c320b-f2bc-4152-93f3-eb49be941d30

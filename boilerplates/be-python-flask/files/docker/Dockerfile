@@ -1,50 +1,70 @@
-# This image provides a Python 2.7 environment you can use to run your Python
-# applications.
-FROM openshift/base-centos7
+FROM python:3.7.0-slim
 
 MAINTAINER "Andras Gyacsok" <andras.gyacsok@boehringer-ingelheim.com>
 
+# Never prompts the user for choices on installation/configuration of packages
+ENV DEBIAN_FRONTEND noninteractive
+ENV TERM linux
+
+ARG PROJECT_HOME=/opt/app-root/src
+ARG HOME=${PROJECT_HOME}
+
+# Define en_US.
+ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_MESSAGES en_US.UTF-8
+
+RUN set -ex  && \
+    # DEPENDENCIES
+    buildDeps=' \
+        build-essential \
+        python3-dev \
+        python3-pip \
+        zlib1g-dev \
+        automake \
+        make \
+        libtool \
+        m4 \
+        automake \
+        gettext \
+    ' \
+    apt-get update -yqq && \
+    apt-get upgrade -yqq && \
+    apt-get install -yqq --no-install-recommends \
+        $buildDeps \
+        apt-utils \
+        locales \
+        pkg-config && \
+    sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen && \
+    locale-gen && \
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
+    # PROJECT
+    mkdir /opt/app-root && \
+    useradd -ms /bin/bash -d ${PROJECT_HOME} -u 1001 prophet && \
+    # CLEAN UP
+    apt-get autoremove -yqq --purge && \
+    apt-get clean
+
+
+COPY run.sh ${PROJECT_HOME}
+COPY dist ${PROJECT_HOME}
+
+
+RUN chown -R prophet: ${PROJECT_HOME} && \
+    chgrp -R 0 ${PROJECT_HOME} && \
+    chmod -R g=u ${PROJECT_HOME} && \
+    chmod g=u /etc/passwd && \
+    chmod u+x ${PROJECT_HOME}/run.sh
+
 EXPOSE 8080
 
-ENV PYTHON_VERSION=2.7 \
-    PATH=$HOME/.local/bin/:$PATH \
-    PYTHONUNBUFFERED=1 \
-    PYTHONIOENCODING=UTF-8 \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    PIP_NO_CACHE_DIR=off
+ENV HOME=${PROJECT_HOME}
+WORKDIR ${PROJECT_HOME}
 
-RUN yum -y update
-
-RUN yum install -y centos-release-scl && \
-    INSTALL_PKGS="libjpeg-turbo libjpeg-turbo-devel python27 python27-python-devel python27-python-setuptools \
-	python27-python-pip nss_wrapper httpd24 httpd24-httpd-devel httpd24-mod_ssl httpd24-mod_auth_kerb \
-        httpd24-mod_ldap httpd24-mod_session atlas-devel gcc-gfortran libffi-devel libtool-ltdl" && \
-    yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    # Remove centos-logos (httpd dependency, ~20MB of graphics) to keep image
-    # size smaller.
-    rpm -e --nodeps centos-logos && \
-    yum clean all -y
-
-# Create a Python virtual environment for use by any application to avoid
-# potential conflicts with Python packages preinstalled in the main Python
-# installation.
-RUN source scl_source enable python27 && \
-   virtualenv /opt/app-root
-
-RUN unset BASH_ENV PROMPT_COMMAND ENV && \
-    source scl_source enable python27 && \
-    source /opt/app-root/bin/activate
-
-COPY dist /opt/app-root/src/
-COPY run.sh /opt/app-root/src/
-
-RUN chown -R 1001:0 /opt/app-root && \
-    chmod -R ug+rwx /opt/app-root
 
 USER 1001
 
-WORKDIR /opt/app-root/src/
-
 CMD ["./run.sh"]
+

@@ -10,8 +10,8 @@ ENV OS_CLI_VERSION_MINOR 1.2-1
 RUN yum -y install openssl 
 RUN yum -y install gnutls-bin 
 
-gnutls-cli --print-cert ${OC_IP} </dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.trust.crt
-gnutls-cli --print-cert ${OC_IP} </dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.crt
+RUN gnutls-cli --print-cert ${OC_IP} </dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.trust.crt
+RUN gnutls-cli --print-cert ${OC_IP} </dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.crt
 # RUN \
 #        openssl s_client -connect ${OC_IP} < /dev/null | \
 #        sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /etc/ssl/certs/ca-bundle.crt && \

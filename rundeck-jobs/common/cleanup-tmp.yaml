@@ -1,4 +1,4 @@
-- description: remove all tmp directories older than specified days
+- description: remove all tmp directories & docker containers running older than specified days
   executionEnabled: true
   group: common
   id: 5cc8e676-b38d-4f2c-82b4-59ea2d7c0261
@@ -33,10 +33,10 @@
 
         echo "Pruning unused Docker data"
         sudo docker system prune --force
+
+        echo "Pruning running docker containers"
+        docker ps | grep 'day[s]* ago' | awk '{print $1}' | xargs docker rm -f
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: 5cc8e676-b38d-4f2c-82b4-59ea2d7c0261
 

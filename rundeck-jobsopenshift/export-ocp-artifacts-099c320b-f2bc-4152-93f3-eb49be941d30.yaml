@@ -1,5 +1,4 @@
-- defaultTab: summary
-  description: Export OC yaml artifacts of a given namespace to git
+- description: Export OC yaml artifacts of a given namespace to git
   executionEnabled: true
   group: openshift
   id: 099c320b-f2bc-4152-93f3-eb49be941d30
@@ -36,7 +35,7 @@
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project
       exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/ocp-templates && git checkout -b production origin/production
-    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
+    - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
     - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker run --rm oc /bin/bash -c "./export_ocp_project_metadata.sh -h ${globals.openshift_apihost} -t ${option.openshift_api_token} -p ${option.project-prefix} -e ${option.project-environments} -g ${option.git_uri}"
     keepgoing: false
     strategy: node-first

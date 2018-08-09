@@ -1,9 +1,8 @@
-- defaultTab: summary
-  description: verifies the global settings (nexus host / OC token / bitbucket)
+- description: verifies the global settings (nexus host / OC token / bitbucket)
   executionEnabled: true
   group: common
   id: ec883e36-6ede-4017-8750-1aa0014cc1e3
-  loglevel: INFO
+  loglevel: DEBUG
   name: verify global rundeck settings
   nodeFilterEditable: false
   options:
@@ -22,7 +21,7 @@
     - description: clone oc script project
       exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && ls -la && cd ocp-templates && git checkout -b production origin/production
     - description: create docker container for openshift client
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
     - description: OC login test
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c "oc login ${globals.openshift_apihost} --token=${option.openshift_api_token}"
     - description: verify nexus host availability

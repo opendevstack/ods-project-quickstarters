@@ -1,11 +1,10 @@
-- defaultTab: summary
-  description: 'creates an openshift component (for project bhw and component bhw-be:
-    bhw-be)'
+- description: 'creates an openshift rshiny component (for project bhw and component
+    bhw-be: bhw-be)'
   executionEnabled: true
   group: openshift
-  id: d905990c-3b74-4a27-9d49-8a63c0a6989f
+  id: ba36276e-5018-47b7-8f3f-9ec8e648d04f
   loglevel: INFO
-  name: create-component
+  name: create-rshiny
   nodeFilterEditable: false
   options:
   - description: the global project id (i.e. bhw for basic hello world)
@@ -14,12 +13,6 @@
   - description: the id of the component to create
     name: component_id
     required: true
-  - description: create a route for a service exposed by this component (true/false)
-    name: route
-    value: 'false'
-    values:
-    - 'false'
-    - 'true'
   - description: openshift token to log on to openshift
     name: openshift_api_token
     secure: true
@@ -39,10 +32,10 @@
     - description: clone oc script project
       exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/ocp-templates && git checkout -b production origin/production
     - description: create docker container for openshift client
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
-    - description: create openshift components within projects
-      exec: echo "Token --> ${option.openshift_api_token}" && cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./create-component.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -r ${option.route} -ne "${globals.nexus_host}"'
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
+    - description: create openshift rshiny app cd project
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./create-rshiny-app.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}"'
     keepgoing: false
     strategy: node-first
-  uuid: d905990c-3b74-4a27-9d49-8a63c0a6989f
+  uuid: ba36276e-5018-47b7-8f3f-9ec8e648d04f
 

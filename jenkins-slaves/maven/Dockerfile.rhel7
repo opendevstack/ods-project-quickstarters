@@ -43,7 +43,7 @@ ADD gradlew /tmp/gradlew
 RUN mkdir -p /tmp/gradle
 ADD gradle/* /tmp/gradle  
 
-RUN gradlew -version
+RUN /tmp/gradlew -version
 
 RUN chown -R 1001:0 $HOME && \
     chmod -R g+rw $HOME

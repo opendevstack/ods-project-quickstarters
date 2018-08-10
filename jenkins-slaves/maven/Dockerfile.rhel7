@@ -40,9 +40,9 @@ ADD ./contrib/settings.xml $HOME/.m2/
 
 # install gradle ..
 ADD gradlew /tmp/gradlew
-RUN mkdir -p /tmp/gradle
-ADD gradle/* /tmp/gradle/
-RUN ls /tmp/gradle/  
+RUN mkdir -p /tmp/gradle/wrapper
+ADD gradle/* /tmp/gradle/wrapper
+RUN ls /tmp/gradle/wrapper 
 
 RUN /tmp/gradlew -version
 

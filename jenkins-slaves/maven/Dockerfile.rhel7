@@ -39,6 +39,10 @@ ADD contrib/bin/configure-slave /usr/local/bin/configure-slave
 ADD ./contrib/settings.xml $HOME/.m2/
 
 # install gradle ..
+ADD gradlew /tmp/gradlew
+RUN mkdir -p /tmp/gradle
+ADD gradle/* /tmp/gradle  
+
 RUN gradlew -version
 
 RUN chown -R 1001:0 $HOME && \

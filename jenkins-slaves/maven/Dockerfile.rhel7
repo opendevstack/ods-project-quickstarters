@@ -15,7 +15,9 @@ LABEL com.redhat.component="jenkins-slave-maven-rhel7-docker" \
 ENV MAVEN_VERSION=3.3 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
-    PROMPT_COMMAND=". /usr/local/bin/scl_enable"
+    PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
+	HOME=/home/jenkins
+	
 
 # Install Maven
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
@@ -35,6 +37,14 @@ RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
 ADD contrib/bin/scl_enable /usr/local/bin/scl_enable
 ADD contrib/bin/configure-slave /usr/local/bin/configure-slave
 ADD ./contrib/settings.xml $HOME/.m2/
+
+# install gradle ..
+ADD gradlew /tmp/gradlew
+RUN mkdir -p /tmp/gradle/wrapper
+ADD gradle/* /tmp/gradle/wrapper
+RUN ls /tmp/gradle/wrapper 
+
+RUN /tmp/gradlew -version
 
 RUN chown -R 1001:0 $HOME && \
     chmod -R g+rw $HOME

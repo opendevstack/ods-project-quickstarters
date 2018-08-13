@@ -1,5 +1,4 @@
-- defaultTab: summary
-  description: 'creates an openshift rshiny component (for project bhw and component
+- description: 'creates an openshift rshiny component (for project bhw and component
     bhw-be: bhw-be)'
   executionEnabled: true
   group: openshift

@@ -1,5 +1,4 @@
-- defaultTab: summary
-  description: verifies the global settings (nexus host / OC token / bitbucket)
+- description: verifies the global settings (nexus host / OC token / bitbucket)
   executionEnabled: true
   group: common
   id: ec883e36-6ede-4017-8750-1aa0014cc1e3

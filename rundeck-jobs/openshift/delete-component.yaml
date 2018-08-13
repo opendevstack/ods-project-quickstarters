@@ -1,5 +1,4 @@
-- defaultTab: summary
-  description: 'deletes an openshift component (for project bhw and component bhw-be:
+- description: 'deletes an openshift component (for project bhw and component bhw-be:
     bhw-be)'
   executionEnabled: true
   group: openshift

@@ -45,3 +45,6 @@ rm $SCRIPT_DIR/files/docker/Dockerfile.bak
 echo "copy custom files & fixes from quickstart to generated project"
 cp -rv $SCRIPT_DIR/files/. .
 cp -r $SCRIPT_DIR/fix/. src/
+
+echo "adding directories 'lib' and 'docker' to nyc exlude list to fix coverage test issue"
+sed -i 's/--reporter=text/--exclude=\\"docker\\" --exclude=\\"lib\\" --reporter=text/g' package.json

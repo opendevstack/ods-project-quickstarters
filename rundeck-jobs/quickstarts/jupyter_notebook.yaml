@@ -41,9 +41,6 @@
         name: prepare-continuous-integration-rshiny
         nodeStep: 'true'
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: a7b930b2-d125-48ce-9997-9643faa9cdd0
 

@@ -8,14 +8,14 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@latest', retriever: modernSCM(
+library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-maven",
+  image: "${dockerRegistry}/cd/jenkins-slave-python",
   projectId: projectId,
   componentId: componentId,
   verbose: true,
@@ -33,6 +33,11 @@ def stageBuild(def context) {
   stage('Build') {
     withEnv(["TAGVERSION=${context.tagversion}"]) {
       sh "python src/tests.py"
+      // PEP8
+      sh '''
+         pycodestyle --show-source --show-pep8 src/*
+         pycodestyle --statistics -qq src/*
+      '''
     }
     sh "cp -r src docker/dist"
   }

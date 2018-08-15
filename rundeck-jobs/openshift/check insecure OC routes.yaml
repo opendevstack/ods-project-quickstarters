@@ -37,12 +37,9 @@
     - description: clone repo and execute script
       exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/ocp-templates && git checkout -b production origin/production
     - description: build container
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
     - exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker run --rm oc /bin/bash -c "ls -ls && ./check_ocp_secure_routes.sh -h ${globals.openshift_apihost} -t ${option.openshift_api_token} -p ${option_project_names}"
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: f7ef4a51-6417-4b97-a658-f85527185447
 

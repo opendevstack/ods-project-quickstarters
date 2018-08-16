@@ -16,9 +16,11 @@ ENV MAVEN_VERSION=3.3 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
-	HOME=/home/jenkins \
+    HOME=/home/jenkins \
     GRADLE_USER_HOME=/home/jenkins/.gradle
-	
+
+#set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/jre
 
 # Install Maven
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
@@ -32,6 +34,13 @@ RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     rpm -V   rh-maven33 && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
+
+#Import base domain wildcard certificate
+RUN echo $JAVA_HOME
+RUN cat /tmp/oc_app.crt
+RUN $JAVA_HOME/bin/keytool -storepasswd -new mysecretpassword -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit && \
+    echo "yes" | $JAVA_HOME/bin/keytool -import -trustcacerts -file /tmp/oc_app.crt -alias oc_app -keystore $JAVA_HOME/lib/security/cacerts -storepass mysecretpassword && \
+    echo "yes"
 
 # When bash is started non-interactively, to run a shell script, for example it
 # looks for this variable and source the content of this file. This will enable

@@ -21,7 +21,6 @@ ENV MAVEN_VERSION=3.3 \
 
 #set JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/jre
->>>>>>> c6ed85f538382d38c523847b5e0ae5429d4e777f
 
 # Install Maven
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \

@@ -17,6 +17,8 @@
     commands:
     - description: echo input parameters
       exec: 'echo openshift_api_token: bb${option.openshift_api_token}bb host: ${globals.openshift_apihost}'
+    - description: Pull and tag jenkins slave
+      exec: sudo docker pull ${globals.openshift_dockerregistry}/cd/jenkins-slave-base && sudo docker tag ${globals.openshift_dockerregistry}/cd/jenkins-slave-base cd/jenkins-slave-base:latest
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project

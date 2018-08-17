@@ -37,4 +37,8 @@ sudo docker pull \
 sudo docker tag \
   ${OCP_DOCKER_REGISTRY}/${JENKINS_SLAVE} ${JENKINS_SLAVE}
   
-sudo docker build -t springboot:latest -t springboot:$SPRING_CLI_VERSION --build-arg SPRING_CLI_VERSION=$SPRING_CLI_VERSION .
+sudo docker build \
+  --rm \
+  -t springboot:latest -t springboot:$SPRING_CLI_VERSION \
+  --build-arg SPRING_CLI_VERSION=$SPRING_CLI_VERSION \
+  .

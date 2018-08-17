@@ -1,4 +1,5 @@
-- description: remove all tmp directories & docker containers running older than specified days
+- defaultTab: summary
+  description: remove all tmp directories & docker containers running older than specified days
   executionEnabled: true
   group: common
   id: 5cc8e676-b38d-4f2c-82b4-59ea2d7c0261

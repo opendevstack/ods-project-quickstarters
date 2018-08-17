@@ -1,4 +1,5 @@
-- description: 'Deletes the openshift projects (for bhw: bhw-cd, bhw-dev, bhw-test)'
+- defaultTab: summary
+  description: 'Deletes the openshift projects (for bhw: bhw-cd, bhw-dev, bhw-test)'
   executionEnabled: true
   group: openshift
   id: 95593acc-3a8d-44b5-bf62-2ead5b0538bd

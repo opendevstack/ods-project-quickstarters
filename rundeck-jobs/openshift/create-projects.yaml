@@ -1,4 +1,5 @@
-- description: 'creates the openshift projects (for bhw: bhw-cd, bhw-dev, bhw-test)'
+- defaultTab: summary
+  description: 'creates the openshift projects (for bhw: bhw-cd, bhw-dev, bhw-test)'
   executionEnabled: true
   group: openshift
   id: 00f767ef-347f-480e-8ad3-bf2aed3abf5d

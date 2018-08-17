@@ -16,7 +16,7 @@ ENV MAVEN_VERSION=3.3 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
-	HOME=/home/jenkins \
+    HOME=/home/jenkins \
     GRADLE_USER_HOME=/home/jenkins/.gradle
 
 #set JAVA_HOME

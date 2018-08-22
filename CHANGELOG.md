@@ -1,10 +1,6 @@
 # Changelog
 
-## 0.1.0 (2018-07-27)
-
-Initial release.
-
-## 0.2.0RC *current master*
+## [Unreleased]
 
 1. Overall changes in architecture
    1. Quickstarter build containers (located in the subdirs of https://github.com/opendevstack/ods-project-quickstarters/tree/master/boilerplates) inherit from corresponding jenkins build slaves now rather than replicating the setup
@@ -20,6 +16,13 @@ Initial release.
 1. Others (bugfixes)
    1. Nodejs 8 quickstarter failed on npm run coverage (#22)
    1. Rundeck containers not cleaned up (#16, #17)
+
+## [0.1.0] - 2018-07-27
+
+Initial release.
+
+[Unreleased]: https://github.com/opendevstack/ods-project-quickstarters/compare/0.1.0...HEAD
+
 
 
 

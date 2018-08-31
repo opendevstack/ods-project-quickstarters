@@ -471,7 +471,7 @@ do
 		echo " --> checking for referenced project image - stream: $ref_imagestreamWithRegistry"
 		
 		# dont do any import on shared images from shared-image namespace and from CD
-		if [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ $ref_imagestreamOwningProject != *shared-services* ]] && [[ $ref_imagestreamOwningProject != *cd* ]]; then 		
+		if [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ $ref_imagestreamOwningProject != "shared-services" ]] && [[ $ref_imagestreamOwningProject != "cd" ]]; then 		
 			
 			echo "Importing remote images ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} into ${ref_imagestreamName}"
 			oc import-image ${ref_imagestreamName} --from=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} --confirm

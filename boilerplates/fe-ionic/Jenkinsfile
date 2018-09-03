@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -9,7 +8,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@latest', retriever: modernSCM(
+library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
@@ -19,16 +18,14 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true
 ) { context ->
   stageBuild(context)
   stageUnitTest(context)
   stageLint(context)
   stageScanForSonarqube(context)
-  stageUploadToNexus(context)
   stageCreateOpenshiftEnvironment(context)
-  stageUpdateOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
   stageTriggerAllBuilds(context)
 }
@@ -44,7 +41,7 @@ def stageBuild(def context) {
         sh "npm run ionic:build"
       }
     }
-    archiveBuild(context)
+    sh "cp -r www docker/dist"
   }
 }
 
@@ -58,16 +55,4 @@ def stageLint(def context) {
   stage('Lint') {
     sh "npm run lint"
   }
-}
-
-def archiveBuild(def context) {
-  def buildTimestamp = new Date().format("dd.MM.yyyy-HH:mm", TimeZone.getTimeZone('UTC'))
-  writeFile file: 'dist/version.json', text: """
-            {
-              \"tagVersion\": \"${context.tagversion}\",
-              \"gitCommit\": \"${context.gitCommit}\",
-              \"buildTimestamp\": \"${buildTimestamp}\"
-            }"""
-  def distFile = "${context.componentId}-${context.tagversion}.tar.gz"
-  sh "tar czvf ${distFile} -C www ."
 }

@@ -45,9 +45,6 @@
         name: prepare-continuous-integration
         nodeStep: 'true'
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: a86d6f06-cedc-4c16-a92c-5ca48e400c3a
 

@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -9,7 +8,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@latest', retriever: modernSCM(
+library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
@@ -19,14 +18,12 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-scala",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)
-  stageUploadToNexus(context)
   stageCreateOpenshiftEnvironment(context)
-  stageUpdateOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
   stageTriggerAllBuilds(context)
 }
@@ -36,19 +33,7 @@ def stageBuild(def context) {
     withEnv(["TAGVERSION=${context.tagversion}"]){
       sh "sbt test"
     }
-    archiveBuild(context)
+    sh "sbt assembly"
+    sh "cp /tmp/sclapp.jar docker/sclapp.jar"
   }
-}
-
-def stageUploadToNexus(def context) {
-  stage('Upload to Nexus') {
-    def distFile = "${context.componentId}-${context.tagversion}.jar"
-    sh "curl -u ${context.nexusUsername}:${context.nexusPassword} --upload-file ${distFile} ${context.nexusHost}/repository/candidates/${context.groupId.replace('.', '/')}/${context.componentId}/${context.tagversion}/${distFile}"
-  }
-}
-
-def archiveBuild(def context) {
-  def distFile = "${context.componentId}-${context.tagversion}.jar"
-  sh "sbt assembly"
-  sh "mv /tmp/sclapp.jar ${distFile}"
 }

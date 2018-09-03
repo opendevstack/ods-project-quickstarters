@@ -37,4 +37,8 @@ sudo docker pull \
 sudo docker tag \
   ${OCP_DOCKER_REGISTRY}/${JENKINS_SLAVE} ${JENKINS_SLAVE}
   
-sudo docker build -t scala:latest -t scala:$SCALA_VERSION --build-arg SCALA_VERSION=$SCALA_VERSION .
+sudo docker build \
+  --rm \
+  -t scala:latest -t scala:$SCALA_VERSION \
+  --build-arg SCALA_VERSION=$SCALA_VERSION \
+  .

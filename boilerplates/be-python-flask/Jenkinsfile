@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -9,25 +8,23 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@latest', retriever: modernSCM(
+library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-maven",
+  image: "${dockerRegistry}/cd/jenkins-slave-python",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true,
   openshiftBuildTimeout: 25
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)
-  stageUploadToNexus(context)
   stageCreateOpenshiftEnvironment(context)
-  stageUpdateOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
   stageTriggerAllBuilds(context)
 }
@@ -36,12 +33,12 @@ def stageBuild(def context) {
   stage('Build') {
     withEnv(["TAGVERSION=${context.tagversion}"]) {
       sh "python src/tests.py"
+      // PEP8
+      sh '''
+         pycodestyle --show-source --show-pep8 src/*
+         pycodestyle --statistics -qq src/*
+      '''
     }
-    archiveBuild(context)
+    sh "cp -r src docker/dist"
   }
-}
-
-def archiveBuild(def context) {
-  def distFile = "${context.componentId}-${context.tagversion}.tar.gz"
-  sh "tar -czf ${distFile} src"
 }

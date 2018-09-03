@@ -1,8 +1,9 @@
-- description: verifies the global settings (nexus host / OC token / bitbucket)
+- defaultTab: summary
+  description: verifies the global settings (nexus host / OC token / bitbucket)
   executionEnabled: true
   group: common
   id: ec883e36-6ede-4017-8750-1aa0014cc1e3
-  loglevel: DEBUG
+  loglevel: INFO
   name: verify global rundeck settings
   nodeFilterEditable: false
   options:
@@ -16,12 +17,14 @@
     commands:
     - description: echo input parameters
       exec: 'echo openshift_api_token: bb${option.openshift_api_token}bb host: ${globals.openshift_apihost}'
+    - description: Pull and tag jenkins slave
+      exec: sudo docker pull ${globals.openshift_dockerregistry}/cd/jenkins-slave-base && sudo docker tag ${globals.openshift_dockerregistry}/cd/jenkins-slave-base cd/jenkins-slave-base:latest
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project
       exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && ls -la && cd ocp-templates && git checkout -b production origin/production
     - description: create docker container for openshift client
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build -t oc .
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
     - description: OC login test
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c "oc login ${globals.openshift_apihost} --token=${option.openshift_api_token}"
     - description: verify nexus host availability
@@ -31,9 +34,6 @@
     - description: verify openshift registry access
       exec: sudo docker login -u ${globals.openshift_user} -p ${option.openshift_api_token} ${globals.openshift_dockerregistry}
     keepgoing: false
-    pluginConfig:
-      WorkflowStrategy:
-        node-first: null
     strategy: node-first
   uuid: ec883e36-6ede-4017-8750-1aa0014cc1e3
 

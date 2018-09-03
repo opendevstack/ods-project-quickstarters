@@ -1,6 +1,5 @@
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
-def final groupId = '@group_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
@@ -9,7 +8,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@latest', retriever: modernSCM(
+library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
@@ -19,7 +18,6 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
   projectId: projectId,
   componentId: componentId,
-  groupId: groupId,
   verbose: true
 ) { context ->
   stageTest(context)

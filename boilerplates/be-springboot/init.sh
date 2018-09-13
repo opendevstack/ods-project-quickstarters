@@ -86,8 +86,8 @@ sed -i.bak 's/mavenCentral()/maven () {\
 
 sed -i.bak "s/\(apply plugin: 'java'\)/\1\napply plugin: 'maven'\napply plugin: 'jacoco'/g" build.gradle
 
-sed -i.bak 's|'$COMPONENT'-${version}-${classifier}.${extension}"|app.jar"\
-    destinationDir  file("$buildDir\/..\/docker")|g' build.gradle
+# by default no jar task in there .. we need to add it.
+echo -e "jar {\n    archiveName     "app.jar"\n    destinationDir  file("$buildDir/../docker")\n}" >> test.gradle
 
 rm build.gradle.bak
 

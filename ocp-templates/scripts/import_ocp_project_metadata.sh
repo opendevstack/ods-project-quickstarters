@@ -463,35 +463,20 @@ do
 		eval ${occomm}
 		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $dc_config_json
 
-		# patch based on remote or build based image! - if the image stream does not exist in the project we assume its foreign.. 
-		# we have to take the original dc - as we rewrite namespaces
-		ref_imagestreamWithRegistry=$( cat $dc_config_json | grep image: | sed -e 's/ //g' | cut -d ':' -f2,3 | cut -d '@' -f1)
+		# grab the stream data so we can import later 
+		ref_imagestreamWithRegistry=$( cat $dc_config_json | grep image: | sed -e 's/ //g' | cut -d ':' -f2,3 | cut -d '@' -f1  | head -1)
 		ref_imagestreamOwningProject=$(echo $ref_imagestreamWithRegistry | cut -d '/' -f2)
 		ref_imagestreamName=$(echo $ref_imagestreamWithRegistry | cut -d '/' -f3)
 		
 		echo " --> checking for referenced project image - stream: $ref_imagestreamWithRegistry"
 		
-		# add the internal cname as well to the check
-		if  [[ "$ref_imagestreamWithRegistry" == *"$OD_OCP_DOCKER_REGISTRY_SOURCE_IP"* || "$ref_imagestreamWithRegistry" == *"$OD_OCP_DOCKER_REGISTRY_SOURCE_INTERNAL_HOST"* ]] && [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [ ! "$ocp_proj_namespace_suffix" == "cd" ]; then 
-			echo "Replacing internal $curr_ocp_namespace image stream - with OD registry reference"
+		# dont do any import on shared images from shared-image namespace and from CD
+		if [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ $ref_imagestreamOwningProject != "shared-services" ]] && [[ $ref_imagestreamOwningProject != "cd" ]]; then 		
 			
-			imagetag=latest
-			# patch authproxy to version 1
-			if [[ "$ref_imagestreamWithRegistry" == *"shared-services/nginx-authproxy"* ]]; then
-				imagetag=${OD_AUTHPROXY_VERSION}
-			fi
-			# patch neo to version 1
-			if [[ "$ref_imagestreamWithRegistry" == *"shared-services/neo4j_325_custom"* ]]; then
-				imagetag=${OD_AUTHPROXY_VERSION}
-			fi			
-			
-			oc patch dc $artifactName -p '{"spec": {"template": {"spec": {"containers": [ {"name": "'"$artifactName"'", "image": "'"$OD_OCP_DOCKER_REGISTRY_SOURCE_HOST"'/'"$ref_imagestreamOwningProject"'/'"$ref_imagestreamName"':'"$imagetag"'"}]}}}}'
-		
-			# this will ensure deployment starts .. the image trigger points to a local non filled image stream that will not be filled, 
-			# hence remove that trigger
-			oc patch dc $artifactName -p '{"spec": {"triggers": [{"type": "ConfigChange"}]}}'
+			echo "Importing remote images ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} into ${ref_imagestreamName}"
+			oc import-image ${ref_imagestreamName} --from=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} --confirm
 		else
-		    echo "Leaving referenced image $ref_imagestreamWithRegistry as is! $OD_OCP_DOCKER_REGISTRY_SOURCE_IP $ocp_proj_namespace_suffix"
+		    echo "Leaving referenced image $ref_imagestreamWithRegistry as is!"
 		fi
 			
         echo

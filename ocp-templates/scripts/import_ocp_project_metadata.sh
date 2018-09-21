@@ -353,9 +353,9 @@ do
 		else
 			if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]]; then 
 				echo "Creating OCP OD pull secret"
-				oc create secret docker-registry OD-ocp  --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
-				oc secrets link deployer OD-ocp --for=pull                                   
-				oc secrets link default OD-ocp --for=pull
+				oc create secret docker-registry odocp  --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
+				oc secrets link deployer odocp --for=pull                                   
+				oc secrets link default odocp --for=pull
 			else
 				echo "OCP OD Token not set - assuming local build"
 			fi

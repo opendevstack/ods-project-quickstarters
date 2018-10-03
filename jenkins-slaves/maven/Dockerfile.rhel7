@@ -26,8 +26,7 @@ ENV JAVA_HOME=/usr/lib/jvm/jre
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum-config-manager --disable epel >/dev/null || : && \
     yum install -y wget && \
-    yum install -y java-1.8.0-openjdk-1.8.0.171-8.b10.el7_5.x86_64 && \
-    yum install -y java-1.8.0-openjdk-devel && \
+	yum install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 && \
     alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }') && \
 	wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo && \
 	sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo && \

@@ -14,12 +14,12 @@ RUN set -x \
     && curl -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
     && tar xzf Python-${PYTHON_VERSION}.tgz \
     && cd Python-${PYTHON_VERSION} \
-    && ./configure \
+    && ./configure --enable-optimizations --with-ensurepip=install \
     && make altinstall \
     && cd .. \
     && rm -rf Python-${Python_VERSION} \
 #    && yum remove -y $INSTALL_PKGS \
-    && python -V
+    && python3 -V
 
 # Upgrade PIP
 RUN pip3 install --upgrade pip \

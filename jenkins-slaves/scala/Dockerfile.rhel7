@@ -57,6 +57,7 @@ RUN cat $HOME/.sbt/repositories | sed -e "s|NEXUS_HOST|$NEXUS_HOST|g" > $HOME/.s
     sed -i.bak -e "s|NEXUS_PASSWORD|$NEXUS_PASSWORD|g" $HOME/.sbt/credentials && \
     rm $HOME/.sbt/credentials.bak && \
     cd /tmp/scala && \
+    . /tmp/set_java_proxy.sh && \
 	sbt -v run || true && \
 	cat /home/jenkins/.sbt/boot/update.log || true && \
 	rm -rf target	

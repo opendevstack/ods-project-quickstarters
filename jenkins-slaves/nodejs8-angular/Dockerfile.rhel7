@@ -60,6 +60,7 @@ COPY npmrc $HOME/.npm-global/etc/npmrc
 
 RUN sed -i "s|NEXUS_HOST|$NEXUS_HOST|g" $HOME/.npm-global/etc/npmrc && \
     sed -i "s|NEXUS_AUTH|$(echo -n $NEXUS_AUTH | base64)|g" $HOME/.npm-global/etc/npmrc && \
+    npm config set ca="" && \
     npm install -g @angular/cli@1.6.5 --unsafe-perm=true --allow-root && \
     npm install -g cypress@2.1.0 --unsafe-perm=true --allow-root > /dev/null && \
     npm --version && \

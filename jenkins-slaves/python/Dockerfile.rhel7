@@ -15,6 +15,7 @@ RUN set -x \
     && tar xzf Python-${PYTHON_VERSION}.tgz \
     && cd Python-${PYTHON_VERSION} \
     && ./configure --enable-optimizations --with-ensurepip=install \
+    && make -j 8 \
     && make altinstall \
     && cd .. \
     && rm -rf Python-${Python_VERSION} \

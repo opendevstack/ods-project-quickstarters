@@ -29,7 +29,7 @@ RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }') && \
 	wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo && \
 	sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo && \
-	yum install -y apache-maven && \
+	yum install -y apache-maven --skip-broken && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
 

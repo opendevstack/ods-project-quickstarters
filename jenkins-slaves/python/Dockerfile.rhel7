@@ -19,6 +19,7 @@ RUN set -x \
     && cd .. \
     && rm -rf Python-${Python_VERSION} \
 #    && yum remove -y $INSTALL_PKGS \
+    && which python \
     && python3 -V
 
 # Upgrade PIP

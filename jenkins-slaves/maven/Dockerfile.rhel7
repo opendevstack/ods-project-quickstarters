@@ -54,6 +54,12 @@ RUN mkdir -p /tmp/gradle/wrapper
 ADD gradle/* /tmp/gradle/wrapper
 RUN ls /tmp/gradle/wrapper 
 
+# set java proxy var
+COPY set_gradle_proxy.sh /tmp/set_gradle_proxy.sh
+RUN chmod 777 /tmp/set_gradle_proxy.sh
+RUN mkdir $GRADLE_USER_HOME
+RUN /tmp/set_gradle_proxy.sh 
+
 RUN /tmp/gradlew -version
 
 RUN chown -R 1001:0 $HOME && \

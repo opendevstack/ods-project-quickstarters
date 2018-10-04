@@ -6,7 +6,7 @@ ENV PYTHON_VERSION=3.7.0
 
 # Install Python
 RUN set -x \
-    && INSTALL_PKGS="gcc make openssl-devel zlib-devel libffi-devel" \
+    && INSTALL_PKGS="gcc make openssl-devel zlib-devel" \
     && yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
@@ -14,12 +14,11 @@ RUN set -x \
     && curl -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
     && tar xzf Python-${PYTHON_VERSION}.tgz \
     && cd Python-${PYTHON_VERSION} \
-    && ./configure --enable-optimizations --with-ensurepip=install \
-    && make -j 8 \
+    && ./configure \
     && make altinstall \
     && cd .. \
     && rm -rf Python-${Python_VERSION} \
-#    && yum remove -y $INSTALL_PKGS \
+    && yum remove -y $INSTALL_PKGS \
     && python3 -V
 
 # Upgrade PIP

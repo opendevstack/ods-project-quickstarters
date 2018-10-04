@@ -60,8 +60,7 @@ RUN cat $HOME/.sbt/repositories | sed -e "s|NEXUS_HOST|$NEXUS_HOST|g" > $HOME/.s
     . /tmp/set_java_proxy.sh && \
     export SBT_OPTS=$JAVA_OPTS && \
     rm $HOME/.sbt/repositories && \
-	sbt -v run || true && \
-	cat /home/jenkins/.sbt/boot/update.log || true && \
+	sbt -v run && \
 	rm -rf target	
 
 RUN	\

@@ -42,7 +42,7 @@ fi
 
 if [[ $NO_PROXY != "" ]]; then
 	noproxy_host=$(echo $NO_PROXY | sed -e "s/,./,*./g")
-	noproxy_host=$(echo $NO_PROXY | sed -e "s/,/|/g")
+	noproxy_host=$(echo $noproxy_host | sed -e "s/,/|/g")
 	echo "systemProp.http.nonProxyHosts=$noproxy_host" >> $GRADLE_USER_HOME/gradle.properties
 	echo "systemProp.https.nonProxyHosts=$noproxy_host" >> $GRADLE_USER_HOME/gradle.properties
 	echo "systemProp.http.nonProxyHosts=$noproxy_host" >> /tmp/gradle/wrapper/gradle-wrapper.properties

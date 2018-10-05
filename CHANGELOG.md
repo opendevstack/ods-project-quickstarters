@@ -7,6 +7,7 @@
    1. Rundeck's OC container inherits from jenkins-slave-base now. The pull and tag is triggered thru *verify-rundeck-settings* rundeck job (#32)
    1. The build of a quickstarter component does not upload the tarball to nexus anymore - instead it uses binary build configs (#9). The shared library will patch old BCs automatically, when taken up.
    1. The containers used to connect to openshift now pull the root ca during build, to ensure SSL trust (#12)
+   1. Slaves now support HTTP/S proxy - inject as ENV - with HTTP_PROXY, HTTPS_PROXY & NO_PROXY (#50)
    
 1. Slave specifics
    1. Python slave upgraded to 3.7 (#24)

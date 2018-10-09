@@ -34,6 +34,8 @@ RUN rm -rf Python-${Python_VERSION} \
     && ln -s /var/lib/origin/Python-${PYTHON_VERSION}/python /usr/local/sbin/python3 \
     && python -V
 
+RUN find / -iname python
+
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
     && python3 get-pip.py
 

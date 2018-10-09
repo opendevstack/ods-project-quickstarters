@@ -2,24 +2,40 @@ FROM cd/jenkins-slave-base
 
 MAINTAINER Michael Sauter <michael.sauter@boehringer-ingelheim.com>
 
-ENV PYTHON_VERSION=3.7.0
+ENV PYTHON_VERSION=3.6.0
+ENV INSTALL_PKGS="yum-utils groupinstall development gcc make openssl-devel zlib-devel"
 
 # Install Python
+# Option 1:
+#   RUN set -x \
+#       && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E '%{rhel}').noarch.rpm \
+#       && yum install -y https://centos7.iuscommunity.org/ius-release.rpm \
+#       && yum install -y python36u python36u-pip \
+#       && ls -lrt /usr/bin/python \
+#       && ls -lrt /usr/bin/python* \
+#       && ln -s /usr/bin/python3.6 /usr/local/sbin/python3
+
+# Option 2
 RUN set -x \
-    && INSTALL_PKGS="gcc make openssl-devel zlib-devel" \
     && yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
-    && cd /tmp \
-    && curl -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
+    && cd /tmp
+
+RUN curl -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
     && tar xzf Python-${PYTHON_VERSION}.tgz \
     && cd Python-${PYTHON_VERSION} \
     && ./configure \
     && make altinstall \
-    && cd .. \
-    && rm -rf Python-${Python_VERSION} \
+    && cd ..
+
+RUN rm -rf Python-${Python_VERSION} \
     && yum remove -y $INSTALL_PKGS \
+    && ln -s /Python-${PYTHON_VERSION}/python /usr/local/sbin/python3 \
     && python3 -V
+
+RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
+    && python3 get-pip.py
 
 # Upgrade PIP
 RUN pip3 install --upgrade pip \
@@ -33,4 +49,7 @@ ENV PATH=~/.local/bin:$PATH
 
 # Install packages
 RUN pip3 install --user requests boto3 argparse botocore awscli pycodestyle \
+#    && ln -s ~/.local/bin/aws /usr/local/sbin/aws \
+#    && ~/.local/bin/aws --version
+    && PATH=$PATH:~/.local/bin/ \
     && aws --version

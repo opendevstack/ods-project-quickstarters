@@ -59,9 +59,9 @@ RUN cat $HOME/.sbt/repositories | sed -e "s|NEXUS_HOST|$NEXUS_HOST|g" > $HOME/.s
     cd /tmp/scala && \
     . /tmp/set_java_proxy.sh && \
     export SBT_OPTS=$JAVA_OPTS && \
-    rm $HOME/.sbt/repositories && \
-	sbt -v run && \
-	rm -rf target	
+    if [[ $HTTP_PROXY != "" ]]; then echo "HTTPS proxy set - SBT bug - remove nexus repos"; rm $HOME/.sbt/repositories; fi && \
+    sbt -v run && \
+    rm -rf target	
 
 RUN	\
     chgrp -R 0 /usr/share && \

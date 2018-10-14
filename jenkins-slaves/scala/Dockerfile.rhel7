@@ -29,7 +29,9 @@ RUN set -x \
 RUN yum -y install java-1.8.0-openjdk \
     && alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }')
 
-RUN curl -O -L http://dl.bintray.com/sbt/rpm/sbt-1.1.6.rpm && \
+ENV SBT_VERSION=1.1.6
+
+RUN curl -O -L http://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm && \
      yum -y install sbt-1.1.6.rpm
 	
 RUN	mkdir -p $HOME/.sbt/1.0/plugins && \
@@ -58,7 +60,7 @@ RUN cat $HOME/.sbt/repositories | sed -e "s|NEXUS_HOST|$NEXUS_HOST|g" > $HOME/.s
     rm $HOME/.sbt/credentials.bak && \
     cd /tmp/scala && \
     . /tmp/set_java_proxy.sh && \
-    export SBT_OPTS=$JAVA_OPTS && \
+    export SBT_OPTS=$JAVA_OPTS"-Duser.home=/home/jenkins" && \
     if [[ $HTTP_PROXY != "" ]]; then echo "HTTPS proxy set - SBT bug - remove nexus repos"; rm $HOME/.sbt/repositories; rm /usr/share/sbt/conf/sbtopts; rm /usr/share/sbt-launcher-packaging/conf/sbtopts; fi && \
     sbt -v run && \
     rm -rf target	

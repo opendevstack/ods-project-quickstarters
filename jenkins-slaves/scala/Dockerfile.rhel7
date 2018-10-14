@@ -29,7 +29,7 @@ RUN set -x \
 RUN yum -y install java-1.8.0-openjdk \
     && alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }')
 
-ENV SBT_VERSION=1.1.6
+ENV SBT_VERSION=1.2.0
 
 RUN curl -O -L http://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm && \
      yum -y install sbt-1.1.6.rpm

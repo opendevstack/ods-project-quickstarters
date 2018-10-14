@@ -12,7 +12,7 @@
 1. Slave specifics
    1. Python slave upgraded to 3.7 (#24)
    1. Maven slave now downloads Gradle 4.8.1 during build to increase build performance of components (#23)
-   1. Scala slave now downloads sbt 1.1.6 / scala 2.12 
+   1. Scala slave now downloads sbt 1.1.6 / scala 2.12 / quickstarter runs on scala 1.2
 
 1. Others (bugfixes)
    1. Nodejs 8 quickstarter failed on npm run coverage (#22)

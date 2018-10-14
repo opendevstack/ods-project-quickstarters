@@ -50,4 +50,4 @@ echo "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-native-packager\" % \"1.3.2\")" 
 
 # add output path for assembly
 echo "enablePlugins(JavaAppPackaging)" >> build.sbt
-echo "assemblyOutputPath in assembly := file(\"/tmp/sclapp.jar\")" >> build.sbt
+echo "assemblyOutputPath in assembly := file(\"docker/sclapp.jar\")" >> build.sbt

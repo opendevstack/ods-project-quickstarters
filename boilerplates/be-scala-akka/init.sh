@@ -28,7 +28,7 @@ sudo chgrp -R 0 .
 
 echo "generate project from local template"
 sudo docker run --rm -v $PWD:/data scala \
-   sbt -Dsbt.version=$SBT_VERSION -v file:///tmp/akka-http-quickstart-scala.g8 --name=$COMPONENT
+   sbt -v file:///tmp/akka-http-quickstart-scala.g8 --name=$COMPONENT
  
 cd $COMPONENT 
 

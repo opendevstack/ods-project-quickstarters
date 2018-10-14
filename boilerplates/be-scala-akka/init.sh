@@ -28,7 +28,7 @@ sudo chgrp -R 0 .
 
 echo "generate project"
 sudo docker run --rm -v $PWD:/data scala \
-   sbt -Dsbt.version=0.13.17 -v new https://github.com/akka/akka-http-quickstart-scala.g8 --name=$COMPONENT
+   sbt -v new https://github.com/akka/akka-http-quickstart-scala.g8 --name=$COMPONENT
  
 cd $COMPONENT 
 

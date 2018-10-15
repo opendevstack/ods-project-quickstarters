@@ -32,7 +32,7 @@ RUN yum -y install java-1.8.0-openjdk \
 ENV SBT_VERSION=1.2.0
 
 RUN curl -O -L http://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm && \
-     yum -y install sbt-1.1.6.rpm
+     yum -y install sbt-$SBT_VERSION.rpm
 	
 RUN	mkdir -p $HOME/.sbt/1.0/plugins && \
 	mkdir -p $HOME/.sbt/0.13/plugins && \

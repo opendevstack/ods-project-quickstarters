@@ -34,6 +34,5 @@ def stageBuild(def context) {
       sh "sbt test"
     }
     sh "sbt assembly"
-    sh "cp /tmp/sclapp.jar docker/sclapp.jar"
   }
 }

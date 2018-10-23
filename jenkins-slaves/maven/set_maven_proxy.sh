@@ -34,4 +34,4 @@ if [[ $HTTP_PROXY != "" ]]; then
 	mvn_proxy=$mvn_proxy"</proxy>"
 fi
 
-echo -e $mvn_proxy /tmp/mvn_proxy
+echo -e $mvn_proxy > /tmp/mvn_proxy

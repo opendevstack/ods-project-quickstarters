@@ -12,9 +12,7 @@ ENV SDKMAN_DIR $HOME/.sdkman
 
 #RUN /bin/bash -lc "source /home/jenkins/.sdkman/bin/sdkman-init.sh && sdk install springboot $SPRING_CLI_VERSION && \
 #    spring --version"
-
-RUN mkdir -p $HOME/jenkins/spring && \
- 	cd $HOME/jenkins/spring
+RUN pwd
 
 RUN curl -O http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/$SPRING_CLI_VERSION/spring-boot-cli-$SPRING_CLI_VERSION-bin.tar.gz 
 

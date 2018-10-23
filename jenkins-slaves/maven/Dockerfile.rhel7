@@ -49,7 +49,9 @@ RUN mv $HOME/.m2/settings.xml $HOME/.m2/settings.xml.orig
 RUN /tmp/set_maven_proxy.sh 
 RUN xpr=$(cat /tmp/mvn_proxy)
 RUN xpr="${xpr//\\/\\\\}"
-RUN cat $HOME/.m2/settings.xml.orig | sed 10a$xpr > $HOME/.m2/settings.xml
+RUN xpr="${xpr//|//\\|}"
+
+RUN cat $HOME/.m2/settings.xml.orig | sed -e "s|<proxies>|<proxies>$xpr|g" > $HOME/.m2/settings.xml
 RUN cat $HOME/.m2/settings.xml
 
 # install gradle ..

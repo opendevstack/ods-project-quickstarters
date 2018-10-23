@@ -18,6 +18,6 @@ WORKDIR /data
 # set proxy if available 
 RUN . /tmp/set_java_proxy.sh && echo $JAVA_OPTS
 
-ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring"]
+ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring", "$JAVA_OPTS"]
 
 CMD ["--help"]

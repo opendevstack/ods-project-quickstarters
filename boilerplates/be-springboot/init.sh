@@ -32,7 +32,7 @@ sudo chgrp -R 0 .
 echo "read args: project=$PROJECT, component=$COMPONENT, package=$PACKAGE, group=$GROUP"
 
 echo "init springboot project"
-sudo docker run --rm -v $PWD:/data springboot init \
+sudo docker run --rm -v $PWD:/data springboot $JAVA_OPTS init \
   --build=gradle \
   --java-version="1.8" \
   --groupId=$PROJECT \

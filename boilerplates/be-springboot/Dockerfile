@@ -12,8 +12,8 @@ ARG SPRING_CLI_VERSION
 
 #RUN /bin/bash -lc "source /home/jenkins/.sdkman/bin/sdkman-init.sh && sdk install springboot $SPRING_CLI_VERSION && \
 #    spring --version"
-RUN echo SPRING_CLI_VERSION && \
-	$mkdir /tmp/spring && \
+RUN echo $SPRING_CLI_VERSION && \
+	mkdir /tmp/spring && \
 	cd /tmp/spring
 
 RUN curl -O http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/$SPRING_CLI_VERSION/spring-boot-cli-$SPRING_CLI_VERSION-bin.tar.gz 

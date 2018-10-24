@@ -15,4 +15,4 @@ fi
 
 echo $JAVA_OPTS
 
-spring "$@"
+/home/jenkins/.sdkman/candidates/springboot/current/bin/spring "$@"

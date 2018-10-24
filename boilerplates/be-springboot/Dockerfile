@@ -15,8 +15,7 @@ RUN /bin/bash -lc "source /home/jenkins/.sdkman/bin/sdkman-init.sh && sdk instal
 
 WORKDIR /data
 
-# set proxy if available 
-RUN . /tmp/set_java_proxy.sh && echo $JAVA_OPTS
+RUN bash -l -c 'echo "export JAVA_OPTS="$(./set_java_proxy.sh && echo $JAVA_OPTS)" >> /etc/bash.bashrc'
 
 ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring"]
 

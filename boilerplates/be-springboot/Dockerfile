@@ -15,6 +15,8 @@ RUN /bin/bash -lc "source /home/jenkins/.sdkman/bin/sdkman-init.sh && sdk instal
 
 WORKDIR /data
 
-ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring"]
+ADD spring_wrapped.sh /home/jenkins/.sdkman/candidates/springboot/current/bin
+
+ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring_wrapped"]
 
 CMD ["--help"]

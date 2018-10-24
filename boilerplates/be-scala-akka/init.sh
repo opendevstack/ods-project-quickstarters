@@ -26,9 +26,9 @@ esac; shift; done
 cd $TARGET_DIR
 sudo chgrp -R 0 .
 
-echo "generate project"
+echo "generate project from local template"
 sudo docker run --rm -v $PWD:/data scala \
-   sbt -Dsbt.version=0.13.17 -v new https://github.com/akka/akka-http-quickstart-scala.g8 --name=$COMPONENT
+   sbt -v new file:///tmp/akka-http-quickstart-scala.g8 --name=$COMPONENT
  
 cd $COMPONENT 
 
@@ -42,12 +42,10 @@ rm $SCRIPT_DIR/files/docker/Dockerfile.bak
 echo "copy custom files from quickstart to generated project"
 cp -rv $SCRIPT_DIR/files/. .
 
-# overwrite sbt version - bug in > 1.0 - so leave 0.13.17
-
-# add assembly otherwise sbt assembly fails
+# add assembly plugin for fast jar otherwise sbt assembly fails
 echo "addSbtPlugin(\"com.eed3si9n\" % \"sbt-assembly\" % \"0.14.5\")" >> project/plugins.sbt
 echo "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-native-packager\" % \"1.3.2\")" >> project/plugins.sbt
 
 # add output path for assembly
 echo "enablePlugins(JavaAppPackaging)" >> build.sbt
-echo "assemblyOutputPath in assembly := file(\"/tmp/sclapp.jar\")" >> build.sbt
+echo "assemblyOutputPath in assembly := file(\"docker/sclapp.jar\")" >> build.sbt

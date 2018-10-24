@@ -43,6 +43,5 @@ def stageBuild(def context) {
         error "Build failed!"
       }
     }
-    sh "cp build/libs/${context.componentId}-*.jar docker/app.jar"
   }
 }

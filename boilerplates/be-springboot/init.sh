@@ -40,7 +40,6 @@ sudo docker run --rm -v $PWD:/data springboot init \
   --package-name="$PACKAGE" \
   --packaging=jar \
   --dependencies="web,jersey,data-jpa,h2,lombok,data-rest,restdocs,security" \
-  --verbose \
   $COMPONENT
 
 cd $COMPONENT

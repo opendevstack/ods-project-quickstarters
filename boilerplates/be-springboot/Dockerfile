@@ -17,6 +17,6 @@ WORKDIR /data
 
 ADD spring_wrapped.sh /home/jenkins/.sdkman/candidates/springboot/current/bin
 
-ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring_wrapped"]
+ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring_wrapped.sh"]
 
 CMD ["--help"]

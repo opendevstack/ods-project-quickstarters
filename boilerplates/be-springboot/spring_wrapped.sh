@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eux
+set -x
 
 echo "Spring CLI wrapper Arguments:"
 for an_arg in "$@" ; do

@@ -15,4 +15,4 @@ fi
 
 echo $JAVA_OPTS
 
-./spring "$@"
+spring "$@"

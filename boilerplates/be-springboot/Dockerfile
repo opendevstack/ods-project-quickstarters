@@ -15,6 +15,6 @@ RUN /bin/bash -lc "source /home/jenkins/.sdkman/bin/sdkman-init.sh && sdk instal
 
 WORKDIR /data
 
-ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring", "$(/tmp/set_java_proxy.sh && echo $JAVA_OPTS)"]
+ENTRYPOINT ["/home/jenkins/.sdkman/candidates/springboot/current/bin/spring"]
 
 CMD ["--help"]

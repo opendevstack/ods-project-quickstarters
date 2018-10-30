@@ -26,6 +26,10 @@ sed -i.final -e "s|value: SONAR_SERVER_AUTH_TOKEN|value: $SONAR_SERVER_AUTH_TOKE
 sed -i.final -e "s|value: DOCKER_REGISTRY|value: $DOCKER_REGISTRY|g" ../templates/cd-jenkins-persistent.yml
 sed -i.final -e "s|value: BITBUCKET_HOST|value: $BITBUCKET_HOST|g" ../templates/cd-jenkins-persistent.yml
 
+sed -i.final -e "s|value: NEXUS_URL|value: $NEXUS_URL|g" ../templates/rshiny-app.yml
+sed -i.final -e "s|value: NEXUS_USERNAME|value: $NEXUS_USERNAME|g" ../templates/rshiny-app.yml
+sed -i.final -e "s|value: NEXUS_PASSWORD|value: $NEXUS_PASSWORD|g" ../templates/rshiny-app.yml
+
 sed -i.final -e "s|value: CD_USER_PWD|value: $CD_USER_PWD|g" ../templates/secrets.yml
 
 sed -i.final -e "s|value: CROWD_URL|value: $CROWD_URL|g" ../templates/rshiny-app.yml

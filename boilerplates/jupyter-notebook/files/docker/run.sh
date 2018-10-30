@@ -20,12 +20,9 @@ if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"1001" ]; then
     export LD_PRELOAD
 fi
 
-# Code fixes problem with 2 installations of Python of different versions.
-# source scl_source enable httpd24 python27 && \
-
+# create jupyter directories
 mkdir -p /opt/app-root/src/share/jupyter
 mkdir -p /opt/app-root/src/share/jupyter/runtime
-
 mkdir -p /opt/app-root/src/work/storage
 
 # set the home directories to a folder with read/write access
@@ -39,4 +36,9 @@ export JUPYTER_RUNTIME_DIR=/opt/app-root/src/share/jupyter/runtime
 
 source /opt/app-root/bin/activate
 
-exec jupyter notebook
+# install pip requirements
+#pip install -i https://$NEXUS_USER:NEXUS_PASSOWRD@nexus3-cd.22ad.bi-x.openshiftapps.com/repository/pypi-all/simple -r requirements.txt
+
+pip install -i https://$NEXUS_USER:$NEXUS_PASSOWRD@$NEXUS_URL/pypi-all/simple -r requirements.txt
+
+exec jupyter lab

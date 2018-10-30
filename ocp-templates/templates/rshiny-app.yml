@@ -6,6 +6,15 @@ metadata:
 objects:
 - apiVersion: v1
   data:
+    password: '${NEXUS_PASSWORD}'
+  kind: Secret
+  metadata:
+    labels:
+      app: rhshiny-jupyter
+    name: nexus
+  type: opaque
+- apiVersion: v1
+  data:
     password: ${CROWD_RSHINY_REALM_PW}
     username: ${CROWD_RSHINY_REALM_USER}
   kind: Secret
@@ -150,6 +159,15 @@ objects:
               secretKeyRef:
                 name: crowd-service
                 key: password
+          - name: NEXUS_HOST
+            value: '${NEXUS_URL}'
+          - name: NEXUS_USERNAME
+            value: '${NEXUS_USERNAME}'
+          - name: NEXUS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: nexus
           name: ${COMPONENT}-authproxy
           image: shared-services/nginx-authproxy:2.0
           ports:
@@ -267,3 +285,9 @@ parameters:
   displayName: crowd pw
   name: CROWD_RSHINY_REALM_PW
   value: CROWD_RSHINY_REALM_PW
+- name: NEXUS_URL
+  value: NEXUS_URL
+- name: NEXUS_USERNAME
+  value: NEXUS_USERNAME
+- name: NEXUS_PASSWORD
+  value: NEXUS_PASSWORD

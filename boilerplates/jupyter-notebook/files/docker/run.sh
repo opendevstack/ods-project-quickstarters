@@ -39,6 +39,7 @@ source /opt/app-root/bin/activate
 # install pip requirements
 #pip install -i https://$NEXUS_USER:NEXUS_PASSOWRD@nexus3-cd.22ad.bi-x.openshiftapps.com/repository/pypi-all/simple -r requirements.txt
 
-pip install -i https://$NEXUS_USER:$NEXUS_PASSOWRD@$NEXUS_URL/pypi-all/simple -r requirements.txt
+echo install -i https://$NEXUS_USER:$NEXUS_PASSOWRD@$NEXUS_URL/repository/pypi-all/simple -r requirements.txt
+pip install -i https://$NEXUS_USER:$NEXUS_PASSOWRD@$NEXUS_URL/repository/pypi-all/simple -r requirements.txt
 
 exec jupyter lab

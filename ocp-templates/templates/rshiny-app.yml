@@ -10,7 +10,7 @@ objects:
   kind: Secret
   metadata:
     labels:
-      app: rhshiny-jupyter
+      app: rshiny-jupyter
     name: nexus
   type: opaque
 - apiVersion: v1
@@ -53,6 +53,7 @@ objects:
     resources: {}
     runPolicy: Serial
     source:
+      contextDir: docker
       git:
         uri: ${BITBUCKET_URL}
       sourceSecret:
@@ -94,6 +95,15 @@ objects:
       spec:
         containers:
         - env:
+          - name: NEXUS_URL
+            value: '${NEXUS_URL}'
+          - name: NEXUS_USERNAME
+            value: '${NEXUS_USERNAME}'
+          - name: NEXUS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: nexus
           name: ${COMPONENT}
           ports:
           - containerPort: 8080
@@ -159,15 +169,6 @@ objects:
               secretKeyRef:
                 name: crowd-service
                 key: password
-          - name: NEXUS_HOST
-            value: '${NEXUS_URL}'
-          - name: NEXUS_USERNAME
-            value: '${NEXUS_USERNAME}'
-          - name: NEXUS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: nexus
           name: ${COMPONENT}-authproxy
           image: shared-services/nginx-authproxy:2.0
           ports:
@@ -262,7 +263,7 @@ parameters:
   displayName: Environment
   name: ENV
   required: true
-- description: The bitbucket URL  
+- description: The bitbucket URL
   displayName: Bitbucket URL
   name: BITBUCKET_URL
   required: true

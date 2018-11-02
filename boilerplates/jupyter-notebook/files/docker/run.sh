@@ -1,23 +1,8 @@
 #!/bin/bash
-
-# Set current user in nss_wrapper
-USER_ID=$(id -u)
-GROUP_ID=$(id -g)
-
-if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"1001" ]; then
-
-    NSS_WRAPPER_PASSWD=/opt/app-root/etc/passwd
-    NSS_WRAPPER_GROUP=/etc/group
-
-    cat /etc/passwd | sed -e 's/^default:/builder:/' > $NSS_WRAPPER_PASSWD
-
-    echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> $NSS_WRAPPER_PASSWD
-
-    export NSS_WRAPPER_PASSWD
-    export NSS_WRAPPER_GROUP
-
-    LD_PRELOAD=libnss_wrapper.so
-    export LD_PRELOAD
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  fi
 fi
 
 # create jupyter directories

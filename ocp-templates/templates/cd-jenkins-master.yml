@@ -1,21 +1,14 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: cd-jenkins-persistent-template
-message: A Jenkins service has been created in your project.  Log into Jenkins with
-  your OpenShift account.  The tutorial at https://github.com/openshift/origin/blob/master/examples/jenkins/README.md
-  contains more information about using this template.
+  template: cd-jenkins-master-template
 metadata:
   annotations:
-    description: |-
-      Jenkins service, with persistent storage.
-
-      NOTE: You must have persistent volumes available in your cluster to use this template.
+    description: Jenkins master
     iconClass: icon-jenkins
     openshift.io/display-name: Jenkins (Persistent)
     tags: instant-app,jenkins
-  creationTimestamp: 2017-05-17T02:59:10Z
-  name: cd-jenkins-persistent
+  name: cd-jenkins-master
 objects:
 - apiVersion: v1
   data:
@@ -24,6 +17,8 @@ objects:
   kind: Secret
   metadata:
     name: cd-user-with-password
+    labels:
+      template: cd-jenkins-master
   type: kubernetes.io/basic-auth
 - apiVersion: v1
   data:
@@ -31,6 +26,8 @@ objects:
   kind: Secret
   metadata:
     name: sonarqube
+    labels:
+      template: cd-jenkins-master
   type: opaque
 - apiVersion: v1
   data:
@@ -38,6 +35,7 @@ objects:
   kind: Secret
   metadata:
     labels:
+      template: cd-jenkins-master
       app: jenkins
     name: nexus
   type: opaque
@@ -46,6 +44,8 @@ objects:
   metadata:
     creationTimestamp: null
     name: '${JENKINS_SERVICE_NAME}'
+    labels:
+      template: cd-jenkins-master
   spec:
     tls:
       insecureEdgeTerminationPolicy: Redirect
@@ -57,6 +57,8 @@ objects:
   kind: PersistentVolumeClaim
   metadata:
     name: '${JENKINS_SERVICE_NAME}'
+    labels:
+      template: cd-jenkins-master
   spec:
     accessModes:
       - ReadWriteOnce
@@ -67,6 +69,8 @@ objects:
   kind: PersistentVolumeClaim
   metadata:
     name: owasp-dependency-check
+    labels:
+      template: cd-jenkins-master
   spec:
     accessModes:
       - ReadWriteOnce
@@ -78,6 +82,8 @@ objects:
   metadata:
     creationTimestamp: null
     name: '${JENKINS_SERVICE_NAME}'
+    labels:
+      template: cd-jenkins-master
   spec:
     replicas: 1
     selector:
@@ -183,11 +189,15 @@ objects:
       serviceaccounts.openshift.io/oauth-redirectreference.jenkins: >-
         {"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"${JENKINS_SERVICE_NAME}"}}
     name: '${JENKINS_SERVICE_NAME}'
+    labels:
+      template: cd-jenkins-master
 - apiVersion: v1
   groupNames: null
   kind: RoleBinding
   metadata:
     name: '${JENKINS_SERVICE_NAME}_edit'
+    labels:
+      template: cd-jenkins-master
   roleRef:
     name: edit
   subjects:
@@ -197,6 +207,8 @@ objects:
   kind: Service
   metadata:
     name: '${JNLP_SERVICE_NAME}'
+    labels:
+      template: cd-jenkins-master
   spec:
     ports:
       - name: agent
@@ -216,6 +228,8 @@ objects:
       service.openshift.io/infrastructure: 'true'
     creationTimestamp: null
     name: '${JENKINS_SERVICE_NAME}'
+    labels:
+      template: cd-jenkins-master
   spec:
     ports:
       - name: web

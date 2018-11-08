@@ -22,6 +22,6 @@ export JUPYTER_RUNTIME_DIR=/opt/app-root/src/share/jupyter/runtime
 source /opt/app-root/bin/activate
 
 # install pip requirements
-pip install -i https://$NEXUS_USER:$NEXUS_PASSWORD@${NEXUS_URL:8}/repository/pypi-all/simple -r requirements.txt
+pip install -i https://$NEXUS_USERNAME:$NEXUS_PASSWORD@${NEXUS_URL:8}/repository/pypi-all/simple -r requirements.txt
 
 exec jupyter lab

@@ -6,6 +6,15 @@ metadata:
 objects:
 - apiVersion: v1
   data:
+    password: '${NEXUS_PASSWORD}'
+  kind: Secret
+  metadata:
+    labels:
+      app: rshiny-jupyter
+    name: nexus
+  type: opaque
+- apiVersion: v1
+  data:
     password: ${CROWD_RSHINY_REALM_PW}
     username: ${CROWD_RSHINY_REALM_USER}
   kind: Secret
@@ -44,6 +53,7 @@ objects:
     resources: {}
     runPolicy: Serial
     source:
+      contextDir: docker
       git:
         uri: ${BITBUCKET_URL}
       sourceSecret:
@@ -85,6 +95,15 @@ objects:
       spec:
         containers:
         - env:
+          - name: NEXUS_URL
+            value: '${NEXUS_URL}'
+          - name: NEXUS_USERNAME
+            value: '${NEXUS_USERNAME}'
+          - name: NEXUS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: nexus
           name: ${COMPONENT}
           ports:
           - containerPort: 8080
@@ -244,7 +263,7 @@ parameters:
   displayName: Environment
   name: ENV
   required: true
-- description: The bitbucket URL  
+- description: The bitbucket URL
   displayName: Bitbucket URL
   name: BITBUCKET_URL
   required: true
@@ -267,3 +286,9 @@ parameters:
   displayName: crowd pw
   name: CROWD_RSHINY_REALM_PW
   value: CROWD_RSHINY_REALM_PW
+- name: NEXUS_URL
+  value: NEXUS_URL
+- name: NEXUS_USERNAME
+  value: NEXUS_USERNAME
+- name: NEXUS_PASSWORD
+  value: NEXUS_PASSWORD

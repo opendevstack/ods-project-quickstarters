@@ -1,6 +1,6 @@
 jupyter
 ipywidgets
-# jupyterlab
+jupyterlab
 numpy
 scipy
 scikit-learn

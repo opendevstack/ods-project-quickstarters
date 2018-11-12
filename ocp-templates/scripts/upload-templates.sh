@@ -40,7 +40,6 @@ sed -i.final -e "s|value: CROWD_RSHINY_REALM_PW|value: $CROWD_RSHINY_REALM_PW|g"
 oc apply -n cd -f ../templates/cd-jenkins-persistent.yml
 oc apply -n cd -f ../templates/component-environment.yml
 oc apply -n cd -f ../templates/component-route.yml
-oc apply -n cd -f ../templates/component-pipeline.yml
 oc apply -n cd -f ../templates/bc-docker.yml
 oc apply -n cd -f ../templates/secrets.yml
 oc apply -n cd -f ../templates/rshiny-app.yml

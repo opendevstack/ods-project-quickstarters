@@ -35,7 +35,7 @@
         ${option.component_id}, git_url_http: ${option.git_url_http}, git_url_ssh:
         ${option.git_url_ssh}, package_name: ${option.package_name}'
     - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters && git checkout origin/production
     - description: generate docker container for scala code
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/be-scala-akka && ./build.sh --registry ${globals.openshift_dockerregistry} --user ${globals.openshift_user} --token ${option.openshift_api_token}
     - description: init scala akka project

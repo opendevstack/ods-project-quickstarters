@@ -43,8 +43,7 @@
     - description: setup quickstarter for continuous integration
       jobref:
         args: '-component_type be-springboot -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id}
-          -project_id ${option.project_id} -component_id ${option.component_id} -group_id
-          ${option.group_id}  -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http} '
+          -project_id ${option.project_id} -component_id ${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http} '
         group: common
         name: prepare-continuous-integration
         nodeStep: 'true'

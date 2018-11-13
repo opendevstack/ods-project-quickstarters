@@ -27,10 +27,6 @@ do
             component_id="$2"
             shift # past argument
             ;;
-        -g|--group-id)
-            group_id="$2"
-            shift # past argument
-            ;;
         -t|--component-type)
             component_type="$2"
             shift # past argument
@@ -46,5 +42,5 @@ done
 # change to directory of this script
 cd $(dirname "$0")
 # replace placeholders
-echo "target: $target, url: $git_url_http, project-id: $project_id, component-id: $component_id, group-id: $group_id, component-type: $component_type"
-sed 's|@project_id@|'$project_id'|g; s|@component_id@|'$component_id'|g; s|@group_id@|'$group_id'|g; s|@component_type@|'$component_type'|g; s|@git_url_http@|'$git_url_http'|g' ./$component_type/Jenkinsfile > $target
+echo "target: $target, url: $git_url_http, project-id: $project_id, component-id: $component_id, component-type: $component_type"
+sed 's|@project_id@|'$project_id'|g; s|@component_id@|'$component_id'|g; s|@component_type@|'$component_type'|g; s|@git_url_http@|'$git_url_http'|g' ./$component_type/Jenkinsfile > $target

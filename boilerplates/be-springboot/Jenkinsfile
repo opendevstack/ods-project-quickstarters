@@ -18,7 +18,10 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-maven",
   projectId: projectId,
   componentId: componentId,
-  verbose: true
+  branchToEnvironmentMapping: [
+    'master': 'test',
+    '*': 'dev'
+  ]
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)

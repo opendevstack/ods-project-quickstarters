@@ -18,7 +18,10 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
   projectId: projectId,
   componentId: componentId,
-  verbose: true
+  branchToEnvironmentMapping: [
+    'master': 'test',
+    '*': 'dev'
+  ]
 ) { context ->
   stageBuild(context)
   stageUnitTest(context)

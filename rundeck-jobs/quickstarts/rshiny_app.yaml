@@ -31,7 +31,7 @@
         git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
         package_name: ${option.package_name}'
     - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
     - script: |-
         #!/bin/bash
         mkdir /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@

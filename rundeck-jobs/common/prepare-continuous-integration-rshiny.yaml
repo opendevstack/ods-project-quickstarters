@@ -6,6 +6,15 @@
   name: prepare-continuous-integration-rshiny
   nodeFilterEditable: false
   options:
+  - description: |-
+      the type of component to create (i.e. springboot-be, angular-frontend).
+      The component type must be created first in the quickstarter project
+    enforced: true
+    name: component_type
+    required: true
+    values:
+    - jupyter-notebook
+    - rshiny-app
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true
@@ -38,6 +47,16 @@
         group: openshift
         name: create-rshiny
         nodeStep: 'true'
+    - description: add Jenkinsfile to generated project
+      script: |-
+        sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
+        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
+        ./renderJenkinsTemplate.sh \
+          --target @option.quickstarter_directory@/Jenkinsfile \
+          --url @option.git_url_http@ \
+          --project-id @option.project_id@ \
+          --component-id @option.component_id@  \
+          --component-type @option.component_type@
     - description: push repository to github
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates && ./git_push.sh --dir ${option.quickstarter_directory} --url ${option.git_url_ssh}
     keepgoing: false

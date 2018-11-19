@@ -27,7 +27,7 @@ case $key in
     shift # past argument
     ;;
     -b|--bitbucket)
-    BITBUCKET_URL="$2"
+    BITBUCKET_REPO="$2"
     shift # past argument
     ;;
     *)
@@ -47,6 +47,10 @@ if [ -z ${COMPONENT+x} ]; then
 else echo "COMPONENT=${COMPONENT}"; fi
 
 for devenv in dev test ; do
-  oc process cd//rshiny-app PROJECT=${PROJECT} COMPONENT=${COMPONENT} BITBUCKET_URL=${BITBUCKET_URL} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
-  oc start-build bc/${COMPONENT} -n ${PROJECT}-${devenv}
+  # create resources
+  oc process cd//rshiny-app PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
+  # create build pipelines
+  oc process cd//component-pipeline PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} BITBUCKET_REPO=${BITBUCKET_REPO} | oc create -n ${PROJECT}-cd -f-
+  # create image build configs
+  oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
 done

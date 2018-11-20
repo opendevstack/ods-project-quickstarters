@@ -20,6 +20,10 @@ ENV NODEJS_VERSION=8.11 \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable"
 
 # install google-chrome (for angular)
+RUN yum-config-manager --enable rhel-7-server-extras-rpms && \
+    yum-config-manager --enable yum-config-manager --enable && \
+    yum update
+ 
 ADD https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm /root/google-chrome-stable_current_x86_64.rpm
 RUN yum -y install redhat-lsb libXScrnSaver
 RUN yum -y install /root/google-chrome-stable_current_x86_64.rpm && \

@@ -108,8 +108,8 @@ cd ..
 rm -rf oc_migration_scripts
 
 echo "[INFO]: import image tags from $SOURCE_ENV"
-oc get bc --no-headers -n $SOURCE_PROJECT | awk '{print $1}' | while read BC; do
-  echo "[INFO]: getting image tag from build config: $BC"
-  image=$(oc get bc $BC -o jsonpath='{.spec.output.to.name}' -n $SOURCE_PROJECT)
+oc get is --no-headers -n $SOURCE_PROJECT | awk '{print $2}' | while read DOCKER_REPO; do
+  echo "[INFO]: importing latest image from ${DOCKER_REPO}"
+  image="${DOCKER_REPO}:latest"
   oc tag ${SOURCE_PROJECT}/${image} ${image} -n $TARGET_PROJECT || true
 done

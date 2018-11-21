@@ -23,8 +23,6 @@ odsPipeline(
     '*': 'dev'
   ]
 ) { context ->
-  stageCreateOpenshiftEnvironment(context)
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
-  stageTriggerAllBuilds(context)
 }

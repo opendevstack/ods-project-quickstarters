@@ -72,6 +72,11 @@ objects:
         - env:
           - name: REPO_BASE
             value: '${REPO_BASE}'
+          - name: TRIGGER_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: trigger-secret
+                name: webhook-proxy
           image: ''
           imagePullPolicy: Always
           name: webhook-proxy
@@ -95,8 +100,19 @@ objects:
           name: jenkins-webhook-proxy:latest
           namespace: '${NAMESPACE}'
       type: ImageChange
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: webhook-proxy
+    labels:
+      app: jenkins-webhook-proxy
+  type: opaque
+  data:
+    trigger-secret: ${PIPELINE_TRIGGER_SECRET}
 parameters:
 - name: NAMESPACE
   value: cd
 - name: REPO_BASE
   value: REPO_BASE
+- name: PIPELINE_TRIGGER_SECRET
+  value: PIPELINE_TRIGGER_SECRET

@@ -33,6 +33,7 @@ sed -i.final -e "s|value: DOCKER_REGISTRY|value: $DOCKER_REGISTRY|g" ../template
 sed -i.final -e "s|value: BITBUCKET_HOST|value: $BITBUCKET_HOST|g" ../templates/cd-jenkins-master.yml
 
 sed -i.final -e "s|value: REPO_BASE|value: $REPO_BASE|g" ../templates/cd-jenkins-webhook-proxy.yml
+sed -i.final -e "s|value: PIPELINE_TRIGGER_SECRET|value: $PIPELINE_TRIGGER_SECRET|g" ../templates/cd-jenkins-webhook-proxy.yml
 
 sed -i.final -e "s|value: CD_USER_PWD|value: $CD_USER_PWD|g" ../templates/secrets.yml
 

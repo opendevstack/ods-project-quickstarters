@@ -1,143 +1,47 @@
 {
   "name": "ocp-react-material-boilerplate",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "lint-staged": {
-    "*.js": "lint:eslint"
-  },
-  "pre-commit": "lint:staged",
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "extends": "airbnb",
-    "env": {
-      "browser": true,
-      "node": true,
-      "jest": true,
-      "es6": true
-    },
-    "plugins": [
-      "redux-saga",
-      "react",
-      "jsx-a11y"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "rules": {
-      "arrow-parens": [
-        "error",
-        "always"
-      ],
-      "arrow-body-style": [
-        0,
-        "as-needed"
-      ],
-      "comma-dangle": [
-        2,
-        "always-multiline"
-      ],
-      "func-names": 0,
-      "no-alert": 0,
-      "no-constant-condition": 0,
-      "no-class-assign": 0,
-      "no-labels": 0,
-      "no-unused-labels": 0,
-      "no-restricted-syntax": 0,
-      "import/imports-first": 0,
-      "import/newline-after-import": 0,
-      "import/no-dynamic-require": 0,
-      "import/no-extraneous-dependencies": 0,
-      "import/no-named-as-default": 0,
-      "import/no-unresolved": 2,
-      "import/prefer-default-export": 0,
-      "no-case-declarations": 0,
-      "one-var": 0,
-      "jsx-a11y/no-static-element-interactions": 0,
-      "no-plusplus": 0,
-      "indent": [
-        2,
-        2,
-        {
-          "SwitchCase": 1
-        }
-      ],
-      "jsx-a11y/aria-props": 2,
-      "jsx-a11y/anchor-has-content": 0,
-      "jsx-a11y/heading-has-content": 0,
-      "jsx-a11y/href-no-hash": 2,
-      "jsx-a11y/label-has-for": 0,
-      "jsx-a11y/mouse-events-have-key-events": 2,
-      "jsx-a11y/role-has-required-aria-props": 2,
-      "jsx-a11y/role-supports-aria-props": 2,
-      "max-len": 0,
-      "newline-per-chained-call": 0,
-      "no-confusing-arrow": 0,
-      "no-console": 1,
-      "no-use-before-define": 0,
-      "prefer-template": 2,
-      "class-methods-use-this": 0,
-      "react/forbid-prop-types": 0,
-      "react/jsx-first-prop-new-line": [
-        2,
-        "multiline"
-      ],
-      "react/jsx-filename-extension": 0,
-      "react/no-did-mount-set-state": 0,
-      "react/jsx-no-target-blank": 0,
-      "react/require-extension": 0,
-      "react/self-closing-comp": 0,
-      "redux-saga/no-yield-in-race": 2,
-      "redux-saga/yield-effects": 2,
-      "require-yield": 0,
-      "import/no-webpack-loader-syntax": 0
-    },
-    "settings": {
-      "import/resolver": {
-        "webpack": {
-          "config": "./internals/webpack/webpack.prod.babel.js"
-        }
-      }
-    }
+    "*.js": "npm run lint"
   },
   "dependencies": {
-    "@material-ui/core": "^1.2.3",
-    "@material-ui/icons": "^1.1.0",
+    "@material-ui/core": "1.5.1",
+    "@material-ui/icons": "2.0.3",
+    "connected-react-router": "^4.3.0",
     "eslint-plugin-react": "^7.9.1",
     "history": "^4.7.2",
     "node-sass-chokidar": "^1.3.0",
-    "npm-run-all": "^4.1.2",
-    "prop-types": "^15.6.2",
+    "prop-types": "15.6.2",
     "querystring": "^0.2.0",
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0",
+    "react": "16.4.2",
+    "react-dom": "16.4.2",
     "react-loadable": "^5.4.0",
-    "react-redux": "^5.0.7",
-    "react-router-dom": "^4.2.2",
-    "react-router-redux": "^5.0.0-alpha.9",
-    "react-scripts": "^1.1.4",
-    "reactstrap": "^6.0.1",
-    "redux": "4.0.0-rc.1",
-    "redux-observable": "1.0.0-alpha.2",
-    "rxjs": "^6.2.0",
-    "rxjs-compat": "^6.2.0"
+    "react-redux": "5.0.7",
+    "react-router-dom": "4.2.2",
+    "react-router-redux": "^4.0.8",
+    "react-scripts": "2.0.3",
+    "redux": "4.0.0",
+    "redux-observable": "1.0.0",
+    "rxjs": "6.2.2",
+    "rxjs-compat": "6.2.2"
   },
   "devDependencies": {
+    "eslint-plugin-jest": "^22.0.0",
+    "npm-run-all": "^4.1.3",
     "redux-devtools": "3.4.1",
-    "source-map-explorer": "^1.5.0"
+    "source-map-explorer": "^1.6.0"
   },
   "scripts": {
     "analyze": "source-map-explorer build/static/js/main.*",
     "build-css": "node-sass-chokidar src/ -o src/",
     "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
     "start-js": "react-scripts start",
-    "start": "npm-run-all -p watch-css start-js",
+    "start": "PORT=8080 NODE_ENV=development npm-run-all -p watch-css start-js",
     "build-js": "react-scripts build",
     "build": "npm-run-all build-css build-js",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src"
   },
   "keywords": [
     "react",
@@ -146,14 +50,20 @@
     "react-loadable",
     "react-redux",
     "react-router",
-    "reactstrap",
     "redux-observable",
-    "boilerplate"
+    "boilerplate",
+    "material-ui"
   ],
   "author": {
     "name": "",
     "url": ""
   },
   "homepage": ".",
-  "license": "MIT"
+  "license": "MIT",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

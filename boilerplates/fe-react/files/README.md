@@ -16,20 +16,19 @@ Before starting with project, please headover to [CRA](https://github.com/facebo
 
 - [React js - ^16.4.0](https://facebook.github.io/react/)
 - [Redux js - ^4.0.0-rc.1](http://redux.js.org/)
+- [react-scripts - 2.0.3](https://www.npmjs.com/package/react-scripts)
 - [react-router-dom - ^4.2.2](https://github.com/ReactTraining/react-router)
 - [react-redux - ^5.0.7](https://github.com/reactjs/react-redux)
 - [react-router-dom - ^4.2.2](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-dom)
 - [react-router-redux - ^5.0.0-alpha.9](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-redux)
 - [redux-observable - ^1.0.0-alpha.2](https://redux-observable.js.org)
 - [Rxjs - Rxjs v6](https://github.com/ReactiveX/rxjs)
-- [reactstrap - Easy to use React Bootstrap 4 components](https://reactstrap.github.io/)
+- [material-ui - Material design for react(https://material-ui.com)
 - [react-loadable - 5.4.0](https://github.com/jamiebuilds/react-loadable)
 
 
 #### Features
 
-- Scss
-- [Domain-style](https://github.com/reactjs/redux/blob/master/docs/faq/CodeStructure.md) for code structure
 - Bundle Size analysis
 - Code splitting with [react-loadable](https://github.com/jamiebuilds/react-loadable)
 
@@ -47,7 +46,7 @@ or
 or
 `$ yarn start`
 
-3. visit - http://localhost:3000/
+3. visit - http://localhost:8080/
 
 To create production ready codes -
 
@@ -151,23 +150,6 @@ The source map explorer determines which file each byte in your minified code ca
 To analyzing bundle, run command -
 
 `$ npm run analyze` / `$ yarn analyze`
-
-
-## Code splitting
-
-Create React App(CRA) by default bundle out entire app into single main.*.js file with Webpack. As our app grows, bundle grows. So instead of downloading the entire app(This hurts the initial load time of our app.) before users can use it, We can split code into small chunks which we can then load on demand and Code splitting is really helpful for larger React apps.
-
-Check out [this](https://mohandere.github.io/mplayground/#/blog/post/2018/03/01/analyzing-the-bundle-size-code-splitting-in-create-react-app/).  example for how to implementation Code splitting and how it helps to load application faster.
-
-This boilerplate using [react-loadable](https://github.com/jamiebuilds/react-loadable) for code splitting.
-
-Open `src/App.js` and edit this line to -
-
-`import routes from './routes';`
-
- To
-
-`import routes from './asyncRoutes';`
 
 ## Deployment
 

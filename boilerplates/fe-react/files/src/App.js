@@ -1,52 +1,37 @@
-import React, {Component} from "react";
-import {Provider} from 'react-redux'
-import {ConnectedRouter} from 'react-router-redux';
-import {AppBar, createMuiTheme, CssBaseline, MuiThemeProvider, Toolbar, Typography} from '@material-ui/core';
+import React, { Component } from "react";
+import { Provider } from 'react-redux'
+import { ConnectedRouter } from 'react-router-redux';
+import { AppBar, CssBaseline, Toolbar, Typography } from '@material-ui/core';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { theme } from './theme';
+import { Router } from './Router';
 
-import store, {history} from './store';
-import './App.css';
-// routes
-import routes from './routes';
+import store from './store';
+
 // common components
 import Footer from './common/components/Footer'
-
-// Styles
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#ad1457',
-    },
-    secondary: {
-      main: '#cddc39',
-    },
-  },
-});
-
 
 class App extends Component {
 
   render() {
     return (
       <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <div className="App">
-            <MuiThemeProvider theme={theme}>
-              <div className="App">
-                <CssBaseline/>
-                <AppBar position="static">
-                  <Toolbar>
-                    <Typography variant="title" color="inherit">Name of the project</Typography>
-                  </Toolbar>
-                </AppBar>
-                <div className="wrap">
-                  {routes}
-                </div>
+        <div >
+          <MuiThemeProvider theme={theme}>
+            <div>
+              <CssBaseline/>
+              <AppBar position="static">
+                <Toolbar>
+                  <Typography variant="title" color="inherit">BI X</Typography>
+                </Toolbar>
+              </AppBar>
+              <div>
+                <Router/>
               </div>
-            </MuiThemeProvider>
-            <Footer/>
-          </div>
-        </ConnectedRouter>
-
+            </div>
+          </MuiThemeProvider>
+          <Footer/>
+        </div>
       </Provider>
     );
   }

@@ -2,9 +2,7 @@ import { ajax } from 'rxjs/observable/dom/ajax';
 import { ofType } from 'redux-observable';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 
-import { REQUEST_USER_REPOS_START } from '../actions/actionTypes';
-
-import { doUserReposFulfilled, doUserReposFailed } from '../actions/doUserRepos';
+import { doUserReposFulfilled, doUserReposFailed, REQUEST_USER_REPOS_START } from '../reducers/applyUserRepos.duck';
 
 // Also now using v6 pipe operators
 const fetchUserRepos = (action$, state$) =>

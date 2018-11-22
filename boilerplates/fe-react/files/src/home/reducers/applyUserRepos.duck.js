@@ -1,4 +1,4 @@
-const REQUEST_USER_REPOS_START = 'REQUEST_USER_REPOS_START';
+export const REQUEST_USER_REPOS_START = 'REQUEST_USER_REPOS_START';
 const REQUEST_USER_REPOS_SUCCESS = 'REQUEST_USER_REPOS_SUCCESS';
 const REQUEST_USER_REPOS_FAILED = 'REQUEST_USER_REPOS_FAILED';
 
@@ -33,22 +33,23 @@ export default function (state = initialState, action) {
       return state;
   }
 }
-const doUserRepos = (payload) => ({
+export const doUserRepos = (payload) => ({
   type: REQUEST_USER_REPOS_START,
   payload
 });
 
 
-const doUserReposFulfilled = (payload) => ({
+export const doUserReposFulfilled = (payload) => ({
   type: REQUEST_USER_REPOS_SUCCESS,
   payload
 });
 
 // on fail
-const doUserReposFailed = (payload) => ({
+export const doUserReposFailed = (payload) => ({
   type: REQUEST_USER_REPOS_FAILED,
   payload
-})
+});
 
 
-export const getUserRepos = (state) => (state.repos);
+export const getUserRepos = (state) => (state.home.userRepos.repos);
+export const isLoading = (state) => (state.home.userRepos.isLoading);

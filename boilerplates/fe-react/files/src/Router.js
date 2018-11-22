@@ -1,11 +1,10 @@
 import React from 'react';
 import { Route, Switch } from 'react-router';
 import Home from './home';
-import PageNotFound from './common/components/PageNotFound';
+import { PageNotFound } from './common/components/PageNotFound';
 import { history } from './history';
 import { ConnectedRouter } from 'connected-react-router';
 import withStyles from '@material-ui/core/styles/withStyles';
-
 
 export const Router = withStyles({
   app: {
@@ -27,8 +26,8 @@ export const Router = withStyles({
       <div className={classes.app}>
         <div className={classes.page}>
           <Switch>
-            <Route exact path="/" component={Home} />
-            <Route component={PageNotFound} />
+            <Route exact path="/" component={Home}/>
+            <Route component={PageNotFound}/>
           </Switch>
         </div>
       </div>

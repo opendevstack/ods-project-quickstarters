@@ -8,9 +8,6 @@ import { Router } from './Router';
 
 import store from './store';
 
-// common components
-import Footer from './common/components/Footer'
-
 class App extends Component {
 
   render() {
@@ -30,7 +27,6 @@ class App extends Component {
               </div>
             </div>
           </MuiThemeProvider>
-          <Footer/>
         </div>
       </Provider>
     );

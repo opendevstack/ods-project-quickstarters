@@ -1,6 +1,4 @@
-### Based on https://github.com/mohandere/cra-boilerplate
-
-# includes material instead of bootstrap
+### Customized version from https://github.com/mohandere/cra-boilerplate
 
 # ocp-react-material-boilerplate
 
@@ -93,30 +91,27 @@ Place all common components such as Header/Footer in `src/common/components` fol
 
 - Create a Module/Feature folder at `src/`
 like - - `src/home`
-Feature folder must contain booststrap file named `index.js` and css file 'style.css' at root
+Feature folder must contain file named `index.js` at root
 
 Like -
 
 - `src/home/index.js`
-- `src/home/style.css`
 
 Next as per need, add sub folders like -
 
-- `src/home/actions/`
 - `src/home/reducers/`
 - `src/home/epics/`
 - `src/home/containers/`
 - `src/home/components/`
 
 
-### Actions
 
-- Create folder named `actions` inside Feature folder like - `src/home/actions`
-- Place `actionTypes.js` which contains all actions to be exported
+### State handling
 
-### Reducers
-
- - Create folder named `reducers` inside Feature folder like - `src/home/reducers`
+- We bundle reducers, actions, seletors, operations and types in one "duck" style cluster to reduce overhead, the ducks are located in reducers folder (read more: 
+https://github.com/erikras/ducks-modular-redux
+https://medium.freecodecamp.org/scaling-your-redux-app-with-ducks-6115955638be)
+- Create folder named `reducers` inside Feature folder like - `src/home/reducers`
 - Place `index.js` which combines all reducers using `combineReducers`
 
 ### Epics
@@ -126,7 +121,7 @@ Next as per need, add sub folders like -
 
 ## Ajax Handling
 
-This boierplate comes with `rxjs` to handle ajax. Additionally as per need we can use other libs like `axios`.
+This boilerplate comes with `rxjs` to handle ajax. Additionally as per need we can use other libs like `axios`.
 
 Using Rxjs DOM api for ajax see file - `rxjs/observable/dom/ajax`
 [AjaxObservable](http://reactivex.io/rxjs/file/es6/observable/dom/AjaxObservable.js.html)
@@ -135,10 +130,6 @@ Using Rxjs DOM api for ajax see file - `rxjs/observable/dom/ajax`
 
 We are using CSS-in-JS solution which comes bundled with material-ui. 
 Read more about it at https://material-ui.com/css-in-js/basics/
-
-
-Finally you can import that css file in `index.js` file
-example - `src/home/index.js` will import `src/home/style.css`
 
 ## Analyzing the Bundle Size
 

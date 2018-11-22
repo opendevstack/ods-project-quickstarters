@@ -133,10 +133,9 @@ Using Rxjs DOM api for ajax see file - `rxjs/observable/dom/ajax`
 
 ## Styling
 
-we are using `scss` Preprocessor. Create a feature/domain specfic scss file, example - `src/home/style.scss`
+We are using CSS-in-JS solution which comes bundled with material-ui. 
+Read more about it at https://material-ui.com/css-in-js/basics/
 
-After compilation the new corresponding CSS file next to it.
-example - `src/home/style.css`
 
 Finally you can import that css file in `index.js` file
 example - `src/home/index.js` will import `src/home/style.css`

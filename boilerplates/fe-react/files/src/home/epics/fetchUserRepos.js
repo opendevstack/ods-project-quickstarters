@@ -5,7 +5,7 @@ import { catchError, mergeMap, map } from 'rxjs/operators';
 import { doUserReposFulfilled, doUserReposFailed, REQUEST_USER_REPOS_START } from '../reducers/applyUserRepos.duck';
 
 // Also now using v6 pipe operators
-const fetchUserRepos = (action$, state$) =>
+const fetchUserRepos = (action$) =>
   action$.pipe(
     ofType(REQUEST_USER_REPOS_START),
     mergeMap(action => {

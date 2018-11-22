@@ -28,8 +28,7 @@ Before starting with project, please headover to [CRA](https://github.com/facebo
 #### Features
 
 - Bundle Size analysis
-- Code splitting with [react-loadable](https://github.com/jamiebuilds/react-loadable)
-
+  
 ## Getting Started
 
 1. To run, go to project folder and run

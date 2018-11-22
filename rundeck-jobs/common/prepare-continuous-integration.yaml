@@ -13,7 +13,6 @@
     name: component_type
     required: true
     values:
-    - be-database
     - be-node-express
     - be-python-flask
     - be-scala-akka

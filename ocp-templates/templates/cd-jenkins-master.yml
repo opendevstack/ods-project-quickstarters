@@ -46,6 +46,7 @@ objects:
     name: '${JENKINS_SERVICE_NAME}'
     labels:
       template: cd-jenkins-master
+      app: jenkins-master
   spec:
     tls:
       insecureEdgeTerminationPolicy: Redirect
@@ -59,6 +60,7 @@ objects:
     name: '${JENKINS_SERVICE_NAME}'
     labels:
       template: cd-jenkins-master
+      app: jenkins-master
   spec:
     accessModes:
       - ReadWriteOnce
@@ -84,6 +86,7 @@ objects:
     name: '${JENKINS_SERVICE_NAME}'
     labels:
       template: cd-jenkins-master
+      app: jenkins-master
   spec:
     replicas: 1
     selector:
@@ -230,6 +233,7 @@ objects:
     name: '${JENKINS_SERVICE_NAME}'
     labels:
       template: cd-jenkins-master
+      app: jenkins-master
   spec:
     ports:
       - name: web

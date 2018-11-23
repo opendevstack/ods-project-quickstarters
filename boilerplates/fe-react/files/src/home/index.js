@@ -1,19 +1,30 @@
-import React, { Component } from 'react';
-import { Container } from 'reactstrap';
+import React from 'react';
 import UserRepos from './containers/UserRepos';
-import './style.css';
+import PropTypes from 'prop-types';
+import withStyles from '@material-ui/core/styles/withStyles';
 
-class Home extends Component {
-  render() {
-    return (
-      <div id="home">
-        <Container>
-          <h2 className="text-center">OpenDevStack</h2>
-          <UserRepos/>
-        </Container>
-      </div>
-    );
-  }
-}
+const styles = ({ spacing }) => ({
+  container: {
+    padding: `0 ${spacing.unit * 2}px`
+  },
+});
 
-export default Home;
+const Home = withStyles(({ spacing }) => ({
+  container: {
+    padding: `0 ${spacing.unit * 2}px`,
+    fontFamily: '"Roboto", sans-serif !important',
+    color: '#4a4a4a',
+  },
+}))(({ classes }) =>
+  (<div className={classes.container}>
+    <h2 className="text-center">OpenDevStack</h2>
+    <UserRepos/>
+  </div>));
+
+Home.propTypes = {
+  classes: PropTypes.object,
+};
+
+export default withStyles(styles)(Home);
+
+

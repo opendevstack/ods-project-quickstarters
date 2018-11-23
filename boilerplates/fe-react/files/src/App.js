@@ -1,55 +1,28 @@
-import React, {Component} from "react";
-import {Provider} from 'react-redux'
-import {ConnectedRouter} from 'react-router-redux';
-import {AppBar, createMuiTheme, CssBaseline, MuiThemeProvider, Toolbar, Typography} from '@material-ui/core';
+import React from "react";
+import { Provider } from 'react-redux'
+import { AppBar, CssBaseline, Toolbar, Typography } from '@material-ui/core';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { theme } from './theme';
+import { Router } from './Router';
 
-import store, {history} from './store';
-import './App.css';
-// routes
-import routes from './routes';
-// common components
-import Footer from './common/components/Footer'
+import store from './store';
 
-// Styles
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#ad1457',
-    },
-    secondary: {
-      main: '#cddc39',
-    },
-  },
-});
-
-
-class App extends Component {
-
-  render() {
-    return (
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <div className="App">
-            <MuiThemeProvider theme={theme}>
-              <div className="App">
-                <CssBaseline/>
-                <AppBar position="static">
-                  <Toolbar>
-                    <Typography variant="title" color="inherit">Name of the project</Typography>
-                  </Toolbar>
-                </AppBar>
-                <div className="wrap">
-                  {routes}
-                </div>
-              </div>
-            </MuiThemeProvider>
-            <Footer/>
-          </div>
-        </ConnectedRouter>
-
-      </Provider>
-    );
-  }
-}
+const App = () => (
+  <Provider store={store}>
+    <div>
+      <MuiThemeProvider theme={theme}>
+        <React.Fragment>
+          <CssBaseline/>
+          <AppBar position="static">
+            <Toolbar>
+              <Typography variant="title" color="inherit">BI X</Typography>
+            </Toolbar>
+          </AppBar>
+          <Router/>
+        </React.Fragment>
+      </MuiThemeProvider>
+    </div>
+  </Provider>
+);
 
 export default App;

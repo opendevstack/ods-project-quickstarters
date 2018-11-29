@@ -102,7 +102,8 @@ if [[ ! -z ${OD_PRJ_ADMINS} ]]; then
 fi
 
 # create jenkins in the cd project
-oc process cd//cd-jenkins-persistent NEXUS_URL=${NEXUS_HOST} | oc create -f- -n ${PROJECT}-cd
+oc process cd//cd-jenkins-master | oc create -f- -n ${PROJECT}-cd
+oc process cd//cd-jenkins-webhook-proxy | oc create -f- -n ${PROJECT}-cd
 
 # add secrets for dockerfile build to dev and tes
 oc process cd//secrets PROJECT=${PROJECT} | oc create -f- -n ${PROJECT}-dev

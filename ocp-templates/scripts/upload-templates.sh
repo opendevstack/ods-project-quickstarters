@@ -50,7 +50,6 @@ oc apply -n cd -f ../templates/cd-jenkins-master.yml
 oc apply -n cd -f ../templates/cd-jenkins-webhook-proxy.yml
 oc apply -n cd -f ../templates/component-environment.yml
 oc apply -n cd -f ../templates/component-route.yml
-oc apply -n cd -f ../templates/component-pipeline.yml
 oc apply -n cd -f ../templates/bc-docker.yml
 oc apply -n cd -f ../templates/secrets.yml
 oc apply -n cd -f ../templates/rshiny-app.yml

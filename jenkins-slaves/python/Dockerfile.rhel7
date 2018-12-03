@@ -39,7 +39,8 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
 
 # Upgrade PIP
 RUN pip3 install --upgrade pip \
-    && pip3 -V
+    && pip3 -V \
+    && pip3 install virtualenv
 
 # Continue as non-root
 RUN chown -R 1001:0 $HOME && \

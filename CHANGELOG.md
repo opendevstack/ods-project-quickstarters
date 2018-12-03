@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [1.0.0] - 2018-12-03
+
 ### Added
 - Spring Boot Jenkins pipeline surfaces test results (#34)
 - Jenkins webhook proxy templates (#81, #82)

@@ -137,7 +137,7 @@ objects:
                 name: crowd-service
                 key: password
           name: ${COMPONENT}-authproxy
-          image: shared-services/nginx-authproxy:2.0
+          image: shared-services/nginx-authproxy:3.0
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -157,7 +157,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: shared-services
-          name: 'nginx-authproxy:2.0'
+          name: 'nginx-authproxy:3.0'
       type: ImageChange
   status: {}
 - apiVersion: v1

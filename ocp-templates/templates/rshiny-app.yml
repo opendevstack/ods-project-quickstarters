@@ -122,6 +122,8 @@ objects:
         - env:
           - name: SERVICE
             value: ${COMPONENT}.${PROJECT}-${ENV}.svc.cluster.local
+          - name: SERVER_SIGNATURE
+            value: ${PROJECT}-${COMPONENT}
           - name: CROWD_REALM_NAME
             value: ${CROWD_REALM_NAME}
           - name: CROWD_URL

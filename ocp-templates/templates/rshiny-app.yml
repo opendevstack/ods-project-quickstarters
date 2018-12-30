@@ -124,6 +124,8 @@ objects:
             value: ${COMPONENT}.${PROJECT}-${ENV}.svc.cluster.local
           - name: SERVER_SIGNATURE
             value: ${PROJECT}-${COMPONENT}
+          - name: WAF_MODSECURITY
+            value: "off"
           - name: CROWD_REALM_NAME
             value: ${CROWD_REALM_NAME}
           - name: CROWD_URL

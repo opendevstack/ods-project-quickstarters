@@ -31,7 +31,7 @@
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project
-      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/feature/BIX-511-waf-api-gateway-quickstarter
+      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
     - description: create docker container for openshift client
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
     - description: create openshift rshiny app cd project

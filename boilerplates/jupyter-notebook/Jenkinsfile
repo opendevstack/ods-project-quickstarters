@@ -23,6 +23,16 @@ odsPipeline(
     '*': 'dev'
   ]
 ) { context ->
+  patchBuildConfig(context)
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
+}
+
+private void patchBuildConfig(def context, def componentId = null) {
+    sh """oc patch bc ${componentId ?: context.componentId} --type=json --patch '[
+    {"op": "replace", "path": "/spec/strategy/dockerStrategy", "value":{"buildArgs":[
+        {"name": "NEXUS_URL" ,"value": "${context.nexusHost}"},
+        {"name": "NEXUS_USERNAME" ,"value": "${context.nexusUsername}"},
+        {"name": "NEXUS_PASSWORD" ,"value": "${context.nexusPassword}"}]}},
+    ]' -n ${context.targetProject}"""
 }

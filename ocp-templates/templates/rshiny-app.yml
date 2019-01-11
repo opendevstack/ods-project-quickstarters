@@ -122,6 +122,10 @@ objects:
         - env:
           - name: SERVICE
             value: ${COMPONENT}.${PROJECT}-${ENV}.svc.cluster.local
+          - name: SERVER_SIGNATURE
+            value: ${PROJECT}-${COMPONENT}
+          - name: WAF_MODSECURITY
+            value: "off"
           - name: CROWD_REALM_NAME
             value: ${CROWD_REALM_NAME}
           - name: CROWD_URL
@@ -137,7 +141,7 @@ objects:
                 name: crowd-service
                 key: password
           name: ${COMPONENT}-authproxy
-          image: shared-services/nginx-authproxy:2.0
+          image: shared-services/nginx-authproxy:3.0
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -157,7 +161,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: shared-services
-          name: 'nginx-authproxy:2.0'
+          name: 'nginx-authproxy:3.0'
       type: ImageChange
   status: {}
 - apiVersion: v1

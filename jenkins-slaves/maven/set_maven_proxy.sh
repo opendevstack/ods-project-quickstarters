@@ -3,7 +3,7 @@
 # 
 if [[ $HTTP_PROXY != "" ]]; then
 
-mvn_proxy="<proxy><id>internal<id><active>true</active><protocol>http</protocol>"
+mvn_proxy="<proxy><id>internal</id><active>true</active><protocol>http</protocol>"
 
 	proxy=$(echo $HTTP_PROXY | sed -e "s|https://||g" | sed -e "s|http://||g")
 	proxy_hostp=$(echo $proxy | cut -d "@" -f2)

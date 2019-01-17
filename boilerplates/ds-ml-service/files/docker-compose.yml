@@ -1,0 +1,35 @@
+version: '3'
+networks:
+  dsi:
+services:
+  prediction:
+    container_name: prediction
+    build:
+      context: docker-prediction
+    environment:
+      DSI_TRAINING_BASE_URL: http://training:8080
+      DSI_TRAINING_SERVICE_USERNAME: dsitraining
+      DSI_TRAINING_SERVICE_PASSWORD: dsitraining123
+      DSI_PREDICTION_SERVICE_USERNAME: dsiprediction
+      DSI_PREDICTION_SERVICE_PASSWORD: dsiprediction123
+    ports:
+      - "8081:8080"
+    networks:
+      - dsi
+  training:
+    container_name: training
+    build:
+      context: docker-training
+    environment:
+      DSI_EXECUTE_ON: LOCAL # LOCAL or SSH
+      DSI_SSH_HOST: odl.bix-digital.com
+      DSI_TRAINING_SERVICE_USERNAME: dsitraining
+      DSI_TRAINING_SERVICE_PASSWORD: dsitraining123
+      DSI_SSH_USERNAME: x2dsi
+      DSI_SSH_PASSWORD: THIS_PASSWORD_SHOULD_BE_NOT_COMMITED
+      DSI_SSH_HTTP_PROXY: THIS_PASSWORD_SHOULD_BE_NOT_COMMITED
+      DSI_SSH_HTTPS_PROXY: THIS_PASSWORD_SHOULD_BE_NOT_COMMITED
+    ports:
+      - "8080:8080"
+    networks:
+      - dsi

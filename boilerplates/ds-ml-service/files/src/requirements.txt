@@ -1,0 +1,9 @@
+flask
+requests
+flask-executor
+pandas
+scikit-learn
+numpy
+joblib
+fabric
+Flask-HTTPAuth

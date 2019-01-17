@@ -1,0 +1,20 @@
+from invoke import Result
+
+
+class RemoteExecutionException(Exception):
+
+    def __init__(self, message: str, result: Result):
+        super(RemoteExecutionException, self).__init__()
+        self.message = message
+        self.remote_result = result
+
+    def __str__(self):
+        return """{message}        
+CMD: {remote_result.command}
+Exit Code: {remote_result.exited}
+
+### stdout ###
+{remote_result.stdout}
+### stderr ###
+{remote_result.stderr}
+##############""".format(message=self.message, remote_result=self.remote_result)

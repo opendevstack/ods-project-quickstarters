@@ -149,8 +149,10 @@ def stageSetupTrainingEnvironmentVariables(def context) {
             sh "oc create secret generic ${context.componentId}-training-secret --from-literal=username=${context.componentId}-training-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${context.targetProject}"
         }
 
-        sh "oc env dc/${context.componentId}-training-service --env=DSI_EXECUTE_ON=LOCAL -n ${context.targetProject}"
-        sh "oc env dc/${context.componentId}-training-service --from=secret/${context.componentId}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${context.targetProject}"
+        sh "oc set triggers dc/${context.componentId}-training-service --from-config --remove -n ${context.targetProject}"
+        sh "oc env dc/${context.componentId}-training-service --env=DSI_EXECUTE_ON=LOCAL -n ${context.targetProject} --overwrite"
+        sh "oc env dc/${context.componentId}-training-service --from=secret/${context.componentId}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${context.targetProject} --overwrite"
+        sh "oc set triggers dc/${context.componentId}-training-service --from-config -n ${context.targetProject}"
     }
 }
 
@@ -161,9 +163,11 @@ def stageSetupPredictionEnvironmentVariables(def context) {
             sh "oc create secret generic ${context.componentId}-prediction-secret --from-literal=username=${context.componentId}-prediction-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${context.targetProject}"
         }
 
-        sh "oc env dc/${context.componentId}-prediction-service --env=DSI_TRAINING_BASE_URL=http://${context.componentId}-training-service.${context.targetProject}.svc:8080 -n ${context.targetProject}"
-        sh "oc env dc/${context.componentId}-prediction-service --from=secret/${context.componentId}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${context.targetProject}"
-        sh "oc env dc/${context.componentId}-prediction-service --from=secret/${context.componentId}-prediction-secret --prefix=DSI_PREDICTION_SERVICE_ -n ${context.targetProject}"
+        sh "oc set triggers dc/${context.componentId}-prediction-service --from-config --remove -n ${context.targetProject}"
+        sh "oc env dc/${context.componentId}-prediction-service --env=DSI_TRAINING_BASE_URL=http://${context.componentId}-training-service.${context.targetProject}.svc:8080 -n ${context.targetProject} --overwrite"
+        sh "oc env dc/${context.componentId}-prediction-service --from=secret/${context.componentId}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${context.targetProject} --overwrite"
+        sh "oc env dc/${context.componentId}-prediction-service --from=secret/${context.componentId}-prediction-secret --prefix=DSI_PREDICTION_SERVICE_ -n ${context.targetProject} --overwrite"
+        sh "oc set triggers dc/${context.componentId}-prediction-service --from-config -n ${context.targetProject}"
     }
 }
 

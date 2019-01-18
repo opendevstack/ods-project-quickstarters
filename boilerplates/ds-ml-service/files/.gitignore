@@ -1,7 +1,7 @@
 .idea
 docker-prediction/dist
 docker-training/dist
-src/common/git_info.py
+src/services/infrastructure/git_info.py
 **/__pycache__
 
 ### Visual Studio Code ###

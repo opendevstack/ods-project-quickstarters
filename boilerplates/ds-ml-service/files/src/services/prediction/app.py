@@ -1,83 +1,35 @@
 import argparse
 
-import joblib
 import pandas as pd
-import requests
 from flask import jsonify, request
-from requests.auth import HTTPBasicAuth
 
-from services.infrastructure.environment import training_host_url, prediction_auth, training_auth, debug_mode
+from services.infrastructure.environment import training_host_url, debug_mode
 from services.infrastructure.flask import init_flask
 from services.infrastructure.git_info import GIT_COMMIT
+
 from services.infrastructure.logging import initialize_logging
+from services.prediction.model_load import load_model
+from services.infrastructure.environment import prediction_auth
 
 TRAINING_POD_URL = training_host_url()
-predictor = None
 
 app, _executor, auth = init_flask()
-users = None
+app.config['USERS'] = prediction_auth()
 
-
-def setup_local_test_users(username, password):
-    global users
-    users = {
-        username: password
-    }
-
-
-@auth.get_password
-def get_password(username):
-    global users
-    if not users:
-        users = prediction_auth()
-
-    if username in users:
-        return users.get(username)
-    return None
-
-
-def load_remote_model():
-    auth = training_auth(raiseException=False)
-    if not auth:
-        return None
-
-    username, password = auth.popitem()
-    response = requests.get(
-        '{0}/getmodel'.format(TRAINING_POD_URL), auth=HTTPBasicAuth(username=username, password=password), stream=True)
-    with open(GIT_COMMIT, 'wb') as f:
-        f.write(response.content)
-
-    print("model loaded")
-    _predictor = joblib.load(GIT_COMMIT)
-    return _predictor
-
-
-def load_local_model():
-    return joblib.load("resources/local.model")
-
-
-def load_model():
-    global predictor
-
-    if predictor:
-        return predictor
-
-    predictor = load_remote_model()
-    if not predictor:
-        predictor = load_local_model()
-
-    return predictor
+try:
+    app.config["PREDICTOR"] = app.config["PREDICTOR"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
+except Exception:
+    app.config['PREDICTOR'] = None
 
 
 @app.route('/predict', methods=['POST'])
 @auth.login_required
 def predict():
-    global predictor
 
-    if not predictor:
+    if not app.config["PREDICTOR"]:
         # noinspection PyBroadException
         try:
-            predictor = load_model()
+            app.config["PREDICTOR"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
         except Exception:
             msg = 'No model for prediction loaded yet'
             app.logger.error(msg)
@@ -90,7 +42,7 @@ def predict():
     app.logger.info(data)
 
     # Checking data object on consistency
-    if set(data.keys()).difference(predictor.source_features):
+    if set(data.keys()).difference(app.config["PREDICTOR"].source_features):
         msg = 'Not all prediction characteristics provided'
         app.logger.error(msg)
         resp = jsonify({'error': msg})
@@ -101,7 +53,7 @@ def predict():
     input_data = pd.DataFrame(data, index=[0])
 
     # predict new value including feature prep
-    res = predictor.prep_and_predict(input_data)
+    res = app.config["PREDICTOR"].prep_and_predict(input_data)
 
     return jsonify({'prediction': res})
 

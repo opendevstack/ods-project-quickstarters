@@ -6,6 +6,7 @@ from flask_executor import Executor
 from flask_httpauth import HTTPBasicAuth
 
 from services.infrastructure.logging import read_log
+from services.infrastructure.environment import prediction_auth, training_auth
 
 
 def init_flask():
@@ -18,6 +19,12 @@ def init_flask():
         jinja2.FileSystemLoader(['services/training/templates', 'services/prediction/templates']),
     ])
     app.jinja_loader = loader
+
+    @auth.get_password
+    def get_password(username):
+        if username in app.config['USERS']:
+            return app.config['USERS'].get(username)
+        return None
 
     return app, executor, auth
 

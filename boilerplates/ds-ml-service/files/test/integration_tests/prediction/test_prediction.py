@@ -5,7 +5,7 @@ from base64 import b64encode
 import pandas as pd
 from sklearn.metrics import accuracy_score
 
-from services.prediction.app import app, setup_local_test_users, load_model
+from services.prediction.app import app
 
 
 class TestIntegrationPrediction(unittest.TestCase):
@@ -16,12 +16,12 @@ class TestIntegrationPrediction(unittest.TestCase):
         # Adding users to authenticate against
         self.username = "user"
         self.password = "password"
-        setup_local_test_users(self.username, self.password)
+        app.config['USERS'][self.username] = self.password
 
         # read held back test data
         self.test_data = pd.read_csv("resources/test.csv")
         self.min_performance = 0.6
-        self.predictor = load_model()
+        self.predictor = app.config['PREDICTOR']
 
     def test_accuracy(self):
         # get prediction data

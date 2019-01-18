@@ -21,21 +21,12 @@ from services.infrastructure.remote.ssh.connection import SSHConnection
 TRAINING_KEY = '_training-job-key_'
 training_args = None
 
-_app, _executor, _auth = init_flask()
-users = None
-
-@_auth.get_password
-def get_pw(username):
-    global users
-
-    users = training_auth()
-    if username in users:
-        return users.get(username)
-    return None
+app, _executor, auth = init_flask()
+app.config['USERS'] = training_auth()
 
 
 @_executor.job
-@_auth.login_required
+@auth.login_required
 def start_training():
     logging.getLogger(__name__).info("Training execution started...")
     # noinspection PyBroadException
@@ -67,8 +58,8 @@ def start_training():
         _executor.futures.pop(TRAINING_KEY)
 
 
-@_app.route('/')
-@_auth.login_required
+@app.route('/')
+@auth.login_required
 def get_status():
     return render_template('index.html',
                            git={
@@ -82,8 +73,8 @@ def get_status():
                            status=status())
 
 
-@_app.route('/getmodel', methods=['GET'])
-@_auth.login_required
+@app.route('/getmodel', methods=['GET'])
+@auth.login_required
 def get_model():
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'error': "Model is not ready"}), 404
@@ -107,8 +98,8 @@ def response(queued: bool, _status=None):
     })
 
 
-@_app.route('/start', methods=['GET'])
-@_auth.login_required
+@app.route('/start', methods=['GET'])
+@auth.login_required
 def start():
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'error': 'There is a training job already running'}), 400
@@ -117,8 +108,8 @@ def start():
     return response(queued=True), 202
 
 
-@_app.route('/finished', methods=['GET'])
-@_auth.login_required
+@app.route('/finished', methods=['GET'])
+@auth.login_required
 def finished():
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'finished': False})
@@ -134,4 +125,4 @@ if __name__ == '__main__':
     flask_args = parser.parse_args()
 
     initialize_logging("training.log", flask_args.debug)
-    _app.run('0.0.0.0', flask_args.port, debug=debug_mode() or flask_args.debug)
+    app.run('0.0.0.0', flask_args.port, debug=debug_mode() or flask_args.debug)

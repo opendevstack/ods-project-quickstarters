@@ -58,7 +58,7 @@ mkdir {0}""".strip().format(self._target_folder),
 
         train_script = """
 import os
-from common.logging import initialize_logging
+from model.logging import initialize_logging
 from training.train import status, train
 os.chdir(\\"{0}/{1}\\")
 initialize_logging(remote=True)
@@ -88,7 +88,7 @@ train()""".strip().format(self._home_folder, self._environment_name)
         self._check_connection()
         self._copy_resources()
 
-        self._logger.info("Checking for conda instalation...")
+        self._logger.info("Checking for conda installation...")
 
         conda_result: invoke.Result = self._connection.run(command="{0} --version".format(self._conda_executable),
                                                            hide=not self._debug_mode,

@@ -28,7 +28,7 @@ class ClassificationModel(object):
         res = self.model.predict(prep_data).tolist()[0]
         return res
 
-    def prep_train(self, df):
+    def prep_and_train(self, df):
         # prepare features
         source_dataframe = df[self.source_features]
         prep_feature_df = self.prep_feature_df(source_dataframe)

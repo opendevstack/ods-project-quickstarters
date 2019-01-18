@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 
+import logging
+
 DSI_SSH_HTTPS_PROXY = "DSI_SSH_HTTPS_PROXY"
 
 DSI_SSH_HTTP_PROXY = "DSI_SSH_HTTP_PROXY"
@@ -74,24 +76,24 @@ def training_host_url() -> str:
     return os.getenv(DSI_TRAINING_BASE_URL, "http://training:8080")
 
 
-def training_auth(raiseException: bool = True) -> dict:
-    return _auth(DSI_TRAINING_SERVICE_USERNAME, DSI_TRAINING_SERVICE_PASSWORD, raiseException)
+def training_auth() -> dict:
+    return _auth(DSI_TRAINING_SERVICE_USERNAME, DSI_TRAINING_SERVICE_PASSWORD)
 
 
-def _auth(username_key, password_key, raiseException: bool = True) -> Optional[dict]:
+def _auth(username_key, password_key) -> Optional[dict]:
     user = os.getenv(username_key)
     password = os.getenv(password_key)
 
     if not user or not password:
-        if raiseException:
-            raise Exception("{0} and/or {1} environment variables are not set".format(username_key,
-                                                                                      password_key))
-        else:
-            return None
-    return {
-        user: password
-    }
+        logging.getLogger(__name__).warning("{0} and/or {1} environment variables are not set. "
+                                            "This behavior is only accepted during test".
+                                            format(username_key, password_key))
+        return {}
+    else:
+        return {
+            user: password
+        }
 
 
-def prediction_auth(raiseException: bool = True) -> dict:
-    return _auth(DSI_PREDICTION_SERVICE_USERNAME, DSI_PREDICTION_SERVICE_PASSWORD, raiseException)
+def prediction_auth() -> dict:
+    return _auth(DSI_PREDICTION_SERVICE_USERNAME, DSI_PREDICTION_SERVICE_PASSWORD)

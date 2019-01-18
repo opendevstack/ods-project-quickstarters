@@ -179,6 +179,11 @@ private boolean secretExists(String projectId, String environment, String secret
     return false
 }
 
+private String randomHash (def length='32') {
+    ret = sh returnStdout: true, script: "dd if=/dev/urandom bs=1 count=${length} 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'"
+    return ret.trim()
+}
+
 def stageMultipleDeployToOpenshift(def context, def stageName, def buildConfigs = null) {
     if (buildConfigs != null) {
         stage(stageName) {

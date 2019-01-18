@@ -142,6 +142,7 @@ private void patchBuildConfig(def context, def componentId = null) {
     ]' -n ${context.targetProject}"""
 }
 
+// THIS ALL SETUP STAGES WILL GO IN A RUNDECK HUGE SCRIPT
 def stageSetupTrainingEnvironmentVariables(def context) {
     stage ("Setup Training Environment Variables") {
         if (!secretExists(context.projectId, context.environment, "${context.componentId}-training-secret")) {

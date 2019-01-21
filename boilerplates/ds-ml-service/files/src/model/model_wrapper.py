@@ -4,7 +4,7 @@ from model.data_cleaning.replace import replace_strings, replace_missing
 from model.feature_prep.polynomial import add_polynomial
 
 
-class ClassificationModel(object):
+class ModelWrapper(object):
 
     def __init__(self):
         self.model = LogisticRegression()

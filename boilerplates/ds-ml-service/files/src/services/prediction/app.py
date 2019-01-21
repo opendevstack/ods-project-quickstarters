@@ -17,19 +17,19 @@ app, _executor, auth = init_flask()
 app.config['USERS'] = prediction_auth()
 
 try:
-    app.config["PREDICTOR"] = app.config["PREDICTOR"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
+    app.config["MODEL"] = app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
 except Exception:
-    app.config['PREDICTOR'] = None
+    app.config['MODEL'] = None
 
 
 @app.route('/predict', methods=['POST'])
 @auth.login_required
 def predict():
 
-    if not app.config["PREDICTOR"]:
+    if not app.config["MODEL"]:
         # noinspection PyBroadException
         try:
-            app.config["PREDICTOR"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
+            app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
         except Exception:
             msg = 'No model for prediction loaded yet'
             app.logger.error(msg)
@@ -42,7 +42,7 @@ def predict():
     app.logger.info(data)
 
     # Checking data object on consistency
-    if set(data.keys()).difference(app.config["PREDICTOR"].source_features):
+    if set(data.keys()).difference(app.config["MODEL"].source_features):
         msg = 'Not all prediction characteristics provided'
         app.logger.error(msg)
         resp = jsonify({'error': msg})
@@ -53,7 +53,7 @@ def predict():
     input_data = pd.DataFrame(data, index=[0])
 
     # predict new value including feature prep
-    res = app.config["PREDICTOR"].prep_and_predict(input_data)
+    res = app.config["MODEL"].prep_and_predict(input_data)
 
     return jsonify({'prediction': res})
 

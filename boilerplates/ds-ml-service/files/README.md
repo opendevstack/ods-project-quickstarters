@@ -1,10 +1,79 @@
 # Data Science Industrialization Boilerplate
 This boilerplate enables data scientists to develop, serve, version models within a CI/CD 
-pipeline hosted on openshift. 
+pipeline hosted on openshift with the goal in mind that one does not have to take care/change 
+much of the needed pipeline and infrastructure.
 
 ## Basic Setup ##
+The boilerplate provides a two pod setup in openshift, one pod for training service and one pod for 
+prediction service.
 
-Two pods in openshift
+##### Docker #####  
+Each service has their own *Dockerfile*, under *docker-prediction* respectively *docker-training*
+that can be changed according to your requirements on operating system dependencies.  
+The *docker-training* container provides a Pod that is able to recreate/train the model that is 
+developed in the current commit either locally on openshift or execute the training on a remote 
+linux system using ssh. The training process is wrapped into a flask server to be able to monitor
+ and possible restart the training process. Moreover, the training service offers and endpoint 
+ for downloading the created model afterwards.  
+The *docker-prediction* container provides a simple flask service for getting new predictions out
+ of your model by making json posts to the *prediction* endpoint.
+ The prediction service downloads the newly trained model from the training pod after startup.
+
+##### Jenkins #####
+The Jenkinsfile organizes the correct succession of spinning up the training, executing it and 
+starting the new deployment of the prediction service.  
+Additionally, it executes unittest ensuring the the code is functionally before a new training 
+process is started, as well as executing integration tests against the prediction endpoint to 
+ensure quality checks before redeploying models in openshift.
+ 
+##### External Files #####
+External files that are needed either for building your model or docker images are stored under 
+*resources*. For demonstration purposes a training and test csv file is stored in resources. 
+
+##### src -  the heart of your service #####
+The *src* folder contains the infrastructure coded needed for providing the services in openshift
+ in *services*. Custom code for developing your prediction service is organized in the *model* 
+ package.  
+ In the (common) *requirements.txt* you can specify python dependencies for training, prediction 
+ and tests. To keep it simple, there is only one requirements.txt for both pods.
+ 
+ 
+##### test ##### 
+The *test* directory mirrors the structure of the *src*, either for unittests or integration 
+tests using the python unittest framework.
+ 
+ 
+#### How to Code Your Own Models ####
+To run your own customized models there is usually no need to change either the Jenkinsfile, 
+openshift setup or the training and prediction microservices.  
+Custom model code will go under *src/model* and can be organized in custom packages like 
+showcased with the *data_cleaning* and *feature_prep*. But in general can be organized as 
+preferred.  
+There are no further restrictions for developing the in the style you want, for the exception to 
+provide the mandatory functions in the ModelWrapper class:
+- **prep_and_train**: is called by the train script (which one can customize) and expects a 
+pandas dataframe (current implementation). The train script is called by the training service
+- **prep_and_predict**: is called by the *predict* endpoint from the prediction service. It 
+expects a pandas dataframe with the column names corresponding to the feature names. The predict 
+endpoint takes the json request, converts it into a pandas dataframe (for simplicity, even if it 
+contains only one row) and executes **prep_and_predict**.
+
+Make sure your specified all dependencies in the requirements.txt
+
+#### How to Develop your Model Locally ####
+It is recommended to develop your code against the python interpreter & dependencies specified in
+ the docker images.
+ This can easily achieved, either by using an IDE that supports that (e.g. PyCharm) or by doing 
+ manually in the docker container.
+ 
+The whole setup (prediction and training service) can be tested using the attached docker-compose
+
+
+
+##### Example Dataset ####
+**Iris flower data set**. (n.d.). In Wikipedia. Retrieved January 7, 2019, from https://en.wikipedia.org/wiki/Iris_flower_data_set
+
+
 
 ### Environment Variables for training ###
 
@@ -33,18 +102,8 @@ Two pods in openshift
 | DSI_PREDICTION_SERVICE_USERNAME | Username to be set as default username for accessing the service | string, required |
 | DSI_PREDICTION_SERVICE_PASSWORD | Password to be set as default password for accessing the service | string, required |
 
-## How to Code Your Own Models ## 
-
-common folder
-
-#### How to Develop Locally ####
-
-Develop against the docker training image
 
 
-
-#### Example Dataset ####
-**Iris flower data set**. (n.d.). In Wikipedia. Retrieved January 7, 2019, from https://en.wikipedia.org/wiki/Iris_flower_data_set
 
 
 ## Structure of the quick starter ##

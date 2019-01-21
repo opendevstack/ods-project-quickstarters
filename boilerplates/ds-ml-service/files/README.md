@@ -70,7 +70,12 @@ The whole setup (prediction and training service) can be tested using the attach
 
 
 
-##### Example Dataset ####
+#### Example & Example Dataset ####
+An example implementation of a custom model is given in *model*, to demonstrate how to organize 
+your custom code.  
+A Logistic Regression using scikit-learn with some (unnecessary) feature cleaning and engineering
+ is trained on the iris data flower set.  
+ 
 **Iris flower data set**. (n.d.). In Wikipedia. Retrieved January 7, 2019, from https://en.wikipedia.org/wiki/Iris_flower_data_set
 
 

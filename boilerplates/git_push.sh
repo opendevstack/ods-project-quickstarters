@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+set -eux
 
 while [[ "$#" > 0 ]]; do case $1 in
   -d=*|--dir=*) directory="${1#*=}";;
@@ -30,7 +30,7 @@ if [ $files == 0 ]; then
 else
 	echo "Upgrading existing project: ${git_url_ssh}"
 	mv "$cloned_git_fld_name"/* .
-	mv "$cloned_git_fld_name"/.git .git
+	mv "$cloned_git_fld_name"/.* .
 fi
 
 rm -rf "$cloned_git_fld_name"

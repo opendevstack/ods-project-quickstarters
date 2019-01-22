@@ -31,11 +31,11 @@ RUN pip install --upgrade pip && \
     fi
 
 # Copying all the code
-
 COPY dist /app
 
 USER root
 
+# Is needed that the special user (1001) needed for starting python servers has the permissions
 RUN chgrp -R 0 /app && \
     chmod -R g=u /app && \
     chmod +x /app/run.sh && \

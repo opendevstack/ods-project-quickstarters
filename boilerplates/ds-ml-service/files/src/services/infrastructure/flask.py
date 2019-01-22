@@ -6,7 +6,6 @@ from flask_executor import Executor
 from flask_httpauth import HTTPBasicAuth
 
 from services.infrastructure.logging import read_log
-from services.infrastructure.environment import prediction_auth, training_auth
 
 
 def init_flask():

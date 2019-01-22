@@ -8,18 +8,20 @@ import traceback
 from flask import jsonify, send_file
 from flask.templating import render_template
 
-from model.train import train
+from model.trainer import train
 from services.infrastructure.environment import debug_mode, execution_environment, DSI_EXECUTE_ON_LOCAL, \
     DSI_EXECUTE_ON_SSH, ssh_host, \
     ssh_username, ssh_password, ssh_port, DSI_EXECUTE_ON, training_auth
 from services.infrastructure.flask import init_flask, status
 from services.infrastructure.git_info import GIT_COMMIT, GIT_COMMIT_SHORT, GIT_BRANCH, GIT_LAST_CHANGE, GIT_REPO_NAME
 from services.infrastructure.logging import initialize_logging
-from services.infrastructure.remote.ssh.connection import SSHConnection
+from services.infrastructure.remote.ssh.executors import SSHRemoteExecutor
 
-# Init flask application
 TRAINING_KEY = '_training-job-key_'
-training_args = None
+"""
+Key used for storing the training thread in the executor. It ensures that only one training
+instance will run at certain point in time
+"""
 
 app, _executor, auth = init_flask()
 app.config['USERS'] = training_auth()
@@ -28,24 +30,29 @@ app.config['USERS'] = training_auth()
 @_executor.job
 @auth.login_required
 def start_training():
+    """Starts the training asynchronously using the flask executor
+
+    It runs the training based on the DSI_EXECUTE_ON environment variable and at the end, removes the future from
+    the executor
+    """
     logging.getLogger(__name__).info("Training execution started...")
     # noinspection PyBroadException
     try:
-        environemnt = execution_environment()
-        if environemnt == DSI_EXECUTE_ON_LOCAL:
+        environment = execution_environment()
+        if environment == DSI_EXECUTE_ON_LOCAL:
             train()
-        elif environemnt == DSI_EXECUTE_ON_SSH:
-            connection = SSHConnection(host=ssh_host(),
-                                       username=ssh_username(),
-                                       password=ssh_password(),
-                                       debug_mode=debug_mode() or flask_args.debug,
-                                       port=ssh_port())
+        elif environment == DSI_EXECUTE_ON_SSH:
+            connection = SSHRemoteExecutor(host=ssh_host(),
+                                           username=ssh_username(),
+                                           password=ssh_password(),
+                                           debug_mode=debug_mode() or flask_args.debug,
+                                           port=ssh_port())
 
             connection.setup_prerequisites()
             connection.run_training()
             connection.save_model_locally()
         else:
-            raise Exception("{0} has a unknown value '{1}'".format(DSI_EXECUTE_ON, environemnt))
+            raise Exception("{0} has a unknown value '{1}'".format(DSI_EXECUTE_ON, environment))
 
         logging.getLogger(__name__).info("Training execution ended!!!")
     except Exception:
@@ -61,6 +68,7 @@ def start_training():
 @app.route('/')
 @auth.login_required
 def get_status():
+    """Reports back the training services status"""
     return render_template('index.html',
                            git={
                                'commit': GIT_COMMIT,
@@ -69,13 +77,13 @@ def get_status():
                                'last_change': GIT_LAST_CHANGE,
                                'name': GIT_REPO_NAME
                            },
-                           training_args=vars(training_args) if training_args else {},
                            status=status())
 
 
 @app.route('/getmodel', methods=['GET'])
 @auth.login_required
 def get_model():
+    """Download the trained model if any or reports 404 when the model is not available"""
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'error': "Model is not ready"}), 404
 
@@ -90,7 +98,23 @@ def get_model():
         return jsonify({'error': "Model could not be found"}), 404
 
 
-def response(queued: bool, _status=None):
+def response(queued: bool, _status: str = None):
+    """Renders the default json answer for the requests
+
+    Parameters
+    ----------
+    queued: if the job is queued
+    _status: text status of the job (Content of the log file)
+
+    HTTP Response
+    -------------
+        Rendered json with:
+        {
+            'queued': queued,
+            'running': <true if the job is already running>,
+            'status': _status
+        }
+    """
     return jsonify({
         'queued': queued,
         'running': _executor.futures.running(TRAINING_KEY),
@@ -101,6 +125,15 @@ def response(queued: bool, _status=None):
 @app.route('/start', methods=['GET'])
 @auth.login_required
 def start():
+    """Request the training to start
+
+    HTTP Response
+    -------------
+    html
+        202: If the training was queued<br/>
+        400: If is already a training running
+
+    """
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'error': 'There is a training job already running'}), 400
 
@@ -111,6 +144,14 @@ def start():
 @app.route('/finished', methods=['GET'])
 @auth.login_required
 def finished():
+    """Reports back the status of the training
+
+    HTTP Response
+    -------------
+    json
+        { 'finished': True if finished }
+
+    """
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'finished': False})
     else:
@@ -118,7 +159,7 @@ def finished():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Traning model and saving it")
+    parser = argparse.ArgumentParser(description="Training model and saving it")
     parser.add_argument("--port", "-p", required=False, default=8080, type=int, help="Port number for the Flask server")
     parser.add_argument("--debug", "-d", action="store_true", help="Enables debug mode in the Flask server")
 

@@ -21,7 +21,7 @@ class TestIntegrationPrediction(unittest.TestCase):
         # read held back test data
         self.test_data = pd.read_csv("resources/test.csv")
         self.min_performance = 0.6
-        self.predictor = app.config['PREDICTOR']
+        self.predictor = app.config['MODEL']
 
     def test_accuracy(self):
         # get prediction data

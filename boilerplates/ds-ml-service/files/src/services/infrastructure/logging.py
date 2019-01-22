@@ -8,11 +8,32 @@ log_path = None
 
 
 class FileHandlerFilter(logging.Filter):
+    """Log filter for removing all Flask and werkzeug log messages from the logs. If debug mode is enabled
+    then the messages will not be filtered out
+    """
+
     def filter(self, record: logging.LogRecord) -> bool:
-        return not record.name.startswith(('flask', 'werkzeug'))
+        return not record.name.startswith(('flask', 'werkzeug')) or debug_mode()
 
 
-def initialize_logging(path, debug=debug_mode(), remote=False):
+def initialize_logging(path, debug=debug_mode(), remote=False) -> None:
+    """Initializes the python's logging factory with a console and a file log handler for all log messages
+
+    Parameters
+    ----------
+    path: str
+        Path where the logging.FileHandler should save the log messages
+    debug: bool
+        Changes the log level from INFO to DEBUG
+    remote: bool
+        If trues adds a 'REMOTE' to all log messages. Should be true only on the remote executable scripts.
+
+    Warnings
+    --------
+    remote:  Should be true only on the remote executable scripts.
+
+
+    """
     global log_path
 
     log_path = path
@@ -35,6 +56,14 @@ def initialize_logging(path, debug=debug_mode(), remote=False):
 
 
 def read_log() -> Optional[str]:
+    """Reads the complete log file
+
+    Returns
+    -------
+    str
+        Log file contents
+
+    """
     global log_path
 
     if os.path.exists(log_path):

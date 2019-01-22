@@ -41,12 +41,10 @@ odsPipeline(
     stageUnitTests(context)
     stageBuild(context)
     stageStartMultipleOpenshiftBuild(context, "Build Training Image" ,trainingConfig)
-    stageSetupTrainingEnvironmentVariables(context)
     stageMultipleDeployToOpenshift(context, "Deploy Training Pod", trainingConfig)
     stageTraining(context)
     stageIntegrationTest(context)
     stageStartMultipleOpenshiftBuild(context, "Build Prediction Image", predictionConfig)
-    stageSetupPredictionEnvironmentVariables(context)
     stageMultipleDeployToOpenshift(context, "Deploy Prediction Pod", predictionConfig)
 }
 
@@ -70,7 +68,6 @@ def stageUnitTests(def context) {
         }
     }
 }
-
 
 def stageBuild(def context) {
     stage('Prepare Docker Builds') {
@@ -97,7 +94,7 @@ def stageTraining(def context) {
         training_username = sh(returnStdout: true, script:"echo \"${training_username}\" | base64 --decode").trim()
 
         sh "oc port-forward ${training_pod_info[0]} 8080 -n ${context.targetProject} &"
-        sh  "python3 jenkinsfile_helper.py --training-service ${training_route} --username \"${training_username}\" --password \"${training_password}\""
+        sh "python3 jenkinsfile_helper.py --training-service ${training_route} --username \"${training_username}\" --password \"${training_password}\""
     }
 }
 
@@ -140,49 +137,6 @@ private void patchBuildConfig(def context, def componentId = null) {
         {"name": "NEXUS_USERNAME" ,"value": "${context.nexusUsername}"},
         {"name": "NEXUS_PASSWORD" ,"value": "${context.nexusPassword}"}]}},
     ]' -n ${context.targetProject}"""
-}
-
-// THIS ALL SETUP STAGES WILL GO IN A RUNDECK HUGE SCRIPT
-def stageSetupTrainingEnvironmentVariables(def context) {
-    stage ("Setup Training Environment Variables") {
-        if (!secretExists(context.projectId, context.environment, "${context.componentId}-training-secret")) {
-            tmpHash = randomHash(32)
-            sh "oc create secret generic ${context.componentId}-training-secret --from-literal=username=${context.componentId}-training-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${context.targetProject}"
-        }
-
-        sh "oc set triggers dc/${context.componentId}-training-service --from-config --remove -n ${context.targetProject}"
-        sh "oc env dc/${context.componentId}-training-service --env=DSI_EXECUTE_ON=LOCAL -n ${context.targetProject} --overwrite"
-        sh "oc env dc/${context.componentId}-training-service --from=secret/${context.componentId}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${context.targetProject} --overwrite"
-        sh "oc set triggers dc/${context.componentId}-training-service --from-config -n ${context.targetProject}"
-    }
-}
-
-def stageSetupPredictionEnvironmentVariables(def context) {
-    stage ("Setup Prediction Environment Variables") {
-        if (!secretExists(context.projectId, context.environment, "${context.componentId}-prediction-secret")) {
-            tmpHash = randomHash(32)
-            sh "oc create secret generic ${context.componentId}-prediction-secret --from-literal=username=${context.componentId}-prediction-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${context.targetProject}"
-        }
-
-        sh "oc set triggers dc/${context.componentId}-prediction-service --from-config --remove -n ${context.targetProject}"
-        sh "oc env dc/${context.componentId}-prediction-service --env=DSI_TRAINING_BASE_URL=http://${context.componentId}-training-service.${context.targetProject}.svc:8080 -n ${context.targetProject} --overwrite"
-        sh "oc env dc/${context.componentId}-prediction-service --from=secret/${context.componentId}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${context.targetProject} --overwrite"
-        sh "oc env dc/${context.componentId}-prediction-service --from=secret/${context.componentId}-prediction-secret --prefix=DSI_PREDICTION_SERVICE_ -n ${context.targetProject} --overwrite"
-        sh "oc set triggers dc/${context.componentId}-prediction-service --from-config -n ${context.targetProject}"
-    }
-}
-
-private boolean secretExists(String projectId, String environment, String secret) {
-    ret = sh(script: "oc get secrets -n ${projectId}-${environment}", returnStdout: true)
-    if (ret.trim().contains(secret)) {
-        return true
-    }
-    return false
-}
-
-private String randomHash (def length='32') {
-    ret = sh returnStdout: true, script: "dd if=/dev/urandom bs=1 count=${length} 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'"
-    return ret.trim()
 }
 
 def stageMultipleDeployToOpenshift(def context, def stageName, def buildConfigs = null) {

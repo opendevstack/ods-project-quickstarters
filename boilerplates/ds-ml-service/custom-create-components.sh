@@ -66,7 +66,7 @@ for devenv in dev test ; do
         oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT}-${type} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
 
         # create component environment variables
-        echo "environment variables for component type ${type}";
+        echo "--> setting environment variables for component type ${type} in env ${devenv}";
         if [ ${type} = "training-service" ]; then
             oc create secret generic ${COMPONENT}-training-secret --from-literal=username=${COMPONENT}-training-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${PROJECT}-${devenv}
             oc set triggers dc/${COMPONENT}-${type} --from-config --remove -n ${PROJECT}-${devenv}

@@ -4,6 +4,77 @@ import time
 import requests
 from requests.auth import HTTPBasicAuth
 
+
+def start_traning(host_url, http_auth):
+    """Starts the training on the training service as soon as the pod in openshift is ready.
+
+    Notes
+    -----
+    Every 5 seconds it is checked if the training can be started, i.e. the training pod is
+    running. Will be shutdown after 150 seconds which would mean that the deployment of the
+    training service was most likely not successful.
+
+    Parameters
+    ----------
+    host_url : String
+        Training service url
+    http_auth : request.auth.HTTPBasicAuth
+        set with username and password for authenticating against the training service
+
+
+    Returns
+    -------
+    success : bool
+        indicates the success of the result of the training process
+
+    """
+    response = None
+    count = 0
+    print("Training server is on: {0}".format(host_url))
+
+    while count < 30:
+        # noinspection PyBroadException
+        try:
+            response = requests.get(
+                '{0}/start'.format(host_url), auth=http_auth, stream=True)
+            success = True
+            return success
+        except Exception:
+            count += 1
+            time.sleep(5)
+            continue
+
+    if not response or response.status_code != 202:
+        print("Training service not reachable!")
+        success = False
+        return success
+
+
+def wait_for_training():
+    """check every 5 seconds if the training has finished using the *finished* endpoint fromt he
+    training service
+
+    Returns
+    -------
+    finished : bool
+        indicating if the training has finished successful
+
+    """
+    finished = False
+    while not finished:
+        try:
+            print("Waiting for the training to finished...")
+            response = requests.get(
+                '{0}/finished'.format(host), auth=auth, stream=True)
+            res_json = response.json()
+            if res_json['finished']:
+                finished = True
+                print("Training finished")
+                return finished
+        finally:
+            time.sleep(5)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Wait for training pod to finish training")
@@ -19,39 +90,7 @@ if __name__ == '__main__':
     host = args.host
     auth = HTTPBasicAuth(username=args.username, password=args.password)
 
-    # start training
-    response = None
-    count = 0
-    print("Training server is on: {0}".format(host))
-    time.sleep(30)
-    while count < 20:
-        try:
-            response = requests.get(
-                '{0}/start'.format(host), auth=auth, stream=True)
+    training_started = start_traning(host, auth)
 
-            break
-        except Exception:
-            count += 1
-            time.sleep(5)
-            continue
-
-    if not response or response.status_code != 202:
-        print("Training service not reachable!")
-        exit(1)
-
-    print("Training started....")
-
-    # check every 5 seconds inf training has finished
-    training_finished = False
-    while not training_finished:
-        try:
-            print("Waiting for the training to finished...")
-            response = requests.get(
-                '{0}/finished'.format(host), auth=auth, stream=True)
-            res_json = response.json()
-            if res_json['finished']:
-                training_finished = True
-                print("Training finished")
-                break
-        finally:
-            time.sleep(5)
+    if training_started:
+        training_finished = wait_for_training()

@@ -2,14 +2,14 @@
 
 ## [Unreleased]
 
-
-## [1.0.1] - 2019-01-25
-
 ### Added
 - Rundeck `prepare-continous integration` job can now be used to upgrade an existing git repository ([#110](https://github.com/opendevstack/ods-project-quickstarters/pull/110))
 
 ### Changed
 - Jupyter & R-Shiny quickstarters are now based on new Openresty-based WAF image ([#103](https://github.com/opendevstack/ods-project-quickstarters/pull/103))
+
+
+## [1.0.1] - 2019-01-25
 
 ### Fixed
 - Exclude images in `openshift` and `rhscl` namespace on import ([#102](https://github.com/opendevstack/ods-project-quickstarters/pull/102))

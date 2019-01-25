@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [1.0.1] - 2019-01-25
+
 ### Fixed
 - Exclude images in `openshift` and `rhscl` namespace on import ([#102](https://github.com/opendevstack/ods-project-quickstarters/pull/102))
 - Maven slave fails when proxy is configured due to invalid XML ([#108](https://github.com/opendevstack/ods-project-quickstarters/pull/108))

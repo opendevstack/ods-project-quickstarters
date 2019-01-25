@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [1.0.1] - 2019-01-25
+
 ### Added
 - Rundeck `prepare-continous integration` job can now be used to upgrade an existing git repository ([#110](https://github.com/opendevstack/ods-project-quickstarters/pull/110))
 

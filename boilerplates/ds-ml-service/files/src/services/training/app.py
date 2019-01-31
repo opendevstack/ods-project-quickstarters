@@ -9,11 +9,12 @@ from flask import jsonify, send_file
 from flask.templating import render_template
 
 from model.trainer import train
-from services.infrastructure.environment import debug_mode, execution_environment, DSI_EXECUTE_ON_LOCAL, \
-    DSI_EXECUTE_ON_SSH, ssh_host, \
+from services.infrastructure.environment import debug_mode, execution_environment, \
+    DSI_EXECUTE_ON_LOCAL, DSI_EXECUTE_ON_SSH, ssh_host, \
     ssh_username, ssh_password, ssh_port, DSI_EXECUTE_ON, training_auth
 from services.infrastructure.flask import init_flask, status
-from services.infrastructure.git_info import GIT_COMMIT, GIT_COMMIT_SHORT, GIT_BRANCH, GIT_LAST_CHANGE, GIT_REPO_NAME
+from services.infrastructure.git_info import GIT_COMMIT, GIT_COMMIT_SHORT, GIT_BRANCH, \
+    GIT_LAST_CHANGE, GIT_REPO_NAME
 from services.infrastructure.logging import initialize_logging
 from services.infrastructure.remote.ssh.executors import SSHRemoteExecutor
 
@@ -32,8 +33,8 @@ app.config['USERS'] = training_auth()
 def start_training():
     """Starts the training asynchronously using the flask executor
 
-    It runs the training based on the DSI_EXECUTE_ON environment variable and at the end, removes the future from
-    the executor
+    It runs the training based on the DSI_EXECUTE_ON environment variable and at the end,
+    removes the future from the executor
     """
     logging.getLogger(__name__).info("Training execution started...")
     # noinspection PyBroadException
@@ -56,6 +57,10 @@ def start_training():
 
         logging.getLogger(__name__).info("Training execution ended!!!")
     except Exception:
+        # This exception is broad because we cannot forseen all possible exceptions in
+        # the DS train code.
+        # Also, since this train is beeing executed in a separed thread all exceptions
+        # should be catched
         logging.getLogger(__name__).info("Training execution raised an exception...")
         f = io.StringIO()
         traceback.print_exc(file=f)
@@ -160,8 +165,10 @@ def finished():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Training model and saving it")
-    parser.add_argument("--port", "-p", required=False, default=8080, type=int, help="Port number for the Flask server")
-    parser.add_argument("--debug", "-d", action="store_true", help="Enables debug mode in the Flask server")
+    parser.add_argument("--port", "-p", required=False, default=8080, type=int,
+                        help="Port number for the Flask server")
+    parser.add_argument("--debug", "-d", action="store_true",
+                        help="Enables debug mode in the Flask server")
 
     flask_args = parser.parse_args()
 

@@ -21,8 +21,9 @@ app.config['USERS'] = prediction_auth()
 # initialize model. Try loading it, fallback (e.g. training service is not up, yet) set it to None.
 # noinspection PyBroadException
 try:
-    app.config["MODEL"] = app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
-except Exception:
+    app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
+except FileNotFoundError:
+    print("remote model and local backup model can't be found, for the moment....")
     app.config['MODEL'] = None
 
 
@@ -50,7 +51,7 @@ def predict():
         # noinspection PyBroadException
         try:
             app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
-        except Exception:
+        except FileNotFoundError:
             msg = 'No model for prediction loaded yet'
             app.logger.error(msg)
             return jsonify({'error': msg}), 404
@@ -81,8 +82,10 @@ def predict():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Training model and saving it")
-    parser.add_argument("--port", "-p", required=False, default=8080, type=int, help="Port number for the Flask server")
-    parser.add_argument("--debug", "-d", action="store_true", help="Enables debug mode in the Flask server")
+    parser.add_argument("--port", "-p", required=False, default=8080, type=int,
+                        help="Port number for the Flask server")
+    parser.add_argument("--debug", "-d", action="store_true",
+                        help="Enables debug mode in the Flask server")
 
     flask_args = parser.parse_args()
 

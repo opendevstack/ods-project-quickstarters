@@ -39,7 +39,8 @@ def start_traning(host_url, http_auth):
                 '{0}/start'.format(host_url), auth=http_auth, stream=True)
             success = True
             return success
-        except Exception:
+        except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError,
+                ConnectionResetError):
             count += 1
             time.sleep(5)
             continue

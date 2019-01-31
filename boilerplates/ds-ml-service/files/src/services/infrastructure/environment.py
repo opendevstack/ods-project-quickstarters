@@ -161,7 +161,8 @@ def training_host_url() -> str:
     Returns
     -------
     str
-        Returns DSI_TRAINING_BASE_URL environment variable value or http://training:8080 (docker compose url)
+        Returns DSI_TRAINING_BASE_URL environment variable value or http://training:8080
+        (docker compose url)
 
     """
     return os.getenv(DSI_TRAINING_BASE_URL, "http://training:8080")
@@ -190,8 +191,8 @@ def training_auth() -> dict:
 
 def _auth(username_key: str, password_key: str) -> Optional[dict]:
     """
-    Creates username password dictionary based on environment variable names given by the parameters. It warns if
-    there is no values for the username and/or password.
+    Creates username password dictionary based on environment variable names given by
+    the parameters. It warns if there is no values for the username and/or password.
 
     Parameters
     ----------
@@ -205,7 +206,8 @@ def _auth(username_key: str, password_key: str) -> Optional[dict]:
     dict
         Returns a dictionary with user authentication parameters based on environment variables as:
         {
-            <value of username_key environment variable> : <value of password_key environment variable>
+            <value of username_key environment variable> :
+             <value of password_key environment variable>
         }
 
     """

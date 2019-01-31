@@ -13,14 +13,16 @@ from services.infrastructure.remote.ssh.exceptions import RemoteExecutionExcepti
 
 
 class SSHRemoteExecutor(object):
-    """This class enables the remote execution (through a SSH connection) of the model.train.train() function
+    """This class enables the remote execution (through a SSH connection) of the
+    model.train.train() function
 
     Attributes
     ----------
 
     _environment_name: str
-        Environment name on the remote machine. It is defined by <repo name>-<branch name> (replacing / for -). This
-        name defines the folder where the code is copied to and the conda environment name
+        Environment name on the remote machine. It is defined by <repo name>-<branch name>
+        (replacing / for -). This name defines the folder where the code is copied to and the
+        conda environment name
     _logger: logging.Logger
         Default logger for the class
     _debug_mode: bool
@@ -32,8 +34,8 @@ class SSHRemoteExecutor(object):
     _home_folder: str
         Remote user home folder
     _python_path: str
-        Contains PYTHONPATH=$PYTHONPATH:<remote home folder>/<environment name> for using it during python
-        script execution
+        Contains PYTHONPATH=$PYTHONPATH:<remote home folder>/<environment name> for using  it
+        during python script execution
 
     Examples
     --------
@@ -76,7 +78,8 @@ class SSHRemoteExecutor(object):
                                                       "password": password
                                                   })
 
-        self._environment_name = "{0}-{1}".format(git_info.GIT_REPO_NAME, git_info.GIT_BRANCH.replace("/", "-"))
+        self._environment_name = "{0}-{1}".format(git_info.GIT_REPO_NAME,
+                                                  git_info.GIT_BRANCH.replace("/", "-"))
         self._env: Optional[dict] = None
 
     def _copy_resources(self) -> None:
@@ -112,7 +115,8 @@ mkdir {0}""".strip().format(self._target_folder),
 
         Notes
         -----
-            The code that is being executed on the created conda environment. The executions works as following:
+            The code that is being executed on the created conda environment. The executions
+            works as following:
 
             Remote script
 
@@ -121,8 +125,8 @@ mkdir {0}""".strip().format(self._target_folder),
             $              [<if self._debug_mode> --debug]
         """
         train_script = "{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0} {" \
-                       "1}".strip().format(
-            self._target_folder, "--debug" if self._debug_mode else "")
+                       "1}".strip().\
+            format(self._target_folder, "--debug" if self._debug_mode else "")
 
         result = self._connection.run(
             command=self._create_run_script(train_script),
@@ -138,7 +142,8 @@ mkdir {0}""".strip().format(self._target_folder),
     def save_model_locally(self) -> None:
         """Saves the remote trained model in the local machine/pod as GIT_COMMIT.model"""
 
-        model_file = "{0}/{1}/{2}.model".format(self._home_folder, self._environment_name, GIT_COMMIT)
+        model_file = "{0}/{1}/{2}.model".format(self._home_folder, self._environment_name,
+                                                GIT_COMMIT)
         self._logger.info("Downloading the model from {0}...".format(model_file))
         self._connection.get(model_file, "/app/{0}".format(os.path.basename(model_file)))
         self._logger.info("Downloading the model from {0}... Done!".format(model_file))
@@ -153,7 +158,8 @@ mkdir {0}""".strip().format(self._target_folder),
                 * Install mini conda if necessary -> self._install_miniconda()
             * Check conda environment with name self._environment_name
                 * Create conda environment if needed -> self._create_conda_environment()
-            * Updates pip packages in the environment using 'src.requirements.txt' -> self._update_pip()
+            * Updates pip packages in the environment using 'src.requirements.txt' ->
+            self._update_pip()
 
         """
         self._logger.info("Checking pre requisites...")
@@ -163,10 +169,8 @@ mkdir {0}""".strip().format(self._target_folder),
 
         self._logger.info("Checking for conda installation...")
 
-        conda_result: invoke.Result = self._connection.run(command="{0} --version".format(self._conda_executable),
-                                                           hide=not self._debug_mode,
-                                                           warn=True,
-                                                           env=self.env())
+        conda_result: invoke.Result = self._connection.run(command="{0} --version".format(
+            self._conda_executable), hide=not self._debug_mode, warn=True, env=self.env())
 
         if conda_result.exited == 0:
             self._logger.info("Checking for conda installation... Found!")
@@ -177,7 +181,8 @@ mkdir {0}""".strip().format(self._target_folder),
         self._logger.info("Checking for conda environment...")
 
         conda_result: invoke.Result = self._connection.run(
-            command="source {0}/miniconda/bin/activate {1}".format(self._home_folder, self._environment_name),
+            command="source {0}/miniconda/bin/activate {1}".format(self._home_folder,
+                                                                   self._environment_name),
             hide=not self._debug_mode,
             warn=True,
             env=self.env())
@@ -196,21 +201,21 @@ mkdir {0}""".strip().format(self._target_folder),
     def _update_pip(self) -> None:
         """Update the conda environment using `pip install -r src/requirements.txt`.
 
-        If the nexus environment variables NEXUS_URL, NEXUS_USERNAME and NEXUS_PASSWORD are available, the nexus server
-        will be used for downloading all python packages
+        If the nexus environment variables NEXUS_URL, NEXUS_USERNAME and NEXUS_PASSWORD are
+        available, the nexus server will be used for downloading all python packages
         """
 
         nexus_url, nexus_username, nexus_password = nexus_env()
 
         if nexus_url and nexus_username and nexus_password:
-            pip_command = "pip install -i https://{0}:{1}@{2}/repository/pypi-all/simple -r".format(nexus_username,
-                                                                                                    nexus_password,
-                                                                                                    nexus_url[8:])
+            pip_command = "pip install -i https://{0}:{1}@{2}/repository/pypi-all/simple -r"\
+                .format(nexus_username, nexus_password, nexus_url[8:])
         else:
             pip_command = "pip install -r"
 
         self._logger.info("Updating pip packages...")
-        activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder, self._environment_name)
+        activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder,
+                                                                  self._environment_name)
         requirements = " {0}/{1}/requirements.txt".format(self._home_folder, self._environment_name)
         deactivate = "source {0}/miniconda/bin/deactivate".format(self._home_folder)
         self._check_exit_code(error_message="Updating pip packages... Failed!",
@@ -231,18 +236,17 @@ mkdir {0}""".strip().format(self._target_folder),
         """Create the conda environment `self._environment_name` in the remote machine"""
 
         self._logger.info("Creating conda environment '{0}'...".format(self._environment_name))
-        self._check_exit_code(error_message="Conda environment was not created!".format(self._environment_name),
-                              result=self._connection.run(
-                                  command="{0} create --yes --name {1} python={2}.{3}".format(self._conda_executable,
-                                                                                              self._environment_name,
-                                                                                              sys.version_info.major,
-                                                                                              sys.version_info.minor),
-                                  hide=not self._debug_mode,
-                                  warn=True,
-                                  replace_env=True,
-                                  env=self.env()))
+        self._check_exit_code(error_message="Conda environment was not created!".format(
+            self._environment_name), result=self._connection.run(
+            command="{0} create --yes --name {1} python={2}.{3}".format(self._conda_executable,
+                                                                        self._environment_name,
+                                                                        sys.version_info.major,
+                                                                        sys.version_info.minor),
+            hide=not self._debug_mode, warn=True, replace_env=True, env=self.env()))
 
-        self._logger.info("Creating conda environment '{0}'... Done!".format(self._environment_name))
+        self._logger.info("Creating conda environment '{0}'... Done!".format(
+            self._environment_name)
+        )
 
     def env(self, reload=False) -> dict:
         """Creates the dictionary of environment variables used during remote script execution
@@ -283,20 +287,23 @@ mkdir {0}""".strip().format(self._target_folder),
         """
 
         miniconda_path = os.getenv("DSI_MINICONDA_PACKAGE_PATH")
-        target_miniconda_path = "{0}/{1}".format(self._target_folder, os.path.basename(miniconda_path))
+        target_miniconda_path = "{0}/{1}".format(self._target_folder,
+                                                 os.path.basename(miniconda_path))
 
         self._logger.info("Installing conda...")
 
         self._check_exit_code(error_message="Conda installation failed!",
                               result=self._connection.run(
-                                  command="bash {0} -b -p $HOME/miniconda".format(target_miniconda_path),
+                                  command="bash {0} -b -p $HOME/miniconda".format(
+                                      target_miniconda_path),
                                   hide=not self._debug_mode,
                                   warn=True))
 
         self._logger.info("Installing conda... Done!")
 
     def _check_exit_code(self, error_message: str, result: invoke.Result) -> None:
-        """Check a remote execution result and if the exited code is bigger the 0 (zero) an exception will be raised.
+        """Check a remote execution result and if the exited code is bigger the 0 (zero) an
+        exception will be raised.
 
         Parameters
         ----------
@@ -308,7 +315,8 @@ mkdir {0}""".strip().format(self._target_folder),
         Raises
         ------
         services.infrastructure.remote.ssh.exceptions.RemoteExecutionException
-            this exception represents the error during remote execution and it is raised if result.exited > 0
+            this exception represents the error during remote execution and it is raised if
+            result.exited > 0
 
         """
         if result.exited:
@@ -316,7 +324,8 @@ mkdir {0}""".strip().format(self._target_folder),
             raise RemoteExecutionException(error_message, result)
 
     def _create_run_script(self, python_command_line) -> str:
-        """Return the script for activating the conda environment, run a python command line and deactivate the environment
+        """Return the script for activating the conda environment, run a python command line and
+        deactivate the environment
 
         The command line looks like:
 
@@ -328,7 +337,8 @@ mkdir {0}""".strip().format(self._target_folder),
         Parameters
         ----------
         python_command_line: str
-            The python command line which should be executed in the form python <python_command_line>
+            The python command line which should be executed in the form python
+            <python_command_line>
 
         Returns
         -------
@@ -336,7 +346,8 @@ mkdir {0}""".strip().format(self._target_folder),
             The command line that should be run remotely
 
         """
-        activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder, self._environment_name)
+        activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder,
+                                                                  self._environment_name)
         deactivate = "source {0}/miniconda/bin/deactivate".format(self._home_folder)
 
         return "{1} && " \
@@ -344,8 +355,8 @@ mkdir {0}""".strip().format(self._target_folder),
                "{3}".format(self._python_path, activate, python_command_line, deactivate)
 
     def _check_connection(self) -> None:
-        """Checks the remote connection by calling `uname -a` in the remote machine, if it succeeds it reads the
-        $HOME environment variable remotely
+        """Checks the remote connection by calling `uname -a` in the remote machine,
+        if it succeeds  it reads the $HOME environment variable remotely
 
         Raises
         ------
@@ -371,6 +382,7 @@ mkdir {0}""".strip().format(self._target_folder),
             raise RemoteExecutionException("Invalid Home Folder in the target host", result)
 
         self._conda_executable = "{0}/miniconda/bin/conda".format(self._home_folder)
-        self._python_path = "PYTHONPATH=$PYTHONPATH:{0}/{1}".format(self._home_folder, self._environment_name)
+        self._python_path = "PYTHONPATH=$PYTHONPATH:{0}/{1}".format(self._home_folder,
+                                                                    self._environment_name)
 
         self._logger.info("Checking connection... Done!")

@@ -8,8 +8,8 @@ log_path = None
 
 
 class FileHandlerFilter(logging.Filter):
-    """Log filter for removing all Flask and werkzeug log messages from the logs. If debug mode is enabled
-    then the messages will not be filtered out
+    """Log filter for removing all Flask and werkzeug log messages from the logs.
+    If debug mode is enabled then the messages will not be filtered out
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -17,7 +17,8 @@ class FileHandlerFilter(logging.Filter):
 
 
 def initialize_logging(path, debug=debug_mode(), remote=False) -> None:
-    """Initializes the python's logging factory with a console and a file log handler for all log messages
+    """Initializes the python's logging factory with a console and a file log handler for all
+    log messages
 
     Parameters
     ----------
@@ -26,7 +27,8 @@ def initialize_logging(path, debug=debug_mode(), remote=False) -> None:
     debug: bool
         Changes the log level from INFO to DEBUG
     remote: bool
-        If trues adds a 'REMOTE' to all log messages. Should be true only on the remote executable scripts.
+        If trues adds a 'REMOTE' to all log messages. Should be true only on the remote
+        executable scripts.
 
     Warnings
     --------
@@ -39,7 +41,9 @@ def initialize_logging(path, debug=debug_mode(), remote=False) -> None:
     log_path = path
 
     log_formatter = logging.Formatter(
-        "{0}%(asctime)s [%(name)-15.15s] [%(levelname)-5.5s]  %(message)s".format("|REMOTE| " if remote else ""))
+        "{0}%(asctime)s [%(name)-15.15s] [%(levelname)-5.5s]  %(message)s".format(
+            "|REMOTE| " if remote else "")
+    )
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG if debug else logging.INFO)
 

@@ -58,6 +58,11 @@ pandas dataframe (current implementation). The train script is called by the tra
 expects a pandas dataframe with the column names corresponding to the feature names. The predict
 endpoint takes the json request, converts it into a pandas dataframe (for simplicity, even if it
 contains only one row) and executes **prep_and_predict**.
+- **source_features**, specifying the name that are used a input for the model. This features 
+include really the source columns from which also more complicated features are derived within 
+the model boundaries
+- **target_variable**, name of the variable that should be used as target for a possible 
+supervised approach
 
 Make sure your specified all dependencies in the requirements.txt
 
@@ -129,7 +134,18 @@ A Logistic Regression using scikit-learn with some (unnecessary) feature cleanin
 			* DSI_PREDICTION_SERVICE_PASSWORD: auto generated password
 	* Route: None by default - no routes exposed to internet
 
+### Remote Training ###
 
+Remote training allows you to run your training inside an openshift pod just by calling an endpoint.
+Once the end point is called the training pod starts an asynchronous training task. Only one training
+task can run at a time. 
+
+#### Endoints ####
+
+* `/` : Return all information about the training service 
+* `/start` : Starts the training
+* `/finished` : Checks if the current traning task is finished
+* `/getmodel` : Download the latest trained model
 
 ### Environment Variables for training ###
 

@@ -35,7 +35,7 @@
         ${option.component_id}, git_url_http: ${option.git_url_https}, git_url_ssh:
         ${option.git_url_ssh}, package_name: ${option.package_name}'
     - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/feature/DSI-2-first-quickstarter-implementation
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
     - description: init DS ML service project
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/ds-ml-service && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: copy custom create components script

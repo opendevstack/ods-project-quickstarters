@@ -1,21 +1,21 @@
 FROM registry.access.redhat.com/rhscl/python-36-rhel7
 
-ARG NEXUS_USERNAME
-ARG NEXUS_PASSWORD
-ARG NEXUS_URL
+ARG nexus_username
+ARG nexus_password
+ARG nexus_url
 
 WORKDIR /app
 
 ENV PYTHONPATH=$PYTHONPATH:/app
-COPY dist/run.sh /app/run.sh
 
 COPY dist/requirements.txt /app
 
 USER 1001
-# From load pip install for caching docker build layers
+
+# Front load pip install for caching docker build layers
 RUN pip install --upgrade pip && \
-    if [[ ! -z ${NEXUS_URL} ]]; \
-    then pip install -i https://${NEXUS_USERNAME}:${NEXUS_PASSWORD}@${NEXUS_URL:8}/repository/pypi-all/simple -r requirements.txt; \
+    if [[ ! -z ${nexus_url} ]]; \
+    then pip install -i https://${nexus_username}:${nexus_password}@${nexus_url:8}/repository/pypi-all/simple -r requirements.txt; \
     else pip install -r requirements.txt; \
     fi
 
@@ -23,7 +23,7 @@ COPY dist /app
 
 USER root
 
-# Is needed that the special user (1001) needed for starting python servers has the permissions
+# Is needed that the special user (1001) has the permissions for starting python servers
 RUN chgrp -R 0 /app && \
     chmod -R g=u /app && \
     chmod +x /app/run.sh && \

@@ -178,8 +178,15 @@ if [[ -f "$targetconfig" ]]; then
 	echo "> sourcing env target config from $targetconfig"
 	source $targetconfig
 else
-	echo "Target cluster config could NOT be located - this is a must to successfully run this script"
+	echo "Target cluster config $targetconfig, for cluster $OD_OCP_TARGET_HOST could NOT be located - this is a must to successfully run this script"
 	exit 1
+fi
+
+if [[ -z ${OD_EXCLUDE_NAMESPACES} ]]; then 
+    # fallback
+	echo ">>> no namespace exclusions set - cd / shared-images / openshift and rhscl"
+	echo
+    OD_EXCLUDE_NAMESPACES=cd,shared-images,openshift,rhscl
 fi
 
 # checkout git repo (standard naming)
@@ -470,9 +477,19 @@ do
 		
 		echo " --> checking for referenced project image - stream: $ref_imagestreamWithRegistry"
 		
+		exlude_this_namespace=false
+		
+		# check for any exclusions
+		for exclude_namespace in $(echo $OD_EXCLUDE_NAMESPACES | sed -e 's/,/ /g');
+		do
+			if [[ $ref_imagestreamOwningProject == $exclude_namespace ]]; then
+				exlude_this_namespace=true
+				echo "... setting exclusion for image $ref_imagestreamWithRegistry based on $OD_EXCLUDE_NAMESPACES"
+			fi
+		done
+		
 		# dont do any import on shared images from shared-image namespace and from CD
-		if [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ $ref_imagestreamOwningProject != "shared-services" ]] && [[ $ref_imagestreamOwningProject != "cd" ]]; then 		
-			
+		if [ "$exlude_this_namespace" = false ] && [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]]; then
 			echo "Importing remote images ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} into ${ref_imagestreamName}"
 			oc import-image ${ref_imagestreamName} --from=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} --confirm
 		else

@@ -15,31 +15,14 @@ library identifier: 'ods-library@production', retriever: modernSCM(
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-python",
+  image: "${dockerRegistry}/cd/jenkins-slave-base",
   projectId: projectId,
   componentId: componentId,
-  openshiftBuildTimeout: 25,
   branchToEnvironmentMapping: [
     'master': 'test',
     '*': 'dev'
   ]
 ) { context ->
-  stageBuild(context)
-  stageScanForSonarqube(context)
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
-}
-
-def stageBuild(def context) {
-  stage('Build') {
-    withEnv(["TAGVERSION=${context.tagversion}"]) {
-      sh "python src/tests.py"
-      // PEP8
-      sh '''
-         pycodestyle --show-source --show-pep8 src/*
-         pycodestyle --statistics -qq src/*
-      '''
-    }
-    sh "cp -r src docker/dist"
-  }
 }

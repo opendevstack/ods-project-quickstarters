@@ -48,18 +48,8 @@ odsPipeline(
     stageMultipleDeployToOpenshift(context, "Deploy Prediction Pod", predictionConfig)
 }
 
-def stageLinter(def context) {
-    stage('Linter') {
-        // PEP8
-        sh '''
-pycodestyle --show-source --show-pep8 src/*
-pycodestyle --statistics -qq src/*
-  '''
-    }
-}
-
 def stageUnitTests(def context) {
-    stage('Unittests') {
+    stage('Unit Tests') {
         withEnv(["NEXUS_USERNAME=${context.nexusUsername}",
         "NEXUS_URL=${context.nexusHost}",
         "NEXUS_PASSWORD=${context.nexusPassword}"]) {

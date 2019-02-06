@@ -1,27 +1,11 @@
 import argparse
-import io
 import logging
-import typing
-from typing import Callable, NoReturn
 
 import joblib
 import pandas as pd
 
 from model.model_wrapper import ModelWrapper
 from services.infrastructure.git_info import GIT_COMMIT
-
-
-def save(save_func: Callable[[typing.BinaryIO], NoReturn], file_name, resources, metrics):
-    output = io.BytesIO()
-    save_func(output)
-    output.seek(0)
-
-    with open(file_name, 'wb') as file:
-        file.write(output.read())
-
-    # ...
-
-    pass
 
 
 def train(model_name=GIT_COMMIT, train_data='train.csv'):
@@ -52,8 +36,6 @@ def train(model_name=GIT_COMMIT, train_data='train.csv'):
     with open("{0}.model".format(model_name), 'wb') as file:
         logging.getLogger(__name__).info("Persisting the model...")
         joblib.dump(value=classification_model, filename=file)
-
-    save(lambda file: joblib.dump(value=classification_model, filename=file), "myfile", "", "")
 
 
 if __name__ == "__main__":

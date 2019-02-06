@@ -3,7 +3,7 @@ def final componentId = '@component_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
-def trainingRoute = "http://localhost:8080" // using fixed internal value localhost:8080 since port-forwarding is being used
+def trainingRoute
 def trainingPodInfo
 def trainingPassword
 def trainingUsername
@@ -67,6 +67,7 @@ def stageBuild(def context) {
 
 def stageTraining(def context) {
     stage('Train Model') {
+        trainingRoute = "http://localhost:8080" // using fixed internal value localhost:8080 since port-forwarding is being used
         while(true) {
             trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
             print("Found pod name: ${trainingPodInfo[0]}")

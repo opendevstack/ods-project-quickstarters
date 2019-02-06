@@ -39,8 +39,7 @@ def start_training(host_url, http_auth):
                 '{0}/start'.format(host_url), auth=http_auth, stream=True)
             success = True
             return success
-        except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError,
-                ConnectionResetError):
+        except (ConnectionRefusedError, ConnectionError, OSError):
             count += 1
             time.sleep(5)
             continue

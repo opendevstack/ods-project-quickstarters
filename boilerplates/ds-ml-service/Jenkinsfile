@@ -3,10 +3,10 @@ def final componentId = '@component_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
-def training_route
-def training_pod_info
-def training_password
-def training_username
+def trainingRoute = "http://localhost:8080" // using fixed internal value localhost:8080 since port-forwarding is being used
+def trainingPodInfo
+def trainingPassword
+def trainingUsername
 
 def trainingConfig = [
     "docker-training"  : "${componentId}-training-service",
@@ -37,8 +37,8 @@ odsPipeline(
         '*'     : 'dev'
     ]
 ) { context ->
-    stageScanForSonarqube(context)
     stageUnitTests(context)
+    stageScanForSonarqube(context)
     stageBuild(context)
     stageStartMultipleOpenshiftBuild(context, "Build Training Image" ,trainingConfig)
     stageMultipleDeployToOpenshift(context, "Deploy Training Pod", trainingConfig)
@@ -77,30 +77,29 @@ def stageBuild(def context) {
 
 def stageTraining(def context) {
     stage('Train Model') {
-        training_route = "http://localhost:8080"
         while(true) {
-            training_pod_info = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-            print("Found pod name: ${training_pod_info[0]}")
-            if (training_pod_info[2] == "Running") {
-                print("Pod ${training_pod_info[0]} is running!!!")
+            trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+            print("Found pod name: ${trainingPodInfo[0]}")
+            if (trainingPodInfo[2] == "Running") {
+                print("Pod ${trainingPodInfo[0]} is running!!!")
                 break
             }
-            print("Pod ${training_pod_info[0]} is still not running...")
+            print("Pod ${trainingPodInfo[0]} is still not running...")
         }
 
-        training_password = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep password: | cut -d':' -f2 ").trim()
-        training_username = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep username: | cut -d':' -f2 ").trim()
-        training_password = sh(returnStdout: true, script:"echo \"${training_password}\" | base64 --decode").trim()
-        training_username = sh(returnStdout: true, script:"echo \"${training_username}\" | base64 --decode").trim()
+        trainingPassword = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep password: | cut -d':' -f2 ").trim()
+        trainingUsername = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep username: | cut -d':' -f2 ").trim()
+        trainingPassword = sh(returnStdout: true, script:"echo \"${trainingPassword}\" | base64 --decode").trim()
+        trainingUsername = sh(returnStdout: true, script:"echo \"${trainingUsername}\" | base64 --decode").trim()
 
-        sh "oc port-forward ${training_pod_info[0]} 8080 -n ${context.targetProject} &"
-        sh "python3 jenkinsfile_helper.py --training-service ${training_route} --username \"${training_username}\" --password \"${training_password}\""
+        sh "oc port-forward ${trainingPodInfo[0]} 8080 -n ${context.targetProject} &"
+        sh "python3 jenkinsfile_helper.py --training-service ${trainingRoute} --username \"${trainingUsername}\" --password \"${trainingPassword}\""
     }
 }
 
 def stageIntegrationTest(def context) {
     stage('Prediction Integration Test') {
-        withEnv(["DSI_TRAINING_BASE_URL=${training_route}","DSI_TRAINING_SERVICE_USERNAME=${training_username}","DSI_TRAINING_SERVICE_PASSWORD=${training_password}"]) {
+        withEnv(["DSI_TRAINING_BASE_URL=${trainingRoute}","DSI_TRAINING_SERVICE_USERNAME=${trainingUsername}","DSI_TRAINING_SERVICE_PASSWORD=${trainingPassword}"]) {
             sh 'PYTHONPATH=src python3 -m unittest discover -s test/integration_tests -t .'
         }
     }

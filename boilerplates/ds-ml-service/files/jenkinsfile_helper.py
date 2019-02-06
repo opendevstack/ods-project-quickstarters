@@ -5,7 +5,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 
-def start_traning(host_url, http_auth):
+def start_training(host_url, http_auth):
     """Starts the training on the training service as soon as the pod in openshift is ready.
 
     Notes
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     host = args.host
     auth = HTTPBasicAuth(username=args.username, password=args.password)
 
-    training_started = start_traning(host, auth)
+    training_started = start_training(host, auth)
 
     if training_started:
         training_finished = wait_for_training()

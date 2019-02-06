@@ -87,8 +87,8 @@ def stageTraining(def context) {
             print("Pod ${trainingPodInfo[0]} is still not running...")
         }
 
-        trainingPassword = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep password: | cut -d':' -f2 ").trim()
-        trainingUsername = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep username: | cut -d':' -f2 ").trim()
+        trainingPassword = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o jsonpath='{.data.password}' -n ${context.targetProject}").trim()
+        trainingUsername = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o jsonpath='{.data.username}' -n ${context.targetProject}").trim()
         trainingPassword = sh(returnStdout: true, script:"echo \"${trainingPassword}\" | base64 --decode").trim()
         trainingUsername = sh(returnStdout: true, script:"echo \"${trainingUsername}\" | base64 --decode").trim()
 

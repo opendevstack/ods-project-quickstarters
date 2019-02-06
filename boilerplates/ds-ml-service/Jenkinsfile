@@ -38,8 +38,8 @@ odsPipeline(
     ]
 ) { context ->
     stageUnitTests(context)
-    stageScanForSonarqube(context)
     stageBuild(context)
+    stageScanForSonarqube(context)
     stageStartMultipleOpenshiftBuild(context, "Build Training Image" ,trainingConfig)
     stageMultipleDeployToOpenshift(context, "Deploy Training Pod", trainingConfig)
     stageTraining(context)

@@ -101,3 +101,29 @@ class ModelWrapper(object):
 
         data = add_polynomial(df, "sepalLength", "poly_sepalLength")
         return data
+
+    def prep_and_predict_batch(self, df):
+        """Predicts a batch of input feature vectors and returns an array for the prediction results
+
+        Parameters
+        ----------
+        df :  pandas.DataFrame
+            DataFrame with several rows (batch) containing at least
+            *self.source_features* + optionally superfluously that will be ignored.
+
+        Returns
+        -------
+        res_batch : list
+            of labels
+
+        """
+
+        # restrict to known source features
+        df = df[self.source_features]
+
+        # feature preparation
+        prep_data_df = self._prep_feature_df(df)
+        prep_data = prep_data_df.values
+
+        res_batch = self.model.predict(prep_data).tolist()
+        return res_batch

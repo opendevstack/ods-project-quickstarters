@@ -7,6 +7,8 @@ import pandas as pd
 from model.model_wrapper import ModelWrapper
 from services.infrastructure.git_info import GIT_COMMIT
 
+from sklearn.metrics import accuracy_score
+
 
 def train(model_name=GIT_COMMIT, train_data='train.csv'):
     """This function is the training entry point and should not be removed. Executes the
@@ -46,3 +48,17 @@ if __name__ == "__main__":
     parsed_args = parser.parse_args()
 
     train(model_name="local2", train_data=parsed_args.input)
+
+    model = joblib.load("local2.model")
+
+    # load test Dataframe
+    test_df = pd.read_csv("resources/test.csv")
+    res = model.prep_and_predict_batch(test_df)
+    print(res, test_df['Species'].values)
+
+    print(accuracy_score(res, test_df["Species"].values))
+
+
+
+
+

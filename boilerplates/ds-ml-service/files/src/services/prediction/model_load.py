@@ -1,6 +1,7 @@
 import joblib
 import requests
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import RequestException
 
 from services.infrastructure.environment import training_auth
 
@@ -39,7 +40,7 @@ def load_remote_model(train_pod_url, git_commit):
         predictor = joblib.load(git_commit)
         return predictor
     except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError,
-            ConnectionResetError):
+            ConnectionResetError, RequestException):
         print("remote training pod not reachable")
         return None
 

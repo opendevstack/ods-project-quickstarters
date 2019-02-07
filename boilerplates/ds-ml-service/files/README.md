@@ -166,7 +166,7 @@ To enable remote training set the `DSI_EXECUTE_ON` variable in OpenShift to *SSH
  
 The easiest approach to use the docker-compose and ssh remote training is to create a yml with environment variables for training. E.g.:
 
-`docker-compose.ssh.uml`
+`docker-compose.ssh.yml`
 
 ```yml
 version: '3'

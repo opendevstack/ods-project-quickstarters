@@ -1,4 +1,5 @@
 from sklearn.linear_model import LogisticRegression
+import pandas as pd
 
 from model.data_cleaning.replace import replace_strings, replace_missing
 from model.feature_prep.polynomial import add_polynomial
@@ -28,28 +29,41 @@ class ModelWrapper(object):
         self.target_variable = "Species"
         self.final_features = []
 
-    def prep_and_predict(self, df):
+    def prep_and_predict(self, json_data):
         """Does feature preparation and executes the prediction for *self.model*. MANDATORY
 
         Parameters
         ----------
-        df : pandas.DataFrame
-            DataFrame with one row (for single prediction) containing at least
-            *self.source_features* + optionally superfluously that will be ignored.
+        json_data : dict
+            json content from the POST. Should at least contain what is specified in
+            `self.source_features`.
+            Can consume dicts in the form:
+             >>> {'feature1': value, ....}
+             or
+             >>> {'feature1': [value1, value2, ....]}
 
         Notes
         -----
-        DataFrame with a single row as input was chosen to be able to use the same feature
-        preperation/engineering code as for the training function.
+        Exception is raised if not all `self.source_features` are provided.
 
 
         Returns
         -------
-        res : label
-            Label predicted by the algorithm
+        res : dict
+            dictionary with the desired json repsonse
         """
+        # convert raw json dictionary to dataframe
+        try:
+            df = pd.DataFrame(json_data)
+        except ValueError:
+            # in case you have a single value
+            df = pd.DataFrame(json_data, index=['0'])
+
         # restrict to known source features
-        df = df[self.source_features]
+        try:
+            df = df[self.source_features]
+        except KeyError:
+            raise
 
         # find all not used source features
         not_used_source = df[df.columns.difference(self.source_features)].columns.values.tolist()
@@ -60,8 +74,9 @@ class ModelWrapper(object):
         prep_data_df = self._prep_feature_df(df)
         prep_data = prep_data_df.values
 
-        res = self.model.predict(prep_data).tolist()[0]
-        return res
+        res = self.model.predict(prep_data).tolist()
+        json_res = {"prediction": res}
+        return json_res
 
     def prep_and_train(self, df):
         """Does feature preparation and executes the training for *self.model*. MANDATORY
@@ -101,29 +116,3 @@ class ModelWrapper(object):
 
         data = add_polynomial(df, "sepalLength", "poly_sepalLength")
         return data
-
-    def prep_and_predict_batch(self, df):
-        """Predicts a batch of input feature vectors and returns an array for the prediction results
-
-        Parameters
-        ----------
-        df :  pandas.DataFrame
-            DataFrame with several rows (batch) containing at least
-            *self.source_features* + optionally superfluously that will be ignored.
-
-        Returns
-        -------
-        res_batch : list
-            of labels
-
-        """
-
-        # restrict to known source features
-        df = df[self.source_features]
-
-        # feature preparation
-        prep_data_df = self._prep_feature_df(df)
-        prep_data = prep_data_df.values
-
-        res_batch = self.model.predict(prep_data).tolist()
-        return res_batch

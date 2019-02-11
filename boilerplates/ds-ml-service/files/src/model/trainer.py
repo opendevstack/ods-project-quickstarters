@@ -47,16 +47,17 @@ if __name__ == "__main__":
     parser.add_argument("--output", "-o", type=str, help="output model name", default="local")
     parsed_args = parser.parse_args()
 
-    train(model_name="local2", train_data=parsed_args.input)
+    train(model_name="local", train_data=parsed_args.input)
 
-    model = joblib.load("local2.model")
+    model = joblib.load("local.model")
 
     # load test Dataframe
     test_df = pd.read_csv("resources/test.csv")
-    res = model.prep_and_predict_batch(test_df)
+    print(test_df.to_dict(orient='list'))
+    res = model.prep_and_predict(test_df.to_dict(orient='list'))
     print(res, test_df['Species'].values)
 
-    print(accuracy_score(res, test_df["Species"].values))
+    print(accuracy_score(res['prediction'], test_df["Species"].values))
 
 
 

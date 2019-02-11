@@ -62,22 +62,16 @@ def predict():
     # logging received data
     app.logger.info(data)
 
-    # Checking data object on consistency
-    if set(data.keys()).difference(app.config["MODEL"].source_features):
-        msg = 'Not all prediction characteristics provided'
+    # predict new value including feature prep
+    try:
+        res = app.config["MODEL"].prep_and_predict(data)
+        return jsonify(res)
+    except KeyError as e:
+        msg = 'Problem with the provided json post: {0}'.format(e)
         app.logger.error(msg)
         resp = jsonify({'error': msg})
         resp.status_code = 400
         return resp
-
-    # convert json to pandas data frame -> be able to use the same feature processing functions
-    input_data = pd.DataFrame(data, index=[0])
-
-    # predict new value including feature prep
-    res = app.config["MODEL"].prep_and_predict(input_data)
-    pred_json = jsonify({'prediction': res})
-
-    return pred_json
 
 
 if __name__ == '__main__':
@@ -86,8 +80,17 @@ if __name__ == '__main__':
                         help="Port number for the Flask server")
     parser.add_argument("--debug", "-d", action="store_true",
                         help="Enables debug mode in the Flask server")
+    parser.add_argument("--local", "-l", required=False, default=False, type=bool,
+                        help="setting dummy user name and password for local development")
 
     flask_args = parser.parse_args()
 
     initialize_logging("prediction.log")
+
+    if flask_args.local:
+        username = "user"
+        password = "password"
+        app.config['USERS'][username] = password
+
     app.run('0.0.0.0', flask_args.port, debug=debug_mode() or flask_args.debug)
+

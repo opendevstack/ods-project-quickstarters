@@ -66,13 +66,14 @@ class:
 - `prep_and_train`: is called by the train script (which one can customize) and expects a
 pandas dataframe (current implementation). The train script is called by the training service
 - `prep_and_predict`: is called by the predict endpoint service from the prediction service. It
-expects a pandas dataframe with the column names corresponding to the feature names. The predict
-endpoint takes the json request, converts it into a pandas dataframe (for simplicity, even if it
-contains only one row) and executes `prep_and_predict`.
-- `source_features`, specifying the name that are used a input for the model. This features 
+consumes the json post as a dictionary. The predict
+endpoint executes `prep_and_predict`.
+- Good practice: `source_features`, specifying the name that are used a input for the model. This 
+features 
 include really the source columns from which also more complicated features are derived within 
 the model boundaries
-- `target_variable`, name of the variable that should be used as target for a possible 
+- Good practice: `target_variable`, name of the variable that should be used as target for a 
+possible 
 supervised approach.
 
 As well as the `train` function in the `src/trainer.py`. It specifies how the model should be 

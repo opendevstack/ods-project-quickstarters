@@ -229,4 +229,3 @@ There is not need for any kind of payload in all endpoints.
 | DSI_TRAINING_SERVICE_PASSWORD | Password of the training service | string, required |
 | DSI_PREDICTION_SERVICE_USERNAME | Username to be set as default username for accessing the service | string, required |
 | DSI_PREDICTION_SERVICE_PASSWORD | Password to be set as default password for accessing the service | string, required |
-

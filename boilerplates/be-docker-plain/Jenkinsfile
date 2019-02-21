@@ -1,0 +1,55 @@
+def final projectId = '@project_id@'
+def final componentId = '@component_id@'
+def final credentialsId = "${projectId}-cd-cd-user-with-password"
+def sharedLibraryRepository
+def dockerRegistry
+node {
+  sharedLibraryRepository = env.SHARED_LIBRARY_REPOSITORY
+  dockerRegistry = env.DOCKER_REGISTRY
+}
+
+library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: sharedLibraryRepository,
+   credentialsId: credentialsId])
+
+// See readme of shared library for usage and customization.
+odsPipeline(
+  image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
+  projectId: projectId,
+  componentId: componentId,
+  verbose: true
+) { context ->
+  stageBuild(context)
+  stageUnitTest(context)
+  /*
+   * if you want to introduce scanning, uncomment
+   * 
+   * stageScanForSonarqube(context)
+   */ 
+  stageCreateOpenshiftEnvironment(context)
+  stageStartOpenshiftBuild(context)
+  stageDeployToOpenshift(context)
+  stageTriggerAllBuilds(context)
+}
+
+def stageBuild(def context) {
+  stage('Build') {
+    withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}"]) 
+    {
+      // copy any other artifacts if needed
+      // sh "cp -r build docker/dist"
+      // the docker context passed in /docker
+    }
+  }
+}
+
+def stageUnitTest(def context) {
+    stage('Unit Test') {
+      withEnv(["CI=true"])
+      {
+         // if needed add your unit tests here
+      }
+    }
+}
+

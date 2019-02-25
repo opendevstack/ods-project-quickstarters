@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Repo from '../components/Repo';
-import { doUserRepos } from '../actions/doUserRepos';
+import { doUserRepos, getUserRepos, isLoading } from '../reducers/applyUserRepos.duck';
 import { bindActionCreators } from 'redux';
 import List from '@material-ui/core/List';
 
@@ -15,10 +15,10 @@ class UserRepos extends Component {
   }
 
   render() {
-    let { repos } = this.props;
-    let pageContent = ''
+    let { repos, loading } = this.props,
+      pageContent = '';
 
-    if(this.props.loading) {
+    if(loading) {
       pageContent = (
         <div className="userReposLoader">
           Loading...
@@ -43,13 +43,14 @@ class UserRepos extends Component {
 }
 
 UserRepos.propTypes = {
-  repos: PropTypes.array
+  repos: PropTypes.array,
+  loading: PropTypes.bool,
 };
 
 const mapStateToProps = state => {
   return {
-    repos: state.home.userRepos.repos,
-    loading: state.home.userRepos.isLoading
+    repos: getUserRepos(state),
+    loading: isLoading(state)
   };
 };
 

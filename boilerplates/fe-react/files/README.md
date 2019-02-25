@@ -1,6 +1,4 @@
-### Based on https://github.com/mohandere/cra-boilerplate
-
-# includes material instead of bootstrap
+### Customized version from https://github.com/mohandere/cra-boilerplate
 
 # ocp-react-material-boilerplate
 
@@ -16,23 +14,21 @@ Before starting with project, please headover to [CRA](https://github.com/facebo
 
 - [React js - ^16.4.0](https://facebook.github.io/react/)
 - [Redux js - ^4.0.0-rc.1](http://redux.js.org/)
+- [react-scripts - 2.0.3](https://www.npmjs.com/package/react-scripts)
 - [react-router-dom - ^4.2.2](https://github.com/ReactTraining/react-router)
 - [react-redux - ^5.0.7](https://github.com/reactjs/react-redux)
 - [react-router-dom - ^4.2.2](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-dom)
 - [react-router-redux - ^5.0.0-alpha.9](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-redux)
 - [redux-observable - ^1.0.0-alpha.2](https://redux-observable.js.org)
 - [Rxjs - Rxjs v6](https://github.com/ReactiveX/rxjs)
-- [reactstrap - Easy to use React Bootstrap 4 components](https://reactstrap.github.io/)
+- [material-ui - Material design for react(https://material-ui.com)
 - [react-loadable - 5.4.0](https://github.com/jamiebuilds/react-loadable)
 
 
 #### Features
 
-- Scss
-- [Domain-style](https://github.com/reactjs/redux/blob/master/docs/faq/CodeStructure.md) for code structure
 - Bundle Size analysis
-- Code splitting with [react-loadable](https://github.com/jamiebuilds/react-loadable)
-
+  
 ## Getting Started
 
 1. To run, go to project folder and run
@@ -47,7 +43,7 @@ or
 or
 `$ yarn start`
 
-3. visit - http://localhost:3000/
+3. visit - http://localhost:8080/
 
 To create production ready codes -
 
@@ -94,30 +90,27 @@ Place all common components such as Header/Footer in `src/common/components` fol
 
 - Create a Module/Feature folder at `src/`
 like - - `src/home`
-Feature folder must contain booststrap file named `index.js` and css file 'style.css' at root
+Feature folder must contain file named `index.js` at root
 
 Like -
 
 - `src/home/index.js`
-- `src/home/style.css`
 
 Next as per need, add sub folders like -
 
-- `src/home/actions/`
 - `src/home/reducers/`
 - `src/home/epics/`
 - `src/home/containers/`
 - `src/home/components/`
 
 
-### Actions
 
-- Create folder named `actions` inside Feature folder like - `src/home/actions`
-- Place `actionTypes.js` which contains all actions to be exported
+### State handling
 
-### Reducers
-
- - Create folder named `reducers` inside Feature folder like - `src/home/reducers`
+- We bundle reducers, actions, seletors, operations and types in one "duck" style cluster to reduce overhead, the ducks are located in reducers folder (read more: 
+https://github.com/erikras/ducks-modular-redux
+https://medium.freecodecamp.org/scaling-your-redux-app-with-ducks-6115955638be)
+- Create folder named `reducers` inside Feature folder like - `src/home/reducers`
 - Place `index.js` which combines all reducers using `combineReducers`
 
 ### Epics
@@ -127,20 +120,15 @@ Next as per need, add sub folders like -
 
 ## Ajax Handling
 
-This boierplate comes with `rxjs` to handle ajax. Additionally as per need we can use other libs like `axios`.
+This boilerplate comes with `rxjs` to handle ajax. Additionally as per need we can use other libs like `axios`.
 
 Using Rxjs DOM api for ajax see file - `rxjs/observable/dom/ajax`
 [AjaxObservable](http://reactivex.io/rxjs/file/es6/observable/dom/AjaxObservable.js.html)
 
 ## Styling
 
-we are using `scss` Preprocessor. Create a feature/domain specfic scss file, example - `src/home/style.scss`
-
-After compilation the new corresponding CSS file next to it.
-example - `src/home/style.css`
-
-Finally you can import that css file in `index.js` file
-example - `src/home/index.js` will import `src/home/style.css`
+We are using CSS-in-JS solution which comes bundled with material-ui. 
+Read more about it at https://material-ui.com/css-in-js/basics/
 
 ## Analyzing the Bundle Size
 
@@ -151,23 +139,6 @@ The source map explorer determines which file each byte in your minified code ca
 To analyzing bundle, run command -
 
 `$ npm run analyze` / `$ yarn analyze`
-
-
-## Code splitting
-
-Create React App(CRA) by default bundle out entire app into single main.*.js file with Webpack. As our app grows, bundle grows. So instead of downloading the entire app(This hurts the initial load time of our app.) before users can use it, We can split code into small chunks which we can then load on demand and Code splitting is really helpful for larger React apps.
-
-Check out [this](https://mohandere.github.io/mplayground/#/blog/post/2018/03/01/analyzing-the-bundle-size-code-splitting-in-create-react-app/).  example for how to implementation Code splitting and how it helps to load application faster.
-
-This boilerplate using [react-loadable](https://github.com/jamiebuilds/react-loadable) for code splitting.
-
-Open `src/App.js` and edit this line to -
-
-`import routes from './routes';`
-
- To
-
-`import routes from './asyncRoutes';`
 
 ## Deployment
 

@@ -13,9 +13,14 @@ library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
 
-// See readme of shared library for usage and customization.
+/*
+  See readme of shared library for usage and customization,
+  including how to create and set your own builder slave instead of 
+  the base slave - the code of the base slave can be found at
+  https://github.com/opendevstack/ods-core/tree/master/jenkins/slave-base
+ */ 
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
+  image: "${dockerRegistry}/cd/jenkins-slave-base",
   projectId: projectId,
   componentId: componentId,
   verbose: true

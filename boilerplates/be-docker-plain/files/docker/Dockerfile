@@ -1,6 +1,6 @@
-# add /overwrite this with your dockerfile ..
-# FROM nginx:1.15.0-alpine
+# add /overwrite FROM with your base image, and do whatever you like here :)
+FROM registry.access.redhat.com/rhel7
 
-RUN echo "container up"
+RUN echo "building simple container"
 
 EXPOSE 8080

@@ -95,9 +95,7 @@ if [[ $version == "4.9" ]]; then
 	          password = "${nexus_pw}"\
 	        }\
 	      }\
-	/g' build.gradle
-	
-	rm build.gradle.bak	
+	/g' build.gradle	
 else
 	templateFile=$SCRIPT_DIR/templates/build-$version.gradle
 	echo "using $templateFile" 
@@ -111,6 +109,8 @@ else
 	fi
 	sed -i.bak "s|__GROUP__|$GROUP|g" build.gradle
 fi
+
+rm build.gradle.bak	
 
 cat >> build.gradle <<EOL
 uploadArchives {

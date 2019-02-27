@@ -58,7 +58,6 @@ version=$(grep /gradle-. gradle/wrapper/gradle-wrapper.properties | cut -d "-" -
 echo "gradle version: $version"
 
 if [[ $version == "4.9" ]]; then
-	echo "could not find file $templateFile falling back to patching generated file"
 	sed -i.bak '/springBootVersion =/a \
 	    nexus_url = "\${project.findProperty("nexus_url") ?: System.getenv("NEXUS_HOST")}"\
 	    nexus_folder = "candidates"\

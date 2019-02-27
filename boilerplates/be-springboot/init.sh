@@ -102,7 +102,8 @@ else
 	templateFile=$SCRIPT_DIR/templates/build-$version.gradle
 	echo "using $templateFile" 
 	# this allows quick config, new version - add new template, done
-	if [[ -f "$targetconfig" ]]; then
+	if [[ -f "$templateFile" ]]; then
+		echo "found specific gradle version template"
 		mv $templateFile build.gradle
 	else 
 		# default

@@ -8,7 +8,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
+library identifier: 'ods-library@production', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
@@ -23,7 +23,10 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-base",
   projectId: projectId,
   componentId: componentId,
-  verbose: true
+  branchToEnvironmentMapping: [
+    'master': 'test',
+    '*': 'dev'
+  ]
 ) { context ->
   stageBuild(context)
   stageUnitTest(context)
@@ -32,29 +35,21 @@ odsPipeline(
    * 
    * stageScanForSonarqube(context)
    */ 
-  stageCreateOpenshiftEnvironment(context)
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
-  stageTriggerAllBuilds(context)
 }
 
 def stageBuild(def context) {
   stage('Build') {
-    withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}"]) 
-    {
-      // copy any other artifacts if needed
-      // sh "cp -r build docker/dist"
-      // the docker context passed in /docker
-    }
+    // copy any other artifacts if needed
+    // sh "cp -r build docker/dist"
+    // the docker context passed in /docker
   }
 }
 
 def stageUnitTest(def context) {
-    stage('Unit Test') {
-      withEnv(["CI=true"])
-      {
-         // if needed add your unit tests here
-      }
-    }
+  stage('Unit Test') {
+    // if needed add your unit tests here
+  }
 }
 

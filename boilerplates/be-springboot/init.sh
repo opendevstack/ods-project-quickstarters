@@ -32,6 +32,7 @@ sudo chgrp -R 0 .
 echo "read args: project=$PROJECT, component=$COMPONENT, package=$PACKAGE, group=$GROUP"
 
 echo "init springboot project"
+
 sudo docker run --rm -v $PWD:/data springboot init \
   --build=gradle \
   --java-version="1.8" \
@@ -50,46 +51,65 @@ echo "configure in memory database in spring application.properties"
 echo "spring.profiles.active: dev" > src/main/resources/application.properties
 echo "spring.jpa.database: HSQL" > src/main/resources/application-dev.properties
 
-echo "customise build.gradle"
+echo "customise build.gradle - getting version"
 
-sed -i.bak '/springBootVersion =/a \
-    nexus_url = "\${project.findProperty("nexus_url") ?: System.getenv("NEXUS_HOST")}"\
-    nexus_folder = "candidates"\
-    nexus_user = "\${project.findProperty("nexus_user") ?: System.getenv("NEXUS_USERNAME")}"\
-    nexus_pw = "\${project.findProperty("nexus_pw") ?: System.getenv("NEXUS_PASSWORD")}"\
-' build.gradle
+version=$(grep /gradle-. gradle/wrapper/gradle-wrapper.properties | cut -d "-" -f2)
 
-sed -i.bak 's/mavenCentral()/maven () {\
-        url "${nexus_url}\/repository\/jcenter\/"\
-        credentials {\
-          username = "${nexus_user}"\
-          password = "${nexus_pw}"\
-        }\
-      }\
-\
-      maven () {\
-        url "${nexus_url}\/repository\/maven-public\/"\
-        credentials {\
-          username = "${nexus_user}"\
-          password = "${nexus_pw}"\
-        }\
-      }\
-\
-      maven () {\
-        url "${nexus_url}\/repository\/atlassian_public\/"\
-        credentials {\
-          username = "${nexus_user}"\
-          password = "${nexus_pw}"\
-        }\
-      }\
-/g' build.gradle
+echo "gradle version: $version"
 
-sed -i.bak "s/\(apply plugin: 'java'\)/\1\napply plugin: 'maven'\napply plugin: 'jacoco'/g" build.gradle
+if [[ $version == "4.9" ]]; then
+	echo "could not find file $templateFile falling back to patching generated file"
+	sed -i.bak '/springBootVersion =/a \
+	    nexus_url = "\${project.findProperty("nexus_url") ?: System.getenv("NEXUS_HOST")}"\
+	    nexus_folder = "candidates"\
+	    nexus_user = "\${project.findProperty("nexus_user") ?: System.getenv("NEXUS_USERNAME")}"\
+	    nexus_pw = "\${project.findProperty("nexus_pw") ?: System.getenv("NEXUS_PASSWORD")}"\
+	' build.gradle
+	
+	sed -i.bak "s/\(apply plugin: 'java'\)/\1\napply plugin: 'maven'\napply plugin: 'jacoco'/g" build.gradle
+	
+	# by default no jar task in there .. we need to add it.
+	echo -e "bootJar {\n    archiveName    \"app.jar\"\n    destinationDir  file(\"\044buildDir/../docker\")\n}" >> build.gradle
 
-# by default no jar task in there .. we need to add it.
-echo -e "bootJar {\n    archiveName    \"app.jar\"\n    destinationDir  file(\"\044buildDir/../docker\")\n}" >> build.gradle
-
-rm build.gradle.bak
+	# add nexus 
+	sed -i.bak 's/mavenCentral()/maven () {\
+	        url "${nexus_url}\/repository\/jcenter\/"\
+	        credentials {\
+	          username = "${nexus_user}"\
+	          password = "${nexus_pw}"\
+	        }\
+	      }\
+	\
+	      maven () {\
+	        url "${nexus_url}\/repository\/maven-public\/"\
+	        credentials {\
+	          username = "${nexus_user}"\
+	          password = "${nexus_pw}"\
+	        }\
+	      }\
+	\
+	      maven () {\
+	        url "${nexus_url}\/repository\/atlassian_public\/"\
+	        credentials {\
+	          username = "${nexus_user}"\
+	          password = "${nexus_pw}"\
+	        }\
+	      }\
+	/g' build.gradle
+	
+	rm build.gradle.bak	
+else
+	templateFile=$SCRIPT_DIR/templates/build-$version.gradle
+	echo "using $templateFile" 
+	# this allows quick config, new version - add new template, done
+	if [[ -f "$targetconfig" ]]; then
+		mv $templateFile build.gradle
+	else 
+		# default
+		mv $SCRIPT_DIR/templates/build-4.10.gradle build.gradle
+	fi
+	sed -i.bak "s|__GROUP__|$GROUP|g" build.gradle
+fi
 
 cat >> build.gradle <<EOL
 uploadArchives {

@@ -4,10 +4,17 @@
 
 ### Added
 - Rundeck `prepare-continous integration` job can now be used to upgrade an existing git repository ([#110](https://github.com/opendevstack/ods-project-quickstarters/pull/110))
+- New quickstarter `be-docker-plain`: usefull for starting with a plain dockerfile and no be/fe framework on top ([#97](https://github.com/opendevstack/ods-project-quickstarters/issues/97))
+- Maven/gradle jenkins slave `jenkins-slave-maven` now gets nexus credentials injected as server into settings.xml ([#127](https://github.com/opendevstack/ods-project-quickstarters/issues/127))
+- New quickstarter `ds_ml_service` for machine learning from model training & testing to production ([#111](https://github.com/opendevstack/ods-project-quickstarters/issues/111))
 
 ### Changed
 - Jupyter & R-Shiny quickstarters are now based on new Openresty-based WAF image ([#103](https://github.com/opendevstack/ods-project-quickstarters/pull/103))
 
+### Fixed
+- Angular quickstarter `fe-angular-frontend` compilation failed due to changed dependency ([#129](https://github.com/opendevstack/ods-project-quickstarters/issues/129))
+- Spring boot quickstarter `be-springboot` gradle build failed due to dependency update to gradle 4.10 ([#131](https://github.com/opendevstack/ods-project-quickstarters/issues/131))
+- Upgrade of repo, thru rundeck job `prepare-continous integration` fails with invalid device ([#124](https://github.com/opendevstack/ods-project-quickstarters/issues/124))
 
 ## [1.0.1] - 2019-01-25
 

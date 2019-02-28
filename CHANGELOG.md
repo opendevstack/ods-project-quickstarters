@@ -4,8 +4,8 @@
 
 ### Added
 - Rundeck `prepare-continous integration` job can now be used to upgrade an existing git repository ([#110](https://github.com/opendevstack/ods-project-quickstarters/pull/110))
-- New quickstarter `be-docker-plain`: usefull for starting with a plain dockerfile and no be/fe framework on top ([#97](https://github.com/opendevstack/ods-project-quickstarters/issues/97))
-- Maven/gradle jenkins slave `jenkins-slave-maven` now gets nexus credentials injected as server into settings.xml ([#127](https://github.com/opendevstack/ods-project-quickstarters/issues/127))
+- New quickstarter `be-docker-plain`: useful for starting with a plain `Dockerfile` and no BE/FE framework on top ([#97](https://github.com/opendevstack/ods-project-quickstarters/issues/97))
+- Maven/Gradle Jenkins slave `jenkins-slave-maven` now gets Nexus credentials injected as server into `settings.xml` ([#127](https://github.com/opendevstack/ods-project-quickstarters/issues/127))
 - New quickstarter `ds_ml_service` for machine learning from model training & testing to production ([#111](https://github.com/opendevstack/ods-project-quickstarters/issues/111))
 
 ### Changed

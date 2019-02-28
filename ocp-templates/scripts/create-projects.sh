@@ -59,36 +59,23 @@ oc new-project ${PROJECT}-dev
 oc new-project ${PROJECT}-test
 
 # set admin permissions for Jenkins on the project(s)
-## remark: 'edit' role may be sufficient but in case the pipeline needs to do more advanced tasks, 'admin' may be required
+# this is needed to clone an entire project including role bindings 
 
 JENKINS_ROLE=admin
 
 oc policy add-role-to-user ${JENKINS_ROLE} system:serviceaccount:${PROJECT}-cd:jenkins -n ${PROJECT}-dev
 oc policy add-role-to-user ${JENKINS_ROLE} system:serviceaccount:${PROJECT}-cd:jenkins -n ${PROJECT}-test
 
-# allow default project user to modify build configs in dev and test
-oc policy add-role-to-user edit system:serviceaccount:${PROJECT}-cd:default -n ${PROJECT}-dev
-# cut - default (cd) user needs admin rights to pull secrets during project clone
-oc policy add-role-to-user admin system:serviceaccount:${PROJECT}-cd:default -n ${PROJECT}-test
-oc policy add-role-to-user edit system:serviceaccount:${PROJECT}-cd:default -n ${PROJECT}-cd
-
 # allow jenkins in <project>-cd to pull images (e.g. slave) from cd project
 oc policy add-role-to-user system:image-puller system:serviceaccount:${PROJECT}-cd:jenkins -n cd
-oc policy add-role-to-user system:image-puller system:serviceaccount:${PROJECT}:default -n cd
 
-# not really needed, because we build an image directly on master again, no pulling
+# allow test users to pull dev images
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${PROJECT}-test -n $PROJECT-dev
 
-# allow all authenticated users to access and view the project
+# allow all authenticated users to view the project
 oc policy add-role-to-group view system:authenticated -n $PROJECT-dev
 oc policy add-role-to-group view system:authenticated -n $PROJECT-test
 oc policy add-role-to-group view system:authenticated -n $PROJECT-cd
-oc policy add-role-to-group edit system:authenticated -n $PROJECT-dev
-oc policy add-role-to-group edit system:authenticated -n $PROJECT-test
-oc policy add-role-to-group edit system:authenticated -n $PROJECT-cd
-oc policy add-role-to-group basic-user system:authenticated -n $PROJECT-dev
-oc policy add-role-to-group basic-user system:authenticated -n $PROJECT-test
-oc policy add-role-to-group basic-user system:authenticated -n $PROJECT-cd
 
 # seed admins, by default only role dedicated-admin has admin rights
 if [[ ! -z ${OD_PRJ_ADMINS} ]]; then 

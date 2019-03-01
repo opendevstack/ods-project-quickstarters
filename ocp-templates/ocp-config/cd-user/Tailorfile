@@ -1,0 +1,5 @@
+# TODO not sure we need anything: namespace prov-dev
+# TODO selector  app=prov-app
+param-dir ../../../../ods-configuration/ods-project-quickstarters/ocp-config/cd-user
+
+secret

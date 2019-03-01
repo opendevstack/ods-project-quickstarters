@@ -1,0 +1,73 @@
+- defaultTab: summary
+  description: |-
+    TEST- creates an openshift component (for project bhw and component bhw-be: bhw-be)
+
+    Testing for [Replace upload-templates.sh with tailor · Issue #38 · opendevstack/ods-project-quickstarters](https://github.com/opendevstack/ods-project-quickstarters/issues/38)
+  executionEnabled: true
+  group: openshift
+  id: 3a10c830-217d-4ca4-b974-9e7c3caa876b
+  loglevel: INFO
+  name: create-component-qs-38
+  nodeFilterEditable: false
+  options:
+  - description: the global project id (i.e. bhw for basic hello world)
+    name: project_id
+    required: true
+  - description: the id of the component to create
+    name: component_id
+    required: true
+  - description: create a route for a service exposed by this component (true/false)
+    name: route
+    value: 'false'
+    values:
+    - 'false'
+    - 'true'
+  - description: openshift token to log on to openshift
+    name: openshift_api_token
+    secure: true
+    storagePath: keys/openshift-api-token
+    valueExposed: true
+  - description: git http url for the component to create
+    name: git_url_http
+    required: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - description: echo input parameters
+      exec: 'echo project_id: ${option.project_id}, component_id: ${option.component_id},
+        route: ${option.route}, git_url_http: ${option.git_url_http}'
+    - description: create tmp dir for job
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
+    - description: clone oc script project
+      exec: >-
+          cd /tmp/rundeck_${job.id}_${job.execid} &&
+          git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git &&
+          cd ods-project-quickstarters &&
+          git checkout origin/task/tailor-for-update-templates
+    - description: clone oc config project
+      exec: >-
+          cd /tmp/rundeck_${job.id}_${job.execid} &&
+          git clone ${globals.bitbucket_sshhost}/opendevstack/ods-configuration.git &&
+          cd ods-configuration &&
+          git checkout origin/task/tailor-for-update-templates
+    - description: create docker container for running script with tailor
+      exec: >-
+          cd /tmp/rundeck_${job.id}_${job.execid} &&
+          mkdir -p docker/ods-configuration/ods-project-quickstarters &&
+          cp -r           ods-configuration/ods-project-quickstarters docker/ods-configuration &&
+          mkdir -p docker/ods-project-quickstarters/ocp-templates/ocp-config &&
+          cp -r           ods-project-quickstarters/ocp-templates/ocp-config docker/ods-project-quickstarters/ocp-templates &&
+          mkdir -p docker/ods-project-quickstarters/ocp-templates/scripts &&
+          cp -r           ods-project-quickstarters/ocp-templates/scripts docker/ods-project-quickstarters/ocp-templates &&
+          cp ods-project-quickstarters/ocp-templates/Dockerfile docker/ &&
+          cd docker &&
+          sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
+    - description: create openshift components within projects
+      exec: >-
+        echo "Token --> ${option.openshift_api_token}" &&
+        cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates &&
+        sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./create-component.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -r ${option.route} -ne "${globals.nexus_host}"'
+    keepgoing: false
+    strategy: node-first
+  uuid: 3a10c830-217d-4ca4-b974-9e7c3caa876b
+

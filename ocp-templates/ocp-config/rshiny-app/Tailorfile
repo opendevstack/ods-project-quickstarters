@@ -1,0 +1,5 @@
+param-file  ../../../../ods-configuration/ods-project-quickstarters/ocp-templates/templates/templates.env,../../../../ods-configuration/ods-project-quickstarters/ocp-config/component-route/route.env
+
+ignore-unknown-parameters true
+
+secret,svc,route,dc,is

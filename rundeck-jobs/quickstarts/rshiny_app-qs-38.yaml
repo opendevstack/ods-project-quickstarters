@@ -1,0 +1,52 @@
+- description: |-
+    TEST-Create an RShiny app
+
+    Testing for [Replace upload-templates.sh with tailor · Issue #38 · opendevstack/ods-project-quickstarters](https://github.com/opendevstack/ods-project-quickstarters/issues/38)
+  executionEnabled: true
+  group: quickstarts
+  id: 59b9b91a-bd3a-4a1b-95a2-b5efc3bc65d6
+  loglevel: INFO
+  name: rshiny_app-qs-38
+  nodeFilterEditable: false
+  options:
+  - description: id of the project (i.e. bhw for basic hello world)
+    name: project_id
+    required: true
+  - description: id of the component to create (i.e. bhw-be for bhw backend)
+    name: component_id
+    required: true
+  - description: git url to access target repository via http
+    name: git_url_http
+    required: true
+  - description: git url to access target repository via ssh
+    name: git_url_ssh
+    required: true
+  - description: openshift api token to log on to open shift
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+    valueExposed: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: 'echo project_id: ${option.project_id},  component_id: ${option.component_id},
+        git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
+        package_name: ${option.package_name}'
+    - description: checkout quickstart
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/task/tailor-for-update-templates
+    - script: |-
+        #!/bin/bash
+        mkdir /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
+        cd /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
+        echo "copy rshiny files from quickstart to generated project"
+        cp -rv /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/rshiny-app/* .
+    - description: setup quickstarter for continuous integration
+      jobref:
+        args: -component_type rshiny-app -component_id ${option.component_id} -project_id ${option.project_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}
+        group: common
+        name: prepare-continuous-integration-rshiny-qs-38
+        nodeStep: 'true'
+    keepgoing: false
+    strategy: node-first
+  uuid: 59b9b91a-bd3a-4a1b-95a2-b5efc3bc65d6

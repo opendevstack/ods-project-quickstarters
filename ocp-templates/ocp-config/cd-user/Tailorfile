@@ -1,0 +1,3 @@
+param-file  ../../../../ods-configuration/ods-project-quickstarters/ocp-templates/templates/templates.env
+
+secret

@@ -18,7 +18,8 @@ case $key in
     shift # past argument
     ;;
     *)
-            # unknown option
+        echo "Unknown option: $1. Exiting in case you did not intend to invoke this script."
+        exit 1
     ;;
 esac
 shift # past argument or value

@@ -39,8 +39,15 @@
   scheduleEnabled: true
   sequence:
     commands:
-    - description: clone quickstarter project
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters && git checkout origin/production
+    - description: clone quickstarter project - origin/production
+      script: |-
+        set -eux
+        mkdir "/tmp/rundeck_@job.id@_@job.execid@"
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
+        cd ods-project-quickstarters
+        # Here the branch can be changed for testing purposes
+        git checkout origin/production
     - description: create rshiny app in openshift
       jobref:
         args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
@@ -49,6 +56,7 @@
         nodeStep: 'true'
     - description: add Jenkinsfile to generated project
       script: |-
+        set -eux
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
         ./renderJenkinsTemplate.sh \

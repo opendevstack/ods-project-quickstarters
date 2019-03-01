@@ -2,30 +2,24 @@ apiVersion: v1
 kind: Template
 labels:
   template: component-route-template
-message: |-
-  For more information about using this template, including OpenShift considerations, see the documentation (TODO).
+  app: ${PROJECT}
+  component: ${COMPONENT}
+  env: ${ENV}
 metadata:
   annotations:
     description: |-
       This templates performs the setup or a route for a component.
     iconClass: icon-nodejs
     openshift.io/display-name: Component Template
-    template.openshift.io/long-description: This template defines resources needed
-      to develop an application, including a build configuration, application
-      deployment configuration.
+    template.openshift.io/long-description: This template defines a route for a component.
   name: component-route
 objects:
   - apiVersion: v1
     kind: Route
     metadata:
-      labels:
-        app: ${PROJECT}
-        component: ${COMPONENT}
-        env: ${ENV}
       name: ${COMPONENT}
-      namespace: ${PROJECT}-${ENV}
     spec:
-      host: 
+      host: ${COMPONENT}-${PROJECT}-${ENV}.${OD_OCP_SOURCE_APP_DOMAIN}
       tls:
         insecureEdgeTerminationPolicy: Redirect
         termination: edge
@@ -46,4 +40,8 @@ parameters:
 - description: The name of the component
   displayName: Component
   name: COMPONENT
+  required: true
+- description: The application domain
+  displayName: app domain
+  name: OD_OCP_SOURCE_APP_DOMAIN
   required: true

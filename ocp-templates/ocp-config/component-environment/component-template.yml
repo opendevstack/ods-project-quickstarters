@@ -1,14 +1,8 @@
 apiVersion: v1
 kind: Template
-metadata:
-  name: component-environment
-  annotations:
-    description: This templates performs the basic setup for applications.
-    iconClass: icon-nodejs
-    openshift.io/display-name: Component Template
-    template.openshift.io/long-description: >-
-      This template defines resources needed to develop an application,
-      including a build configuration, application deployment configuration.
+labels:
+  template: component-template
+  app: '${PROJECT}-${COMPONENT}'
 objects:
   - apiVersion: v1
     kind: Service
@@ -17,23 +11,17 @@ objects:
         description: Exposes and load balances the application pods
         service.alpha.openshift.io/dependencies: '[]'
       labels:
-        app: '${PROJECT}'
         branch: '${BRANCH}'
-        component: '${COMPONENT}'
-        env: '${ENV}'
       name: '${COMPONENT}'
-      namespace: '${PROJECT}-${ENV}'
     spec:
       ports:
-        - name: 8080-tcp
+      -   name: 8080-tcp
           port: 8080
           protocol: TCP
           targetPort: 8080
       selector:
-        app: '${PROJECT}'
-        component: '${COMPONENT}'
+        app: '${PROJECT}-${COMPONENT}'
         deploymentconfig: '${COMPONENT}'
-        env: '${ENV}'
       sessionAffinity: None
       type: ClusterIP
   - apiVersion: v1
@@ -41,32 +29,49 @@ objects:
     metadata:
       annotations:
         description: Keeps track of changes in the application image
-      labels:
-        app: '${PROJECT}'
-        component: '${COMPONENT}'
-        env: '${ENV}'
       name: '${COMPONENT}'
-      namespace: '${PROJECT}-${ENV}'
     spec:
       dockerImageRepository: '${COMPONENT}'
+      lookupPolicy:
+        local: false
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      annotations:
+        description: Defines how to build the application
+      name: ${COMPONENT}
+    spec:
+      failedBuildsHistoryLimit: 5
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${COMPONENT}:${TAGVERSION}
+      postCommit: {}
+      resources: {}
+      runPolicy: Serial
+      source:
+        type: Binary
+        binary: {}
+      strategy:
+        type: Docker
+        dockerStrategy: {}
+      successfulBuildsHistoryLimit: 5
+      triggers: []
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
       labels:
-        app: '${PROJECT}'
         branch: '${BRANCH}'
-        component: '${COMPONENT}'
-        env: '${ENV}'
       name: '${COMPONENT}'
-      namespace: '${PROJECT}-${ENV}'
     spec:
       replicas: 1
+      revisionHistoryLimit: 10
       selector:
-        app: '${PROJECT}'
-        component: '${COMPONENT}'
+        app: '${PROJECT}-${COMPONENT}'
         deploymentconfig: '${COMPONENT}'
-        env: '${ENV}'
       strategy:
+        activeDeadlineSeconds: 21600
         resources: {}
         rollingParams:
           intervalSeconds: 1
@@ -78,13 +83,12 @@ objects:
       template:
         metadata:
           labels:
-            app: '${PROJECT}'
-            component: '${COMPONENT}'
+            app: '${PROJECT}-${COMPONENT}'
             deploymentconfig: '${COMPONENT}'
             env: '${ENV}'
         spec:
           containers:
-            - image: '${PROJECT}-${ENV}/${COMPONENT}:latest'
+            - image: '${PROJECT}-${ENV}/${COMPONENT}:${TAGVERSION}'
               imagePullPolicy: IfNotPresent
               name: '${COMPONENT}'
               ports:
@@ -96,8 +100,10 @@ objects:
                 requests:
                   memory: '${MEMORY_REQUEST}'
               terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
           dnsPolicy: ClusterFirst
           restartPolicy: Always
+          schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
       test: false
@@ -109,7 +115,7 @@ objects:
               - '${COMPONENT}'
             from:
               kind: ImageStreamTag
-              name: '${COMPONENT}:latest'
+              name: '${COMPONENT}:${TAGVERSION}'
               namespace: '${PROJECT}-${ENV}'
           type: ImageChange
 parameters:
@@ -130,6 +136,11 @@ parameters:
     description: The branch (either 'feature' or 'master').
     value: feature
     required: true
+  - name: BRANCH
+    displayName: Branch
+    description: The branch (either 'feature' or 'master').
+    value: feature
+    required: true
   - name: MEMORY_LIMIT
     displayName: Memory Limit
     description: Maximum amount of memory available for the container.
@@ -140,5 +151,8 @@ parameters:
     description: Minimum amount of memory requested for the container.
     value: 256Mi
     required: true
-labels:
-  template: component-template
+  - name: TAGVERSION
+    displayName: tag version
+    description: The version to be used.
+    value: latest
+    required: true

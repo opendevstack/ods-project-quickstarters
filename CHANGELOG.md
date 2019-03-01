@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Angular quickstarter `fe-angular-frontend` compilation failed due to changed dependency ([#129](https://github.com/opendevstack/ods-project-quickstarters/issues/129))
+- Spring boot quickstarter `be-springboot` gradle build failed due to dependency update to gradle 4.10 ([#131](https://github.com/opendevstack/ods-project-quickstarters/issues/131))
 
 ## [1.0.1] - 2019-01-25
 

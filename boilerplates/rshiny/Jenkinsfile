@@ -15,7 +15,7 @@ library identifier: 'ods-library@1.0.x', retriever: modernSCM(
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-scala",
+  image: "${dockerRegistry}/cd/jenkins-slave-base",
   projectId: projectId,
   componentId: componentId,
   branchToEnvironmentMapping: [
@@ -23,17 +23,6 @@ odsPipeline(
     '*': 'dev'
   ]
 ) { context ->
-  stageBuild(context)
-  stageScanForSonarqube(context)
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
-}
-
-def stageBuild(def context) {
-  stage('Test') {
-    withEnv(["TAGVERSION=${context.tagversion}"]){
-      sh "sbt test"
-    }
-    sh "sbt assembly"
-  }
 }

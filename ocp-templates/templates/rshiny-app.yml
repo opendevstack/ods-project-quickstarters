@@ -6,6 +6,15 @@ metadata:
 objects:
 - apiVersion: v1
   data:
+    password: '${NEXUS_PASSWORD}'
+  kind: Secret
+  metadata:
+    labels:
+      app: rshiny-jupyter
+    name: nexus
+  type: opaque
+- apiVersion: v1
+  data:
     password: ${CROWD_RSHINY_REALM_PW}
     username: ${CROWD_RSHINY_REALM_USER}
   kind: Secret
@@ -26,38 +35,6 @@ objects:
     name: ${COMPONENT}
   spec:
     dockerImageRepository: ${COMPONENT}
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      project: ${PROJECT}
-      component: ${COMPONENT}
-      environment: ${ENV}
-    name: ${COMPONENT}
-  spec:
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: ${COMPONENT}:latest
-    postCommit: {}
-    resources: {}
-    runPolicy: Serial
-    source:
-      git:
-        uri: ${BITBUCKET_URL}
-      sourceSecret:
-        name: cd-user-token
-      type: Git
-    strategy:
-      dockerStrategy: {}
-      type: Docker
-    triggers:
-      - type: Generic
-        generic:
-          secret: ${TRIGGER_SECRET}
-  status:
-    lastVersion: 0
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -85,6 +62,15 @@ objects:
       spec:
         containers:
         - env:
+          - name: NEXUS_URL
+            value: '${NEXUS_URL}'
+          - name: NEXUS_USERNAME
+            value: '${NEXUS_USERNAME}'
+          - name: NEXUS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: nexus
           name: ${COMPONENT}
           ports:
           - containerPort: 8080
@@ -244,10 +230,6 @@ parameters:
   displayName: Environment
   name: ENV
   required: true
-- description: The bitbucket URL  
-  displayName: Bitbucket URL
-  name: BITBUCKET_URL
-  required: true
 - description: Trigger secret
   name: TRIGGER_SECRET
   value: secret101
@@ -267,3 +249,9 @@ parameters:
   displayName: crowd pw
   name: CROWD_RSHINY_REALM_PW
   value: CROWD_RSHINY_REALM_PW
+- name: NEXUS_URL
+  value: NEXUS_URL
+- name: NEXUS_USERNAME
+  value: NEXUS_USERNAME
+- name: NEXUS_PASSWORD
+  value: NEXUS_PASSWORD

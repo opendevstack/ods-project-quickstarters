@@ -1,28 +1,22 @@
-import { applyMiddleware, createStore } from 'redux';
+import { applyMiddleware, createStore, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
-import createHistory from 'history/createHashHistory';
-import { routerMiddleware } from 'react-router-redux';
-// import root epics/reducer
+import { connectRouter, routerMiddleware } from 'connected-react-router';
 import rootEpic from './rootEpic';
 import rootReducer from './rootReducer';
-import queryString from 'querystring';
+import { history } from './history';
 
-// export `history` to use in index.js, we using `createBrowserHistory`
-export const history = createHistory();
-
-const epicMiddleware = createEpicMiddleware(rootEpic, {
-  dependencies: {
-    queryString
-  }
-});
-
-// Build the middleware for intercepting and dispatching navigation actions
-const appRouterMiddleware = routerMiddleware(history);
-
+const epicMiddleware = createEpicMiddleware();
 const store = createStore(
-  rootReducer,
-  applyMiddleware(epicMiddleware),
-  applyMiddleware(appRouterMiddleware)
+  connectRouter(history)(rootReducer),
+  compose(
+    applyMiddleware(epicMiddleware),
+    applyMiddleware(routerMiddleware(history)),
+    process.env.NODE_ENV === 'development' && window.devToolsExtension
+      ? window.devToolsExtension()
+      : f => f
+  )
 );
+
+epicMiddleware.run(rootEpic);
 
 export default store;

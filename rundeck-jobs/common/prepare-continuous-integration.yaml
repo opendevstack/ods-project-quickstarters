@@ -20,6 +20,7 @@
     - fe-angular
     - fe-ionic
     - fe-react
+    - be-docker-plain
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true
@@ -56,6 +57,7 @@
         nodeStep: 'true'
     - description: add Jenkinsfile to generated project
       script: |-
+        sudo mkdir -p @option.quickstarter_directory@
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates 
         ./renderJenkinsTemplate.sh \

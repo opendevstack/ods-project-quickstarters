@@ -1,0 +1,152 @@
+def final projectId = '@project_id@'
+def final componentId = '@component_id@'
+def final credentialsId = "${projectId}-cd-cd-user-with-password"
+def sharedLibraryRepository
+def dockerRegistry
+def trainingRoute
+def trainingPodInfo
+def trainingPassword
+def trainingUsername
+
+def trainingConfig = [
+    "docker-training"  : "${componentId}-training-service",
+]
+
+def predictionConfig = [
+    "docker-prediction": "${componentId}-prediction-service"
+]
+
+node {
+    sharedLibraryRepository = env.SHARED_LIBRARY_REPOSITORY
+    dockerRegistry = env.DOCKER_REGISTRY
+}
+
+library identifier: 'ods-library@production', retriever: modernSCM(
+    [$class       : 'GitSCMSource',
+        remote       : sharedLibraryRepository,
+        credentialsId: credentialsId])
+
+// See readme of shared library for usage and customization.
+odsPipeline(
+    image: "${dockerRegistry}/cd/jenkins-slave-python",
+    projectId: projectId,
+    componentId: componentId,
+    openshiftBuildTimeout: 25,
+    branchToEnvironmentMapping: [
+        'master': 'test',
+        '*'     : 'dev'
+    ]
+) { context ->
+    stageUnitTests(context)
+    stageBuild(context)
+    stageScanForSonarqube(context)
+    stageStartMultipleOpenshiftBuild(context, "Build Training Image" ,trainingConfig)
+    stageMultipleDeployToOpenshift(context, "Deploy Training Pod", trainingConfig)
+    stageTraining(context)
+    stageIntegrationTest(context)
+    stageStartMultipleOpenshiftBuild(context, "Build Prediction Image", predictionConfig)
+    stageMultipleDeployToOpenshift(context, "Deploy Prediction Pod", predictionConfig)
+}
+
+def stageUnitTests(def context) {
+    stage('Unit Tests') {
+        withEnv(["NEXUS_USERNAME=${context.nexusUsername}",
+        "NEXUS_URL=${context.nexusHost}",
+        "NEXUS_PASSWORD=${context.nexusPassword}"]) {
+            sh 'pip install -i https://$NEXUS_USERNAME:$NEXUS_PASSWORD@${NEXUS_URL:8}/repository/pypi-all/simple -r src/requirements.txt --user'
+            sh 'PYTHONPATH=src python3 -m unittest discover -s test/unittests -t .'
+        }
+    }
+}
+
+def stageBuild(def context) {
+    stage('Prepare Docker Builds') {
+        sh './build.sh'
+    }
+}
+
+def stageTraining(def context) {
+    stage('Train Model') {
+        trainingRoute = "http://localhost:8080" // using fixed internal value localhost:8080 since port-forwarding is being used
+        while(true) {
+            trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+            print("Found pod name: ${trainingPodInfo[0]}")
+            if (trainingPodInfo[2] == "Running") {
+                print("Pod ${trainingPodInfo[0]} is running!!!")
+                break
+            }
+            print("Pod ${trainingPodInfo[0]} is still not running...")
+        }
+
+        trainingPassword = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o jsonpath='{.data.password}' -n ${context.targetProject}").trim()
+        trainingUsername = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o jsonpath='{.data.username}' -n ${context.targetProject}").trim()
+        trainingPassword = sh(returnStdout: true, script:"echo \"${trainingPassword}\" | base64 --decode").trim()
+        trainingUsername = sh(returnStdout: true, script:"echo \"${trainingUsername}\" | base64 --decode").trim()
+
+        sh "oc port-forward ${trainingPodInfo[0]} 8080 -n ${context.targetProject} &"
+        sh "python3 jenkinsfile_helper.py --training-service ${trainingRoute} --username \"${trainingUsername}\" --password \"${trainingPassword}\""
+    }
+}
+
+def stageIntegrationTest(def context) {
+    stage('Prediction Integration Test') {
+        withEnv(["DSI_TRAINING_BASE_URL=${trainingRoute}","DSI_TRAINING_SERVICE_USERNAME=${trainingUsername}","DSI_TRAINING_SERVICE_PASSWORD=${trainingPassword}"]) {
+            sh 'PYTHONPATH=src python3 -m unittest discover -s test/integration_tests -t .'
+        }
+    }
+}
+
+def stageStartMultipleOpenshiftBuild(def context, def stageName, def buildConfigs = null) {
+    if (buildConfigs != null) {
+        stage(stageName) {
+            if (!context.environment) {
+                println("Skipping for empty environment ...")
+                return
+            }
+            buildConfigs.each { dockerFolder, buildConfig ->
+                timeout(context.openshiftBuildTimeout) {
+                    patchBuildConfig(context, buildConfig)
+                    sh "oc start-build  --from-dir ${dockerFolder} --follow -n ${context.targetProject} " +
+                    "${buildConfig}"
+                }
+            }
+        }
+    } else {
+        stageStartOpenshiftBuild(context)
+    }
+}
+
+private void patchBuildConfig(def context, def componentId = null) {
+    sh """oc patch bc ${componentId ?: context.componentId} --type=json --patch '[
+    {"op": "replace", "path": "/spec/source", "value":{"type":"Binary"}},
+    {"op": "replace", "path": "/spec/output/to/name", "value":"${componentId ?: context.componentId}:${
+        context.tagversion
+    }"},
+    {"op": "replace", "path": "/spec/strategy/dockerStrategy", "value":{"buildArgs":[
+        {"name": "NEXUS_URL" ,"value": "${context.nexusHost}"},
+        {"name": "NEXUS_USERNAME" ,"value": "${context.nexusUsername}"},
+        {"name": "NEXUS_PASSWORD" ,"value": "${context.nexusPassword}"}]}},
+    ]' -n ${context.targetProject}"""
+}
+
+def stageMultipleDeployToOpenshift(def context, def stageName, def buildConfigs = null) {
+    if (buildConfigs != null) {
+        stage(stageName) {
+            if (!context.environment) {
+                println("Skipping for empty environment ...")
+                return
+            }
+            buildConfigs.each { dockerFolder, buildConfig ->
+                openshiftTag(
+                        srcStream: buildConfig,
+                        srcTag: context.tagversion,
+                        destStream: buildConfig,
+                        destTag: "latest",
+                        namespace: context.targetProject
+                )
+            }
+        }
+    } else {
+        stageDeployToOpenshift(context)
+    }
+}

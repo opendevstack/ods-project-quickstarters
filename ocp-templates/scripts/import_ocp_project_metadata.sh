@@ -459,7 +459,10 @@ do
 			break
 		fi
 		
-		cat $dc_config_json | sed -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g" -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" -e "s|namespace: $OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE|namespace: $OD_OCP_SHARED_SPACE_TARGET|g" -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" > $dc_config_json$tmp_postfix
+		echo "Replacing nexus host -source $OD_OCP_SOURCE_NEXUS_URL with $OD_OCP_TARGET_NEXUS_URL"
+		echo "Replacing SQ host -source $OD_OCP_SOURCE_SQ_URL with $OD_OCP_TARGET_SQ_URL"
+		
+		cat $dc_config_json | sed -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g" -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" -e "s|namespace: $OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE|namespace: $OD_OCP_SHARED_SPACE_TARGET|g" -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" -e "s|$OD_OCP_SOURCE_SQ_URL|$OD_OCP_TARGET_SQ_URL|g" > $dc_config_json$tmp_postfix
 
 		artifact_file=${dc_config_json}
 		artifactName=$(eval_oc_artifact_name)

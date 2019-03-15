@@ -32,6 +32,10 @@ case $key in
     OD_PRJ_ADMINS="$2"
     shift # past argument
     ;;    
+	-e|--project_entitlements)
+    OD_PRJ_ENTL_GROUPS="$2"
+    shift # past argument
+    ;;    
     -n|--nexus)
     NEXUS_HOST="$2"
     shift # past argument
@@ -58,8 +62,8 @@ oc new-project ${PROJECT}-cd
 oc new-project ${PROJECT}-dev
 oc new-project ${PROJECT}-test
 
-# set admin permissions for Jenkins on the project(s)
-# this is needed to clone an entire project including role bindings 
+# set admin permissions for the Jenkins SA on the project(s)
+# this is needed to clone an entire project including role bindings for autocloneEnv in the shared lib 
 
 JENKINS_ROLE=admin
 
@@ -72,11 +76,6 @@ oc policy add-role-to-user system:image-puller system:serviceaccount:${PROJECT}-
 # allow test users to pull dev images
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${PROJECT}-test -n $PROJECT-dev
 
-# allow all authenticated users to view the project
-oc policy add-role-to-group view system:authenticated -n $PROJECT-dev
-oc policy add-role-to-group view system:authenticated -n $PROJECT-test
-oc policy add-role-to-group view system:authenticated -n $PROJECT-cd
-
 # seed admins, by default only role dedicated-admin has admin rights
 if [[ ! -z ${OD_PRJ_ADMINS} ]]; then 
 	for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
@@ -86,6 +85,49 @@ if [[ ! -z ${OD_PRJ_ADMINS} ]]; then
 		oc policy add-role-to-user admin ${admin_user} -n ${PROJECT}-test
 		oc policy add-role-to-user admin ${admin_user} -n ${PROJECT}-cd
 	done
+fi
+
+if [[ ! -z ${OD_PRJ_ENTL_GROUPS} ]]; then 
+	echo "seeding special permission groups"
+	for group in $(echo $OD_PRJ_ENTL_GROUPS | sed -e 's/,/ /g');
+	do		
+		groupName=$(echo $group | cut -d "=" -f1)
+		groupValue=$(echo $group | cut -d "=" -f2)
+		
+		usergroup_role=edit
+		admingroup_role=admin
+		readonlygroup_role=view
+		
+		if [[ ${groupValue} == "" ]];
+		then
+			continue
+		fi
+		
+		echo "- seeding groups: ${groupName^^} - ${groupValue}"
+		if [[ ${groupName^^} == *USERGROUP* ]]; then
+			oc policy add-role-to-group ${usergroup_role} ${groupValue} -n ${PROJECT}-dev
+			oc policy add-role-to-group ${usergroup_role} ${groupValue} -n ${PROJECT}-test
+			oc policy add-role-to-group ${usergroup_role} ${groupValue} -n ${PROJECT}-cd
+		elif [[ ${groupName^^} == *ADMINGROUP* ]]; then 
+			oc policy add-role-to-group ${admingroup_role} ${groupValue} -n ${PROJECT}-dev
+			oc policy add-role-to-group ${admingroup_role} ${groupValue} -n ${PROJECT}-test
+			oc policy add-role-to-group ${admingroup_role} ${groupValue} -n ${PROJECT}-cd
+		elif [[ ${groupName^^} == *READONLYGROUP* ]]; then
+			oc policy add-role-to-group ${readonlygroup_role} ${groupValue} -n ${PROJECT}-dev
+			oc policy add-role-to-group ${readonlygroup_role} ${groupValue} -n ${PROJECT}-test
+			oc policy add-role-to-group ${readonlygroup_role} ${groupValue} -n ${PROJECT}-cd
+		fi
+	done
+else
+	echo "- seeding default edit/view rights for system:authenticated"
+	oc policy add-role-to-group edit system:authenticated -n $PROJECT-dev
+	oc policy add-role-to-group edit system:authenticated -n $PROJECT-test
+	oc policy add-role-to-group edit system:authenticated -n $PROJECT-cd
+	
+	# allow all authenticated users to view the project
+	oc policy add-role-to-group view system:authenticated -n $PROJECT-dev
+	oc policy add-role-to-group view system:authenticated -n $PROJECT-test
+	oc policy add-role-to-group view system:authenticated -n $PROJECT-cd	
 fi
 
 # create jenkins in the cd project

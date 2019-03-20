@@ -1,6 +1,10 @@
-# fe-angular
+# fe-angular 
 
- ## Purpose of this quickstarter (use this when you want to ... )
+Angular quick starter project
+
+ ## Purpose of this quickstarter
+ 
+ This quick starter gives you a boilerplate code for Angular project.
 
  ## What files / architecture is generated?
 

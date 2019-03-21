@@ -13,14 +13,28 @@ Angular quickstarter project
 ├── README.md
 ├── angular.json
 ├── docker
+│   ├── Dockerfile
+│   └── nginx.vh.default.conf.nginx
 ├── e2e
+│   ├── protractor.conf.js
+│   ├── src
+│   │   ├── app.e2e-spec.ts
+│   │   └── app.po.ts
+│   └── tsconfig.e2e.json
 ├── package.json
 ├── sonar-project.properties
 ├── src
 │   ├── app
+│   │   ├── app.component.html
+│   │   ├── app.component.scss
+│   │   ├── app.component.spec.ts
+│   │   ├── app.component.ts
+│   │   └── app.module.ts
 │   ├── assets
 │   ├── browserslist
 │   ├── environments
+│   │   ├── environment.prod.ts
+│   │   └── environment.ts
 │   ├── favicon.ico
 │   ├── index.html
 │   ├── karma.conf.js

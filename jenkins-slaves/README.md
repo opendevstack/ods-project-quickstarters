@@ -1,17 +1,16 @@
 # Jenkins Slaves
 
-Jenkins slaves that are not part of the OpenShift distribution.
+Hosts all the jenkins slaves that are part of the OpenDevStack distribution.
 
-All slaves should inherit from the [slave-base](https://github.com/opendevstack/ods-core/tree/master/jenkins/slave-base).
+All these slaves inherit from the [slave-base](https://github.com/opendevstack/ods-core/tree/master/jenkins/slave-base).
 
-## OCP config
+If you create a new slave please create readme.md inside its directory, based on [template](../__JENKINS_SLAVE_TEMPLATE_README.md)
+
+## OCP config / installation
 
 Config can be created / updated / deleted with Tailor.
 
 Example:
 ```
-cd maven/ocp-config && tailor status
+cd <slave name>/ocp-config && tailor status
 ```
-
-
-

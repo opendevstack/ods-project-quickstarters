@@ -1,6 +1,6 @@
 # Python Jenkins Slave
 
-## Introduction / Used for building `node.js` 
+## Introduction / Used for building `python` 
 This slave is used to build / execute python code
 
 ## Features / what's in, which plugins, ...

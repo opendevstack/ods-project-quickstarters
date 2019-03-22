@@ -1,7 +1,10 @@
 # Scala / SBT Jenkins Slave
 
 ## Introduction / Used for building `scala` 
-This slave is used to build scala code
+This slave is used to build scala code thru SBT (Scala build tool)
+
+The image is built in the global `cd` project and is named `jenkins-slave-scala`.
+it can be referenced in a `jenkinsfile` with `cd/jenkins-slave-scala`
 
 ## Features / what's in, which plugins, ...
 1. SBT 1.1.6

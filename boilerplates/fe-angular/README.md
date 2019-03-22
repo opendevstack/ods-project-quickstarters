@@ -9,10 +9,10 @@ Angular quickstarter project
 ## What files / architecture is generated?
  ```
 .
-├── Jenkinsfile
+├── Jenkinsfile - This file contains Jenkins build configuration settings
 ├── README.md
-├── angular.json
-├── docker
+├── angular.json - This file contains Angular project configuration settings
+├── docker - This folder contains Docker configuration settings
 │   ├── Dockerfile
 │   └── nginx.vh.default.conf.nginx
 ├── e2e
@@ -21,8 +21,8 @@ Angular quickstarter project
 │   │   ├── app.e2e-spec.ts
 │   │   └── app.po.ts
 │   └── tsconfig.e2e.json
-├── package.json
-├── sonar-project.properties
+├── package.json - This file contains scripts to run and node packages dependencies for project
+├── sonar-project.properties - This file contains SonarQube configuration settings
 ├── src
 │   ├── app
 │   │   ├── app.component.html
@@ -73,9 +73,8 @@ In Jenkinsfile, there are various stages
 
 ## Builder Slave used
 
-This quickstarter uses below Jenkins builder slave:
-
-https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular
+This quickstarter uses
+[Nodejs8-Angular builder slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular) Jenkins builder slave.
 
 ## Known limitations
 

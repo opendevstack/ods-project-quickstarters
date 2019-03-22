@@ -79,3 +79,11 @@ Basically, the tasks implemented by this pipeline are:
 NOTE: The 2nd step executes ```gradlew build``` to compile your project and create a distribution as ```jar``` file. 
 This file is copied to the ```docker``` folder to be included in the docker image when the image is built in step 3.  
 
+## Builder Slave used
+
+This quickstarter uses
+[Maven builder slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/maven) Jenkins builder slave.
+
+## Known limitations
+
+NA

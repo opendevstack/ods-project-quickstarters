@@ -115,7 +115,7 @@ case $key in
     OD_VERBOSE="$2"
     shift # past argument
     ;;
-    --skip_config_validation)
+    --skip-config-validation)
     SKIP_CONF_VALIDATION="$2"
     shift # past argument
     ;;
@@ -176,7 +176,7 @@ fi
 scriptdir=$(pwd)
 
 # find the right configuration to use based on the target API host passed parameter
-targetconfig=$(grep -H $OD_OCP_TARGET_HOST $scriptdir/migration_config/ocp_project_config_target | cut -d ':' -f1)
+targetconfig=$(grep -H $OD_OCP_TARGET_HOST $scriptdir/migration_config/ocp_project_config_target* | cut -d ':' -f1)
 
 if [[ -f "$targetconfig" ]]; then
 	echo "> sourcing env target config from $targetconfig"
@@ -271,81 +271,98 @@ fi
 
 OD_PRJ_ADMINS=$OD_PRJ_ADMINS,$OD_OCP_CD_SA_TARGET
 
-if grep -q $OD_OCP_TARGET_HOST $sourceconfig; then
-    echo "Source and Target cluster are the same. Validating configuration..."
+if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
+    if grep -q $OD_OCP_TARGET_HOST $sourceconfig; then
+        echo "Source and Target cluster are the same. Validating configuration..."
 
 
-    if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+        if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+            if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+                echo "Target domain is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+                echo "Target nexus url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+                echo "Target bitbucket url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+            if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
+                echo "Target service account is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+    else
+        echo "Source and Target cluster are NOT the same. Validating configuration..."
+
+        if [[ -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+            echo "Source domain is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
         if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
-            echo "Target domain is empty while source is not. It should be to prevent errors"
+            echo "Target domain is empty. It should be set when importing into a different cluster"
+            exit 1
         fi
-    fi
 
-    if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+        if [[ "$OD_OCP_SOURCE_APP_DOMAIN" = "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+            echo "Source and Target domains are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+
+        if [[ -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+            echo "Source nexus url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
         if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
-            echo "Target nexus url is empty while source is not. It should be to prevent errors"
+            echo "Target nexus url is empty. It should be set when importing into a different cluster"
+            exit 1
         fi
-    fi
 
-    if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+        if [[ "$OD_OCP_SOURCE_NEXUS_URL" = "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+            echo "Source and Target nexus urls are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+            echo "Source bitbucket url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
         if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
-            echo "Target bitbucket url is empty while source is not. It should be to prevent errors"
+            echo "Target bitbucket url is empty. It should be set when importing into a different cluster"
+            exit 1
         fi
-    fi
 
-    if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
-        if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
-            echo "Target service account is empty while source is not. It should be to prevent errors"
+        if [[ "$OD_OCP_SOURCE_BITBUCKET_URL" = "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+            echo "Source and Target bitbuckets urls are the same. It should be different when importing into a different cluster"
+            exit 1
         fi
-    fi
 
-elif [[ "$SKIP_CONF_VALIDATION" -ne "true" ]]; then
-    echo "Source and Target cluster are NOT the same. Validating configuration..."
+        if [[ -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
+            "Source space for Jenkins image is not set. It should be set when importing into a different cluster"
+            exit 1
+        fi
 
-    if [[ -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
-        echo "Source domain is empty. It should be set when importing into a different cluster"
-    fi
-
-    if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
-        echo "Target domain is empty. It should be set when importing into a different cluster"
-    fi
-
-    if [[ "$OD_OCP_SOURCE_APP_DOMAIN" -eq "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
-        echo "Source and Target domains are the same. It should be different when importing into a different cluster"
-    fi
-
-
-    if [[ -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
-        echo "Source nexus url is empty. It should be set when importing into a different cluster"
-    fi
-
-    if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
-        echo "Target nexus url is empty. It should be set when importing into a different cluster"
-    fi
-
-    if [[ "$OD_OCP_SOURCE_NEXUS_URL" -eq "$OD_OCP_TARGET_NEXUS_URL" ]]; then
-        echo "Source and Target nexus urls are the same. It should be different when importing into a different cluster"
-    fi
-
-    if [[ -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
-        echo "Source bitbucket url is empty. It should be set when importing into a different cluster"
-    fi
-
-    if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
-        echo "Target bitbucket url is empty. It should be set when importing into a different cluster"
-    fi
-
-    if [[ "$OD_OCP_SOURCE_BITBUCKET_URL" -eq "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
-        echo "Source and Target bitbuckets urls are the same. It should be different when importing into a different cluster"
-    fi
-
-    if [[ -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
-        echo "Source space for Jenkins image is not set. It should be different when importing into a different cluster"
-    fi
-
-    if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
-        if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
-            echo "Target service account is empty while source is not. It should be to prevent errors"
+        if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+            if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
+                echo "Target service account is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
         fi
     fi
 else

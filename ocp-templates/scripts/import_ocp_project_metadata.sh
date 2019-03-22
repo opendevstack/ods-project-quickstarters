@@ -115,6 +115,10 @@ case $key in
     OD_VERBOSE="$2"
     shift # past argument
     ;;
+    --skip_config_validation)
+    SKIP_CONF_VALIDATION="$2"
+    shift # past argument
+    ;;
     *)
     # unknown option
     ;;
@@ -267,6 +271,89 @@ fi
 
 OD_PRJ_ADMINS=$OD_PRJ_ADMINS,$OD_OCP_CD_SA_TARGET
 
+if grep -q $OD_OCP_TARGET_HOST $sourceconfig; then
+    echo "Source and Target cluster are the same. Validating configuration..."
+
+
+    if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+        if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+            echo "Target domain is empty while source is not. It should be to prevent errors"
+        fi
+    fi
+
+    if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+        if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+            echo "Target nexus url is empty while source is not. It should be to prevent errors"
+        fi
+    fi
+
+    if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+        if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+            echo "Target bitbucket url is empty while source is not. It should be to prevent errors"
+        fi
+    fi
+
+    if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+        if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
+            echo "Target service account is empty while source is not. It should be to prevent errors"
+        fi
+    fi
+
+elif [[ "$SKIP_CONF_VALIDATION" -ne "true" ]]; then
+    echo "Source and Target cluster are NOT the same. Validating configuration..."
+
+    if [[ -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+        echo "Source domain is empty. It should be set when importing into a different cluster"
+    fi
+
+    if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+        echo "Target domain is empty. It should be set when importing into a different cluster"
+    fi
+
+    if [[ "$OD_OCP_SOURCE_APP_DOMAIN" -eq "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+        echo "Source and Target domains are the same. It should be different when importing into a different cluster"
+    fi
+
+
+    if [[ -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+        echo "Source nexus url is empty. It should be set when importing into a different cluster"
+    fi
+
+    if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+        echo "Target nexus url is empty. It should be set when importing into a different cluster"
+    fi
+
+    if [[ "$OD_OCP_SOURCE_NEXUS_URL" -eq "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+        echo "Source and Target nexus urls are the same. It should be different when importing into a different cluster"
+    fi
+
+    if [[ -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+        echo "Source bitbucket url is empty. It should be set when importing into a different cluster"
+    fi
+
+    if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+        echo "Target bitbucket url is empty. It should be set when importing into a different cluster"
+    fi
+
+    if [[ "$OD_OCP_SOURCE_BITBUCKET_URL" -eq "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+        echo "Source and Target bitbuckets urls are the same. It should be different when importing into a different cluster"
+    fi
+
+    if [[ -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
+        echo "Source space for Jenkins image is not set. It should be different when importing into a different cluster"
+    fi
+
+    if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+        if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
+            echo "Target service account is empty while source is not. It should be to prevent errors"
+        fi
+    fi
+else
+    echo "WARNING!!! Validation was skipped"
+fi
+
+
+
 # Test if the login token is provided to execute the login or just use current session
 if [ -z "$OD_OCP_TARGET_TOKEN" ]; then
   echo "Skiping 'oc login'... using current oc '`oc whoami`' session"
@@ -322,7 +409,10 @@ do
         
 		oc new-project ${curr_ocp_namespace} || exit 1
 		# create the baseline with service accounts, role bindings - and switch SA account
-		cat project.yml | sed -e "s|$OD_OCP_CD_SA_SOURCE|$OD_OCP_CD_SA_TARGET|g" > project.yml$tmp_postfix
+		cp project.yml project.yml$tmp_postfix
+		if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+		    sed -i -e "s|$OD_OCP_CD_SA_SOURCE|$OD_OCP_CD_SA_TARGET|g" project.yml$tmp_postfix
+		fi
 
 
 		if [ "$OD_USE_APPLY" = true ]; then
@@ -421,7 +511,14 @@ do
 		skip_replace=false
 		
 		# replace hosts
-		cat $template_config_json | sed -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  > $template_config_json$tmp_postfix
+		cp $template_config_json $template_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $template_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $template_config_json$tmp_postfix
+		fi
 
 		occomm=$(eval_oc_artifact_status)$template_config_json$tmp_postfix
 	
@@ -441,7 +538,15 @@ do
 		skip_replace=false
 		
 		# replace hosts
-		cat $cmap_config_json | sed -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  > $cmap_config_json$tmp_postfix
+
+		cp $cmap_config_json $cmap_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $cmap_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $cmap_config_json$tmp_postfix
+		fi
 
 		occomm=$(eval_oc_artifact_status)$cmap_config_json$tmp_postfix
 	
@@ -458,8 +563,28 @@ do
 			echo "No artifacts fround that match $dc_config_json"
 			break
 		fi
-		
-		cat $dc_config_json | sed -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g" -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" -e "s|namespace: $OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE|namespace: $OD_OCP_SHARED_SPACE_TARGET|g" -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" > $dc_config_json$tmp_postfix
+
+		cp  $dc_config_json $dc_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
+		fi
+
+   		sed  -i -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" $dc_config_json$tmp_postfix
+
+
+		if [[ ! -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
+		    sed  -i -e "s|namespace: $OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE|namespace: $OD_OCP_SHARED_SPACE_TARGET|g" $dc_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SHARED_SPACE_SOURCE" ]]; then
+		    sed  -i -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" $dc_config_json$tmp_postfix
+		fi
+
+
 
 		artifact_file=${dc_config_json}
 		artifactName=$(eval_oc_artifact_name)
@@ -529,8 +654,16 @@ do
 
 		artifact_file=${bc_config_json}
 		skip_replace=false
-		
-		cat $bc_config_json | sed -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g" -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g" > $bc_config_json$tmp_postfix
+
+		cp $bc_config_json $bc_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $bc_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $bc_config_json$tmp_postfix
+		fi
+
 		
 		occomm=$(eval_oc_artifact_status)$bc_config_json$tmp_postfix
 		eval ${occomm}
@@ -548,8 +681,12 @@ do
 	
 		artifact_file=${route_config_json}
 		skip_replace=false
-		
-		cat $route_config_json | sed -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" > $route_config_json$tmp_postfix
+
+		cp $route_config_json $route_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $route_config_json$tmp_postfix
+		fi
+
 		if [ ! -z "$OD_TO_PROJECT" ]; then
 			sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$OD_TO_PROJECT|g" $route_config_json$tmp_postfix
 		fi

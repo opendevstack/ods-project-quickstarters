@@ -1,4 +1,4 @@
-# fe-angular
+# Frontend Angular (fe-angular)
 
 Angular quickstarter project
 

@@ -68,22 +68,29 @@ The files are generated using [Ionic CLI](https://ionicframework.com/docs/cli/).
 
 ## Usage - how do you start after you provisioned this quickstarter
 
-As pre-requisite you'll need to have installed [node](https://nodejs.org/en/download/), npm which is bundled with the node installation, [git](https://git-scm.com/downloads) and is recommended to install the ionic cli globally in your local environment by running: `npm install -g ionic`
+As pre-requisite you'll need to have installed:
+
+* [node](https://nodejs.org/en/download/)
+* npm which is bundled with the node installation
+* [git](https://git-scm.com/downloads) 
+* Ionic CLI globally in your local environment by running: `npm install -g ionic`
 
 Once you have you developer environment set up you can simply:
 
 * Clone your generated git repository and `cd` to your folder
 * Run command `npm install` in project directory to install npm dependencies.
-* Run `ionic serve` command to start the dev server, it will open your browser at *http://localhost:8100/*
+* Run `ionic serve` command to start the dev server, it will open your browser at `http://localhost:8100/`
 
-To develop an iOS application, you'll need to setup your developer environment as suggested in this [guide](https://ionicframework.com/docs/installation/ios).
+To develop an **iOS** application, you'll need to setup your developer environment as suggested in this [guide](https://ionicframework.com/docs/installation/ios).
 
-For android support configure your environment like this [guide](https://ionicframework.com/docs/installation/android).
+For **android** support configure your environment like this [guide](https://ionicframework.com/docs/installation/android).
 
 
 ## How this quickstarter is built thru Jenkins
 
-When the code in your git repository is updated the Jenkins file comes into action with the following stages:
+The `Jenkinsfile` contains the configuration that customizes the core pipeline implemented by [jenkins shared library](https://github.com/opendevstack/ods-jenkins-shared-library).
+
+When the code in your git repository is updated the `Jenkinsfile` comes into action with the following stages for this quickstarter:
 
   * **Build** - Installs the dependencies of your project with `yarn install`, generates the build by running `npm run ionic:build`, if the merged git branch is master it creates the production build with `npm run ionic:build --prod`. Finally, it copies the output folder `www` into `docker/dist`.
 

@@ -71,6 +71,12 @@ In Jenkinsfile, there are various stages
   * stageUnitTest - Runs unit test cases by executing command `yarn test`.
   * stageLint - Runs `ng lint` profiler by running command `npm run lint`.
 
+## Builder Slave used
+
+This quickstarter uses below Jenkins builder slave:
+
+https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular
+
 ## Known limitations
 
 NA

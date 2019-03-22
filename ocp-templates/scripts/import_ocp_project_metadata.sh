@@ -382,9 +382,6 @@ if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
         fi
 
 
-
-
-
         if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
             if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
                 echo "Target service account is empty while source is not. It should be to prevent errors"

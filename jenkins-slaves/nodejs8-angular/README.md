@@ -1,7 +1,7 @@
-# Node.js 8 - Angular 
+# Node.js 8 - Angular Jenkins Slave
 
 ## Introduction / Used for building `node.js` 
-This slave is used to build node.js based projects, both via `npm` and `yarn`
+This slave is used to build node.js based projects, both thru `npm` and `yarn`
 
 ## Features / what's in, which plugins, ...
 1. Nexus configuration 

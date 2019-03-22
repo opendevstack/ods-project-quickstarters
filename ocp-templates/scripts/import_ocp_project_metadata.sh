@@ -304,6 +304,14 @@ if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
             fi
         fi
 
+        if [[ -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_SQ_URL" ]]; then
+                echo "Target Sonarqube url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+
     else
         echo "Source and Target cluster are NOT the same. Validating configuration..."
 
@@ -353,10 +361,29 @@ if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
             exit 1
         fi
 
+        if [[ -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+            echo "Source Sonarqube url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_TARGET_SQ_URL" ]]; then
+            echo "Target Sonarqube url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ "$OD_OCP_SOURCE_SQ_URL" = "$OD_OCP_TARGET_SQ_URL" ]]; then
+            echo "Source and Target Sonarqube urls are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
         if [[ -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
             "Source space for Jenkins image is not set. It should be set when importing into a different cluster"
             exit 1
         fi
+
+
+
+
 
         if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
             if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
@@ -445,25 +472,24 @@ do
 			oc policy add-role-to-user admin ${admin_user}
 		done
 
-		# fixme - likely too many rights
+		# admin for the creating SA and image pull rights
 		oc policy add-role-to-user admin system:serviceaccount:${OD_OCP_CD_SA_TARGET}
 		oc policy add-role-to-user system:image-puller system:serviceaccount:${OD_OCP_CD_SA_TARGET}
-		oc policy add-role-to-user edit system:authenticated
-		oc policy add-role-to-user system:image-puller default
-		oc policy add-role-to-user edit default
-		oc policy add-role-to-user system:image-puller system:serviceaccount:${project_name}:default -n cd
+		# everyone authenticated can see
+		oc policy add-role-to-user view system:authenticated
 
 		# if jenkins CD is NOT part of the import it does not make sense to try to create the linking SA 
 		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"$cd"* ]];
 		then
-			echo "creating service account jenkins to modify build config during jenkins build"
+			echo "creating service account jenkins to modify build configs during jenkins build"
 			oc policy add-role-to-user admin system:serviceaccount:${project_name}-cd:jenkins -n ${project_name}-${ocp_proj_namespace_suffix}
 			echo
 		fi
 		
 		# add pull rights against ocp OD dedicated - for NON CD projects - otherwise we even pull the jenkins image and that we dont want
 		if [[ $ocp_proj_namespace_suffix == "cd" ]]; then 
-			echo "--  not creating pull secret to OCP, this is CD"
+			echo "--  not creating pull secret to OCP, this is CD - just adding image pull rights"
+			oc policy add-role-to-user system:image-puller system:serviceaccount:${project_name}-cd:jenkins -n cd
 		else
 			if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]]; then 
 				echo "Creating OCP OD pull secret"
@@ -583,12 +609,15 @@ do
 
 		cp  $dc_config_json $dc_config_json$tmp_postfix
 		if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
-		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
+		    echo "Replacing nexus host -source $OD_OCP_SOURCE_NEXUS_URL with $OD_OCP_TARGET_NEXUS_URL"
+		    sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
 		fi
 
-		if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
-		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+		    echo "Replacing SQ host -source $OD_OCP_SOURCE_SQ_URL with $OD_OCP_TARGET_SQ_URL"
+		    sed -i -e "s|$OD_OCP_SOURCE_SQ_URL|$OD_OCP_TARGET_SQ_URL|g"  $dc_config_json$tmp_postfix
 		fi
+
 
    		sed  -i -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" $dc_config_json$tmp_postfix
 
@@ -600,8 +629,6 @@ do
 		if [[ ! -z "$OD_OCP_SHARED_SPACE_SOURCE" ]]; then
 		    sed  -i -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" $dc_config_json$tmp_postfix
 		fi
-
-
 
 		artifact_file=${dc_config_json}
 		artifactName=$(eval_oc_artifact_name)

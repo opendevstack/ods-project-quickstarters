@@ -1,4 +1,4 @@
-# Scala Akka HTTP Quickstarter
+# Scala Akka HTTP Quickstarter (be-scala-akka)
 
 ## Purpose of this quickstarter
  

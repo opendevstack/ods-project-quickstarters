@@ -49,9 +49,9 @@ The files are generated using [Ionic CLI](https://ionicframework.com/docs/cli/).
 │   ├── test.ts
 │   └── tsconfig.spec.json
 ├── www
-├── .angular-cli.json This file contains Angular project configuration settings
-├── config.xml This file contains config settings for your mobile app, like package name and native preferences
-├── .ionic.config.json This file contains Ionic project configuration 
+├── .angular-cli.json - This file contains Angular project configuration settings
+├── config.xml - This file contains config settings for your mobile app, like package name and native preferences
+├── .ionic.config.json - This file contains Ionic project configuration 
 ├── karma.conf.js
 ├── protractor.conf.js
 ├── tsconfig.json
@@ -75,11 +75,13 @@ As pre-requisite you'll need to have installed:
 * [git](https://git-scm.com/downloads) 
 * Ionic CLI globally in your local environment by running: `npm install -g ionic`
 
+
 Once you have you developer environment set up you can simply:
 
 * Clone your generated git repository and `cd` to your folder
 * Run command `npm install` in project directory to install npm dependencies.
 * Run `ionic serve` command to start the dev server, it will open your browser at `http://localhost:8100/`
+
 
 To develop an **iOS** application, you'll need to setup your developer environment as suggested in this [guide](https://ionicframework.com/docs/installation/ios).
 
@@ -103,6 +105,7 @@ When the code in your git repository is updated the `Jenkinsfile` comes into act
 
 This quickstarter uses
 [Nodejs8-Angular builder slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular) Jenkins builder slave.
+
 
 ## Known Limitation
 

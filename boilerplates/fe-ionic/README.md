@@ -4,7 +4,7 @@ Ionic quickstarter project
 
 ## Purpose of this quickstarter
 
-This quickstarter generates an Ionic 3 project, you can use it when you want to develop a cross platform app (iOS, android and PWA) in one codebase using Web technologies like CSS, HTML and JavaScript/Typescript.
+This quickstarter generates an Ionic 3 project, you can use it when you want to develop a cross platform mobile app (iOS, android and PWA) in one codebase using Web technologies like CSS, HTML and JavaScript/Typescript.
 
 It contains the basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/), so you have your CI/CD process out of the box.
 

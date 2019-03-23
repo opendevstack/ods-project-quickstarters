@@ -1,10 +1,8 @@
 # Spring Boot Quickstarter
 
 ## Purpose of this quickstarter
-Use this quickstarter to generate a spring boot project.
+Use this quickstarter to generate a [spring boot](https://www.tutorialspoint.com/spring_boot/index.htm) based project.
 
-This quickstarter was made to enable with minimal effort (just 2 clicks) provisioning app users to generate a spring boot project.
-  
 It will provide a java 8 project with preconfigured gradle build and CI/CD integration (Jenkinsfile).
 
 ## What files / architecture is generated?

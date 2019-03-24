@@ -4,8 +4,7 @@ Angular quickstarter project
 
 ## Purpose of this quickstarter
  
-This is a Angular project quickstarter with basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).
-
+User this is a Angular project quickstarter if you want to build a frontend. It contains the basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).
 
 ## What files / architecture is generated?
  ```

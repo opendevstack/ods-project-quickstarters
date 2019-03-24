@@ -4,7 +4,7 @@
  
 This is a Akka HTTP project quickstarter with basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).
 
-Use it if you want to build an Actor / Stream based HTTP integration layer for your application. 
+Use it if you want to build an Actor / Stream based HTTP integration layer for your application, based on scala. 
 
 ## What files / architecture is generated?
 An example Akka HTTP Server implementation is generated with a little user registration protocol and according tests to showcase the server side routing DSL. 

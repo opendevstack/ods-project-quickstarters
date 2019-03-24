@@ -53,7 +53,7 @@ In Jenkinsfile, there are various stages
 ## Builder Slave used
 
 This quickstarter uses the
-[Scala Jenkins Slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves).
+[Scala Jenkins Slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/scala).
 
 ## Known limitations
 

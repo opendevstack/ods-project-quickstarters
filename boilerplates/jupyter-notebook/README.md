@@ -19,6 +19,8 @@ python 3.6 + jupyter (lab)
 
 ## Usage - how do you start after you provisioned this quickstarter
 The quickstarter sets up two pods in openshift. The jupyter notebook is routed through a crowd authentication proxy.
+For accessing the jupyter notebook use the route exposed by the authentication service:
+`<your-component-name>-authrpoxy`
 
 
 The directory `/app/src/work/storage` is created where code can be organized using installed git.  

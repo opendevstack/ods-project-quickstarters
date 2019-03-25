@@ -1,11 +1,9 @@
 # Data Science Industrialization Boilerplate
 
 ## Purpose of this quickstarter
-Adpated und moved to the right place of the README.md for ds machine learning quickstarter (#172)
 This boilerplate enables data scientists to develop, serve, version models within a CI/CD
 pipeline hosted on OpenShift with the goal in mind that one does not have to take care/change
 much of the needed pipeline and infrastructure.
-
 
 ## Basic Setup ##
 The boilerplate provides a two pod setup in OpenShift, one pod for training service and one pod for
@@ -57,7 +55,6 @@ The `test` directory mirrors the structure of the `src`, either for unittests or
 tests using the python unittest framework.
 
 
-<<<<<<< HEAD
 ## How to Code Your Own Models ##
 To run your own customized models there is usually no need to change either the `Jenkinsfile`,
 OpenShift setup or the training and prediction microservices.
@@ -160,8 +157,7 @@ A Logistic Regression using scikit-learn with some (unnecessary) feature cleanin
 
 ## What architecture is generated?
 
-
-* Traininggot
+* Training
     * Build Config
 		* name: `<componentId>-training-service`
 		* variables: None
@@ -264,7 +260,6 @@ There is not need for any kind of payload in all endpoints.
 | DSI_PREDICTION_SERVICE_USERNAME | Username to be set as default username for accessing the service | string, required |
 | DSI_PREDICTION_SERVICE_PASSWORD | Password to be set as default password for accessing the service | string, required |
 
-
 ## Frameworks used
 python 3.6
 
@@ -351,4 +346,3 @@ The build pipeline is defined in the `Jenkinsfile` in the project root. The main
 
 ## Known limitions
 N/A
-

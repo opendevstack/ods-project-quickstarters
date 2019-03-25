@@ -248,6 +248,23 @@ mkdir {0}""".strip().format(self._target_folder),
             self._environment_name)
         )
 
+        ## install pip in conda
+        self._logger.info("Installing pip {} environment...".format(self._environment_name))
+        activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder,
+                                                                  self._environment_name)
+        install_pip_cmd = "conda install --yes pip"
+        deactivate = "source {0}/miniconda/bin/deactivate".format(self._home_folder)
+        self._check_exit_code(error_message="Installing pip... Failed!",
+                              result=self._connection.run(
+                                  command="{0} && "
+                                          "{1} && "
+                                          "{2}".format(activate,
+                                                       install_pip_cmd,
+                                                       deactivate),
+                                  hide=not self._debug_mode,
+                                  warn=True,
+                                  env=self.env()))
+
     def env(self, reload=False) -> dict:
         """Creates the dictionary of environment variables used during remote script execution
 

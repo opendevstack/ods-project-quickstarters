@@ -290,6 +290,13 @@ if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
             fi
         fi
 
+        if [[ ! -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_SQ_URL" ]]; then
+                echo "Target Sonarqube url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
         if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
             if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
                 echo "Target bitbucket url is empty while source is not. It should be to prevent errors"
@@ -335,6 +342,22 @@ if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
 
         if [[ "$OD_OCP_SOURCE_NEXUS_URL" = "$OD_OCP_TARGET_NEXUS_URL" ]]; then
             echo "Source and Target nexus urls are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+
+        if [[ -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+            echo "Source Sonarqube url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_TARGET_SQ_URL" ]]; then
+            echo "Target Sonarqube url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ "$OD_OCP_SOURCE_SQ_URL" = "$OD_OCP_TARGET_SQ_URL" ]]; then
+            echo "Source and Target Sonarqube urls are the same. It should be different when importing into a different cluster"
             exit 1
         fi
 
@@ -585,8 +608,8 @@ do
 		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
 		fi
 
-		if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
-		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_SQ_URL|$OD_OCP_TARGET_SQ_URL|g"  $dc_config_json$tmp_postfix
 		fi
 
    		sed  -i -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" $dc_config_json$tmp_postfix

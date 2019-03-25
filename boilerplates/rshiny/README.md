@@ -8,10 +8,10 @@ Provisions a Rshiny application within openshift using crowd authentification.
 +-- app.R
 
 ## Frameworks used
-R/Rshiny
+[R](https://www.tutorialspoint.com/r/index.htm)/[Rshiny](https://shiny.rstudio.com/tutorial/)
 
 ## Usage - how do you start after you provisioned this quickstarter
-The quickstarter sets up two pods in openshift. The rshiny application is routed through a crowd authentication proxy.
+The quickstarter sets up two pods in openshift. The rshiny application is routed through a [crowd authentication proxy](https://github.com/opendevstack/ods-core/tree/master/shared-images/nginx-authproxy-crowd).
 
 
 ## How this quickstarter is built through jenkins

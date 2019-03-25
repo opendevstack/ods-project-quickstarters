@@ -1,37 +1,11 @@
 # Data Science Industrialization Boilerplate
 
 ## Purpose of this quickstarter
+Adpated und moved to the right place of the README.md for ds machine learning quickstarter (#172)
 This boilerplate enables data scientists to develop, serve, version models within a CI/CD
 pipeline hosted on OpenShift with the goal in mind that one does not have to take care/change
 much of the needed pipeline and infrastructure.
 
-## What files / architecture is generated?
-
-```
-.
-├── Jenkinsfile  -  This file contains Jenkins build configuration settings
-├── README.md  -  Readme file template
-├── docker-compose.yml  -  For running all services locally
-├── jenkinsfile_helper.py  -  Helper function used during the Jenkins pipeline
-├── build.sh  -  Build Script. This script copies all necessary files to the docker images 
-├── docker-prediction  -  This folder contains Docker configuration settings for prediction service
-│   └── Dockerfile
-├── docker-training  -  This folder contains Docker configuration settings for training service
-│   └── Dockerfile
-├── src
-│   ├── run.sh  -  Docker entrypoint
-│   ├── requeriments.txt  -  All the dependencies needed 
-│   ├── model
-│   │   ├── model_wrapper.py 
-│   │   ├── trainer.py
-│   │   └── *  -  Here is the place to add all code related to model training and prediction.
-│   ├── infrastruture  -  Common code for training and prediction services 
-│   ├── training  -  Training service 
-│   └── prediction  -  Prediction service
-└── test
-    ├── integration_tests  -  Folder to add integration tests
-    └── unittests  -  Folder to add unit tests
-```
 
 ## Basic Setup ##
 The boilerplate provides a two pod setup in OpenShift, one pod for training service and one pod for
@@ -83,6 +57,7 @@ The `test` directory mirrors the structure of the `src`, either for unittests or
 tests using the python unittest framework.
 
 
+<<<<<<< HEAD
 ## How to Code Your Own Models ##
 To run your own customized models there is usually no need to change either the `Jenkinsfile`,
 OpenShift setup or the training and prediction microservices.
@@ -155,9 +130,38 @@ A Logistic Regression using scikit-learn with some (unnecessary) feature cleanin
 **Iris flower data set**. (n.d.). In Wikipedia. Retrieved January 7, 2019, from https://en
 .wikipedia.org/wiki/Iris_flower_data_set
 
-## Structure of the quick starter ##
+## What files are generated?
+```
+.
+├── Jenkinsfile  -  This file contains Jenkins build configuration settings
+├── README.md  -  Readme file template
+├── docker-compose.yml  -  For running all services locally
+├── jenkinsfile_helper.py  -  Helper function used during the Jenkins pipeline
+├── build.sh  -  Build Script. This script copies all necessary files to the docker images 
+├── docker-prediction  -  This folder contains Docker configuration settings for prediction service
+│   └── Dockerfile
+├── docker-training  -  This folder contains Docker configuration settings for training service
+│   └── Dockerfile
+├── src
+│   ├── run.sh  -  Docker entrypoint
+│   ├── requeriments.txt  -  All the dependencies needed 
+│   ├── model
+│   │   ├── model_wrapper.py 
+│   │   ├── trainer.py
+│   │   └── *  -  Here is the place to add all code related to model training and prediction.
+│   ├── infrastruture  -  Common code for training and prediction services 
+│   ├── training  -  Training service 
+│   └── prediction  -  Prediction service
+└── test
+    ├── integration_tests  -  Folder to add integration tests
+    └── unittests  -  Folder to add unit tests
+```
 
-* Training
+
+## What architecture is generated?
+
+
+* Traininggot
     * Build Config
 		* name: `<componentId>-training-service`
 		* variables: None
@@ -217,15 +221,15 @@ services:
 The training pod starts an asynchronous training task. Only one 
 training task can run at a time. 
 
-## Endoints ##
+### Endoints ##
 
-### Training Endpoint ###
+#### Training Endpoint ###
 * `/` : Return all information about the training service 
 * `/start` : Starts the training. 
 * `/finished` : Checks if the current traning task is finished
 * `/getmodel` : Download the latest trained model
 
-### Prediction Endpoint ###
+#### Prediction Endpoint ###
 * `/predict` : Return all information about the training service
     * payload: Should be a json containing the data necessary for prediciton. The payload is not pre defined, but it is defined by the trainined model 
  
@@ -261,7 +265,90 @@ There is not need for any kind of payload in all endpoints.
 | DSI_PREDICTION_SERVICE_PASSWORD | Password to be set as default password for accessing the service | string, required |
 
 
-## Builder Slave used 
-This quickstarter uses the
-[Python3 slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python)
-builder slave
+## Frameworks used
+python 3.6
+
+## Usage - how do you start after you provisioned this quickstarter
+### How to Code Your Own Models ##
+To run your own customized models there is usually no need to change either the `Jenkinsfile`,
+OpenShift setup or the training and prediction microservices.
+Custom model code will go under `src/model` and can be organized in custom packages like
+showcased with the `src/model/data_cleaning` and `src/model/feature_prep`. In general, it can be 
+organized as
+the users prefers.
+There are no further restrictions for developing the in the style you want, for the exception to
+provide the mandatory functions and attributes in `src/model/model_wrapper.py` for the `ModelWrapper
+class:
+- `prep_and_train`: is called by the train script (which one can customize) and expects a
+pandas dataframe (current implementation). The train script is called by the training service
+- `prep_and_predict`: is called by the predict endpoint service from the prediction service. It
+consumes the json post as a dictionary. The predict
+endpoint executes `prep_and_predict`.
+- Good practice: `source_features`, specifying the name that are used a input for the model. This 
+features 
+include really the source columns from which also more complicated features are derived within 
+the model boundaries
+- Good practice: `target_variable`, name of the variable that should be used as target for a 
+possible 
+supervised approach.
+
+As well as the `train` function in the `src/trainer.py`. It specifies how the model should be 
+trained.
+
+Make sure your specified all dependencies in the `requirements.txt`.
+
+### How to Develop your Model Locally ##
+It is recommended to develop your code against the python interpreter & dependencies specified in the docker images.
+This can be easily achieved, either by using an IDE that supports that (e.g. PyCharm) or by doing 
+manually in the docker container.
+
+The whole setup (prediction and training service) can be tested using the attached docker-compose
+
+#### Local deployment (docker-compose) - testing the services ###
+
+Any new change: Generate `/dist` folder for both training and prediction containers
+```
+./build.sh
+```
+
+Setup the right values for the environment variables in `docker-compose.yml` file wherever there 
+is a definition like `THIS_PARAMETER_SHOULD_BE_NOT_COMMITED`
+```
+vim docker-compose.yml
+```
+
+Build the images defined in `docker-compose.yml`
+```
+docker-compose build
+```
+
+Run the images defined in `docker-compose.yml`
+```
+docker-compose up
+```
+
+When done: stop the containers
+```
+[Ctrl+C]
+```
+
+
+## How this quickstarter is built through jenkins
+The build pipeline is defined in the `Jenkinsfile` in the project root. The main stages of the pipeline are:
+1. Unittests
+2. Prepare build
+3. Sonarcube checks
+4. Build training image
+5. Deploy training pod
+6. Execute/reproduce training either on openshift pod or in ssh remote machine
+7. Integration test against the newly trained model wrapped in the flask `/prediction` endpoint
+8. Build prediction image
+9. Deploy prediction service 
+ 
+
+## Builder slave used
+[jenkins-slave-python](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python)
+
+## Known limitions
+N/A
+

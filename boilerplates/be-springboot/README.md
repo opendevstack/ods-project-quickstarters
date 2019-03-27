@@ -14,13 +14,13 @@ When provisioning this quickstarter in the provisioning app a spring boot projec
 
 The generated project requires java 8 and include the required gradle build and wrapper artifact.
 
-#####Project Structure
+## Project Structure
 The generated spring boot project contains following folders:
 + ```src``` (maven based java project structure)
 + ```gradle``` (gradle wrapper portable distribution)
 + ```docker``` (include the ```Dockerfile``` used to build the image to be deployed during CI/CD to openshift)
 
-#####Gradle Support
+### Gradle Support
 The generated project includes a gradlew wrapper which is a portable distribution of gradle.
 It allows you to easily build the project without any further tool installation other than java.    
 
@@ -42,12 +42,12 @@ The quickstarter uses the latest available spring boot cli version to generate t
 
 Run ```gradlew -v``` to verify the installed version of gradle wrapper.
 
-#####Dependencies and Frameworks used
+## Dependencies and Frameworks used
 The generated spring boot project is preconfigured with some third party dependencies (i.e. ```--dependencies="web,jersey,data-jpa,h2,lombok,data-rest,restdocs,security"```), which are defined in the script ```init.sh``` (open it to understand the internal of the code generation of this quickstarter).
 
 Look in method ```dependencies``` in the file ```build.gradle``` to review the defined dependencies.   
 
-#####ODS Integration (Jenkinsfile)
+### ODS Integration (Jenkinsfile)
 The project includes a special artifact that enables it to integrate with OpenDevStack CI/CD infrastructure.
 The ```Jenkinsfile``` provides this capability.
 Basically it is the script that is executed in Jenkins every time a push to your git repository is done. More on this below.

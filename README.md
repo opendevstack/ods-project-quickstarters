@@ -53,8 +53,8 @@ To test out things locally, you can mimick what Rundeck. The general procedure i
 Note that those scripts might need parameters to work, and often need to be adjusted slightly to work (e.g. removing `chown`ing to `rundeck` user).
 
 If you contribute a new quickstarter / boilerplate - please use the provided `README.md` templates
-1. for a `jenkins-slave` - use `__JENKINS_SLAVE_TEMPLATE_README.md`
-1. for a `boilerplace`- use `__QS_BOILERPLATE_TEMPLATE_README.md`
+1. for a `jenkins-slave` - the [`slave template`](__JENKINS_SLAVE_TEMPLATE_README.md)
+1. for a `boilerplace`- the [`boilerplate`](QS_BOILERPLATE_TEMPLATE_README.md)
 
 ## Upgrade an existing Git repository to OpenDevStack
 

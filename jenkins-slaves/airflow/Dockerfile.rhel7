@@ -2,6 +2,20 @@ FROM cd/jenkins-slave-base
 
 LABEL maintainer="Gerard Castillo <gerard.castillo@boehringer-ingelheim.com>"
 
+ARG AIRFLOW_VERSION=1.10.2
+ARG PYTHON_DEPS=""
+ARG AIRFLOW_DEPS=""
+
+ENV AIRFLOW_HOME=$HOME/airflow
+ENV AIRFLOW_GPL_UNIDECODE yes
+ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_MESSAGES en_US.UTF-8
+ENV NODEJS_VERSION=8.11 \
+    NPM_CONFIG_PREFIX=$HOME/.npm-global \
+    PATH=$HOME/node_modules/.bin/:$HOME/.npm-global/bin/:$PATH
 ENV PATH=/opt/rh/rh-python36/root/usr/bin${PATH:+:${PATH}} \
     LD_LIBRARY_PATH=/opt/rh/rh-python36/root/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} \
     MANPATH=/opt/rh/rh-python36/root/usr/share/man:$MANPATH \
@@ -11,6 +25,7 @@ ENV PATH=/opt/rh/rh-python36/root/usr/bin${PATH:+:${PATH}} \
     ENV=/usr/local/bin/scl_enable \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable"
 
+# Python 3.6
 RUN set -x && \
     yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum-config-manager --disable rhel-7-server-htb-rpms && \
@@ -24,11 +39,58 @@ RUN set -x && \
 
 COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
 
-# Upgrade PIP
+# Upgrade pip
 RUN pip install --upgrade pip && \
     pip -V && \
     pip install virtualenv pycodestyle
 
-# Configure PIP SSL validation
+# Configure pip SSL validation
 RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
     && pip config list
+
+# Airflow
+RUN buildDeps=' \
+        freetds-devel \
+        krb5-devel \
+        cyrus-sasl-devel \
+        openssl-devel \
+        libffi-devel \
+        postgresql-devel \
+        mariadb-devel \
+        git \
+    ' \
+    && rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+    && yum install --assumeyes \
+        $buildDeps \
+        freetds \
+        mariadb-libs \
+        curl \
+        rsync \
+        nmap-ncat \
+    && localedef -c -f UTF-8 -i en_US en_US.UTF-8 \
+    && pip install -U pip setuptools wheel \
+    && pip install pytz \
+    && pip install pyOpenSSL \
+    && pip install ndg-httpsclient \
+    && pip install unittest-xml-reporting \
+    && pip install pyasn1 \
+    && pip install apache-airflow[crypto,rabbitmq,celery,postgres,hive,jdbc,mysql,ssh,kubernetes,elasticsearch${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
+    && pip install 'redis>=3.2.0,<4' \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+
+# NodeJS 8
+RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - && \
+    yum install -y nodejs && \
+    yum install -y gcc-c++ make && \
+    curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
+    yum install -y yarn && \
+    yum clean all -y
+
+COPY contrib/npmrc $HOME/.npm-global/etc/npmrc
+
+RUN sed -i "s|NEXUS_HOST|$NEXUS_HOST|g" $HOME/.npm-global/etc/npmrc && \
+    sed -i "s|NEXUS_AUTH|$(echo -n $NEXUS_AUTH | base64)|g" $HOME/.npm-global/etc/npmrc && \
+    npm config set ca=null && \
+    npm config set strict-ssl=false && \
+    npm --version

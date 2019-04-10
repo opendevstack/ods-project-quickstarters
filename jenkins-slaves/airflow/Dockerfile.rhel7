@@ -1,37 +1,31 @@
 FROM cd/jenkins-slave-base
 
-MAINTAINER Michael Sauter <michael.sauter@boehringer-ingelheim.com>
+LABEL maintainer="Gerard Castillo <gerard.castillo@boehringer-ingelheim.com>"
 
-ENV PYTHON_VERSION=3.6.0
-ENV INSTALL_PKGS="yum-utils groupinstall development gcc make openssl-devel zlib-devel"
+RUN yum install -y --setopt=tsflags=nodocs subscription-manager && \
+    subscription-manager repos --enable rhel-7-server-optional-rpms \
+        --enable rhel-server-rhscl-7-rpms && \
+    yum -y install @development && \
+    yum -y install rh-python36 && \
+    yum -y install rh-python36-numpy \
+                    rh-python36-scipy \
+                    rh-python36-python-tools \
+                    rh-python36-python-six
 
-RUN set -x \
-    && yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS \
-    && yum clean all \
-    && rm -rf /var/cache/yum/*
+RUN python --version
+# $ scl enable rh-python36 bash
+# $ python3 -V
+# Python 3.6.3
 
-RUN cd /tmp \
-    && curl -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
-    && tar xzf Python-${PYTHON_VERSION}.tgz -C / \
-    && rm -rf Python-${Python_VERSION}.tgz
+# $ python -V  # python now also points to Python3
+# Python 3.6.3
 
-RUN cd /Python-${PYTHON_VERSION} \
-    && ./configure \
-    && make altinstall \
-    && ln -s /Python-${PYTHON_VERSION}/python /usr/local/sbin/python3 \
-    && python3 -V \
-    && chmod a+rx /Python-${PYTHON_VERSION} \
-    && chmod a+rx /Python-${PYTHON_VERSION}/python \
-    && yum remove -y $INSTALL_PKGS
+# $ mkdir ~/pydev
+# $ cd ~/pydev
 
-RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
-    && python3 get-pip.py
+# $ python3 -m venv py36-venv
+# $ source py36-venv/bin/activate
 
-# Upgrade PIP
-RUN pip3 install --upgrade pip \
-    && pip3 -V \
-    && pip3 install virtualenv pycodestyle
-        
 # Configure PIP SSL validation
 RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
     && pip config list

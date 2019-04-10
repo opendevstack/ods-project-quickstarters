@@ -24,7 +24,10 @@ RUN set -x && \
 
 COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
 
-RUN  python -V && pip -h
+# Upgrade PIP
+RUN pip install --upgrade pip && \
+    pip -V && \
+    pip install virtualenv pycodestyle
 
 # Configure PIP SSL validation
 RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \

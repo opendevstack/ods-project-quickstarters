@@ -2,17 +2,29 @@ FROM cd/jenkins-slave-base
 
 LABEL maintainer="Gerard Castillo <gerard.castillo@boehringer-ingelheim.com>"
 
-RUN yum install -y --setopt=tsflags=nodocs subscription-manager && \
-    subscription-manager repos --enable rhel-7-server-optional-rpms \
-        --enable rhel-server-rhscl-7-rpms && \
-    yum -y install @development && \
-    yum -y install rh-python36 && \
-    yum -y install rh-python36-numpy \
-                    rh-python36-scipy \
-                    rh-python36-python-tools \
-                    rh-python36-python-six
+RUN set -x \
+    && yum-config-manager --enable rhel-server-rhscl-7-rpms \
+    && yum-config-manager --disable rhel-7-server-htb-rpms \
+    && yum makecache
+
+RUN yum search python36
+
+RUN yum -y install rh-python36
+
+# RUN yum -y install @development && \
+#     yum -y install rh-python36 && \
+#     yum -y install rh-python36-numpy \
+#                     rh-python36-scipy \
+#                     rh-python36-python-tools \
+#                     rh-python36-python-six
 
 RUN python --version
+# RUN python3 -V
+
+RUN scl enable rh-python36 bash
+
+RUN python --version
+
 # $ scl enable rh-python36 bash
 # $ python3 -V
 # Python 3.6.3
@@ -27,5 +39,5 @@ RUN python --version
 # $ source py36-venv/bin/activate
 
 # Configure PIP SSL validation
-RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
-    && pip config list
+# RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
+#     && pip config list

@@ -24,23 +24,8 @@ RUN set -x && \
 
 COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
 
-RUN  python -V && pip -V
-
-
-
-# $ scl enable rh-python36 bash
-# $ python3 -V
-# Python 3.6.3
-
-# $ python -V  # python now also points to Python3
-# Python 3.6.3
-
-# $ mkdir ~/pydev
-# $ cd ~/pydev
-
-# $ python3 -m venv py36-venv
-# $ source py36-venv/bin/activate
+RUN  python -V && pip -h
 
 # Configure PIP SSL validation
-# RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
-#     && pip config list
+RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
+    && pip config list

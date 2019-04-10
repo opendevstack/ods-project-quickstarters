@@ -2,28 +2,31 @@ FROM cd/jenkins-slave-base
 
 LABEL maintainer="Gerard Castillo <gerard.castillo@boehringer-ingelheim.com>"
 
-RUN set -x \
-    && yum-config-manager --enable rhel-server-rhscl-7-rpms \
-    && yum-config-manager --disable rhel-7-server-htb-rpms \
-    && yum makecache
+ENV PATH=/opt/rh/rh-python36/root/usr/bin${PATH:+:${PATH}} \
+    LD_LIBRARY_PATH=/opt/rh/rh-python36/root/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} \
+    MANPATH=/opt/rh/rh-python36/root/usr/share/man:$MANPATH \
+    PKG_CONFIG_PATH=/opt/rh/rh-python36/root/usr/lib64/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}} \
+    XDG_DATA_DIRS="/opt/rh/rh-python36/root/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}" \
+    BASH_ENV=/usr/local/bin/scl_enable \
+    ENV=/usr/local/bin/scl_enable \
+    PROMPT_COMMAND=". /usr/local/bin/scl_enable"
 
-RUN yum search python36
+RUN set -x && \
+    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    yum-config-manager --disable rhel-7-server-htb-rpms && \
+    yum makecache && \
+    yum -y install @development && \
+    yum -y install rh-python36 && \
+    yum -y install rh-python36-numpy \
+                    rh-python36-scipy \
+                    rh-python36-python-tools \
+                    rh-python36-python-six
 
-RUN yum -y install rh-python36
+COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
 
-# RUN yum -y install @development && \
-#     yum -y install rh-python36 && \
-#     yum -y install rh-python36-numpy \
-#                     rh-python36-scipy \
-#                     rh-python36-python-tools \
-#                     rh-python36-python-six
+RUN  python -V && pip -V
 
-RUN python --version
-# RUN python3 -V
 
-RUN scl enable rh-python36 bash
-
-RUN python --version
 
 # $ scl enable rh-python36 bash
 # $ python3 -V

@@ -8,7 +8,9 @@ It can be referenced in a `Jenkinsfile` with `cd/jenkins-slave-airflow`
 
 ## Features / what's in, which plugins, ...
 1. Python 3.6
-1. PIP
+2. PIP
+3. NodeJS 8.x
+4. Airflow 1.10.2
 
 ## Known limitations
 Not (yet) Nexus package manager aware and no special HTTP Proxy configuration

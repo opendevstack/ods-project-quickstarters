@@ -33,11 +33,20 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: Dockerfile.rhel7
+        env:
+          - name: NEXUS_HOST
+            value: ${NEXUS_URL}
+          - name: NEXUS_AUTH
+            value: ${NEXUS_AUTH}
         from:
           kind: ImageStreamTag
           name: jenkins-slave-base:latest
       type: Docker
     triggers: []
 parameters:
+- name: NEXUS_URL
+  required: true
+- name: NEXUS_AUTH
+  required: true
 - name: REPO_BASE
   required: true

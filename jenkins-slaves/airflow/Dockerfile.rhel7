@@ -89,3 +89,6 @@ RUN buildDeps=' \
     && pip install 'redis>=3.2.0,<4' \
     && yum clean all \
     && rm -rf /var/cache/yum
+
+RUN chgrp -R 0 $HOME && \
+    chmod -R g=u $HOME

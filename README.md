@@ -14,7 +14,7 @@ This repository contains quickstarters, which are basically templates that help 
 - [Mobile - Ionic](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-ionic/README.md)
 - [Data Science - Machine Learning](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/ds-ml-service/README.md)
 - [Data Science - Jupyter Notebook](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/jupyter-notebook/README.md)
-- [Data Science - R-Shiny](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/rshiny/README.md)
+- [Data Science - R-Shiny](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/rshiny-app/README.md)
 
 Next to those, there is a ["blank" quickstarter](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-docker-plain/README.md) allowing to start from scratch, while still providing all the OCP resources / Jenkins / SonarQube conveniences described in the following sections.
 
@@ -63,7 +63,7 @@ Push your repository into the newly created bitbucket project (and note the name
 Logon to rundeck and pick the `common/prepare-continuous-integration` rundeck job
 
 1. Pick the technology target thru `component type` - this will ensure you get the right jenkins file based on the technology you pick - and should fit the technology you have built your application with
-2. Provide `quickstarter_directory` - this can be any filesystem directory - usually in `/tmp/<component name>` where the git repository will be cloned to 
+2. Provide `quickstarter_directory` - this can be any filesystem directory - usually in `/tmp/<component name>` where the git repository will be cloned to
 3. Provide `project_id` - this is the project name you noted in step (0)
 4. Provide `component_id`- this is the name of the component (from step 0) that will be rendered into the jenkins template, and also used as name for the openshift resources
 5. Provide `git_url_http/ssh` - this is the URL to clone and commit to for the job.

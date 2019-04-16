@@ -1,7 +1,7 @@
 # Airflow Jenkins Slave
 
 ## Introduction / Used for building / testing `airflow`
-This slave is used to build / execute / test [Airflow](https://airflow.apache.org/) code
+This slave is used to build / execute / test [Airflow](https://airflow.apache.org/) code for `airflow-cluster` quickstarter.
 
 The image is built in the global `cd` project and is named `jenkins-slave-airflow`.
 It can be referenced in a `Jenkinsfile` with `cd/jenkins-slave-airflow`

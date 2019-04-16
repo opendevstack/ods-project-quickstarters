@@ -9,20 +9,21 @@ node {
 }
 
 library identifier: 'ods-library@production', retriever: modernSCM(
-        [$class       : 'GitSCMSource',
-         remote       : sharedLibraryRepository,
-         credentialsId: credentialsId])
+    [$class       : 'GitSCMSource',
+        remote       : sharedLibraryRepository,
+        credentialsId: credentialsId])
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-        image: "${dockerRegistry}/cd/jenkins-slave-airflow",
-        projectId: projectId,
-        componentId: componentId,
-        openshiftBuildTimeout: 25,
-        branchToEnvironmentMapping: [
-                'master': 'test',
-                '*'     : 'dev'
-        ]
+    image: "${dockerRegistry}/cd/jenkins-slave-airflow",
+    projectId: projectId,
+    componentId: componentId,
+    openshiftBuildTimeout: 25,
+    testResults : 'artifacts',
+    branchToEnvironmentMapping: [
+            'master': 'test',
+            '*'     : 'dev'
+    ]
 ) { context ->
     stageDAGTest(context)
     stageUnitTest(context)
@@ -30,7 +31,6 @@ odsPipeline(
     stageStartOpenshiftBuild(context)
     stageDeployToOpenshift(context)
     stagePublishDAGs(context)
-
 }
 
 def stageDAGTest(def context) {
@@ -64,7 +64,5 @@ def stagePublishDAGs(def context) {
 
         sh "oc rsync --no-perms=true --delete=true --exclude=.keep --exclude=__pycache__ src/dags ${airflow_webserver_info[0]}:/opt/app-root/src/airflow/ -n ${context.targetProject}"
         sh "oc rsync --no-perms=true --delete=true --exclude=.keep --exclude=__pycache__ src/dags ${airflow_scheduler_info[0]}:/opt/app-root/src/airflow/ -n ${context.targetProject}"
-
-
     }
 }

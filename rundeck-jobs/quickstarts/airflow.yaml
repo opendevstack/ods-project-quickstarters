@@ -36,7 +36,7 @@
       script: |-
         echo "openshift_api_token: @option.openshift_api_token@"
         echo "project_id: @opoption.project_id@"
-        echo "component_id: @option.component_id@" 
+        echo "component_id: @option.component_id@"
         echo "git_url_http: @option.git_url_https@"
         echo "git_url_ssh: @option.git_url_ssh@"
         echo "package_name: @option.package_name@"
@@ -67,11 +67,11 @@
         sudo docker run \
         -v /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/:/ods-project-quickstarters \
         --rm \
-        oc /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && oc project cd && cd /ods-project-quickstarters/boilerplates/airflow && ./custom-create-components.sh -p @option.project_id@ -b "@option.git_url_http@" -ne "@globals.nexus_host@" -h "22ad.bi-x.openshiftapps.com"  -oa "@globals.openshift_apihost@" -r "172.30.21.196:5000" -oc "https://console.bi-x.openshift.com"'
+        oc /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && oc project cd && cd /ods-project-quickstarters/boilerplates/airflow && ./custom-create-components.sh -p @option.project_id@ -b "@option.git_url_http@" -ne "@globals.nexus_host@" -h "your.main.openshift.app.route.uri.host"  -oa "@globals.openshift_apihost@" -r "your-registry-host:your-registry-port" -oc "https://your-openshift-console"'
     - description: add Jenkinsfile to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R /tmp/rundeck_@job.id@_@job.execid@/airflow
-        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates 
+        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
         ./renderJenkinsTemplate.sh \
           --target /tmp/rundeck_@job.id@_@job.execid@/airflow/Jenkinsfile \
           --url @option.git_url_http@ \

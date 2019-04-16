@@ -50,10 +50,7 @@ RUN sed -i "s|NEXUS_HOST|$NEXUS_HOST|g" $HOME/.npmrc && \
 # Upgrade pip and npm
 RUN pip install --upgrade pip && \
     pip -V && \
-    pip install virtualenv pycodestyle && \
-    # npm install -g npm && \
-    # npm install -g @angular/cli@1.6.5 --unsafe-perm=true --allow-root && \
-    npm --version
+    pip install virtualenv pycodestyle
 
 # Configure pip SSL validation
 RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt && \

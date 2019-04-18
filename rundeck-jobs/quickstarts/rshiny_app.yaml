@@ -36,8 +36,8 @@
         #!/bin/bash
         mkdir /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
         cd /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
-        echo "copy rshiny files from quickstart to generated project"
-        cp -rv /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/rshiny/* .
+        echo "copy rshiny-app files from quickstart to generated project"
+        cp -rv /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/rshiny-app/* .
     - description: setup quickstarter for continuous integration
       jobref:
         args: -component_type rshiny-app -component_id ${option.component_id} -project_id ${option.project_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}

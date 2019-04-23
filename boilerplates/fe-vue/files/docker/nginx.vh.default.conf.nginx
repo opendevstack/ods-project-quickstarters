@@ -28,7 +28,7 @@ server {
     location / {
       root /docroot;
       index  index.html;
-      # this is for angular
+
       try_files $uri$args $uri$args/ $uri $uri/ /index.html =404;
     }
 

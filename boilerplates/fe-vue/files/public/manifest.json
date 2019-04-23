@@ -1,6 +1,6 @@
 {
-  "name": "fe-vue5",
-  "short_name": "fe-vue5",
+  "name": "fe-vue",
+  "short_name": "fe-vue",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",
@@ -18,3 +18,4 @@
   "background_color": "#000000",
   "theme_color": "#4DBA87"
 }
+

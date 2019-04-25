@@ -1,6 +1,18 @@
 # fe-vue
 
 ## Project setup
+
+### Configure .npmrc 
+Configure the `.npmrc` file to download the npm dependencies from the internal Nexus Host.
+
+```
+registry= <nexus host url>
+always-auth=true
+_auth= <base64 encoded nexus credentials>
+email=
+```
+
+### Install npm dependencies
 ```
 npm install
 ```
@@ -32,3 +44,4 @@ npm run test:unit
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+

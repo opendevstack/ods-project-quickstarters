@@ -11,7 +11,16 @@
    <!-- ### configured http proxy ### -->
   </proxies>
 
-  <profiles>
+  <!-- inject nexus server credentials -->
+  <servers>
+   <server>
+      <id>nexus</id>
+      <username>__NEXUS_USER</username>
+      <password>__NEXUS_PW</password>
+   </server>
+  </servers>
+
+ <profiles>
 
     <!-- JBoss EAP Maven repository -->
     <profile>

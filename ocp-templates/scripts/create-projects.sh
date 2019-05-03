@@ -67,11 +67,15 @@ oc new-project ${PROJECT}-test
 
 JENKINS_ROLE=admin
 
+# allow jenkins from CD project to admin the environment projects
 oc policy add-role-to-user ${JENKINS_ROLE} system:serviceaccount:${PROJECT}-cd:jenkins -n ${PROJECT}-dev
 oc policy add-role-to-user ${JENKINS_ROLE} system:serviceaccount:${PROJECT}-cd:jenkins -n ${PROJECT}-test
 
 # allow jenkins in <project>-cd to pull images (e.g. slave) from cd project
 oc policy add-role-to-user system:image-puller system:serviceaccount:${PROJECT}-cd:jenkins -n cd
+
+# allow webhook proxy to create a pipeline BC in the +cd project
+oc policy add-role-to-user edit -z default -n ${PROJECT}-cd
 
 # allow test users to pull dev images
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${PROJECT}-test -n $PROJECT-dev

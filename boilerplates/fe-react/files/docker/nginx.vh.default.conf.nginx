@@ -22,6 +22,10 @@ server {
     listen       8080;
     server_name  localhost;
 
+    gzip on;
+    gzip_types      text/html text/css application/javascript application/json;
+    gzip_min_length 1024;
+
     # don't send the nginx version number in error pages and Server header
     server_tokens off;
 

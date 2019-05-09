@@ -8,7 +8,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@0.1-latest', retriever: modernSCM(
+library identifier: 'ods-library@production', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
@@ -18,14 +18,15 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-maven",
   projectId: projectId,
   componentId: componentId,
-  verbose: true
+  branchToEnvironmentMapping: [
+    'master': 'test',
+    '*': 'dev'
+  ]
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)
-  stageCreateOpenshiftEnvironment(context)
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
-  stageTriggerAllBuilds(context)
 }
 
 def stageBuild(def context) {

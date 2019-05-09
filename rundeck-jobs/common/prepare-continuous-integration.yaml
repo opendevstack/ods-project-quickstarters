@@ -13,7 +13,6 @@
     name: component_type
     required: true
     values:
-    - be-database
     - be-node-express
     - be-python-flask
     - be-scala-akka
@@ -21,6 +20,7 @@
     - fe-angular
     - fe-ionic
     - fe-react
+    - be-docker-plain
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true
@@ -48,7 +48,7 @@
   sequence:
     commands:
     - description: clone quickstarter project
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters/boilerplates && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
     - description: create component in openshift
       jobref:
         args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
@@ -57,6 +57,7 @@
         nodeStep: 'true'
     - description: add Jenkinsfile to generated project
       script: |-
+        sudo mkdir -p @option.quickstarter_directory@
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates 
         ./renderJenkinsTemplate.sh \
@@ -64,8 +65,7 @@
           --url @option.git_url_http@ \
           --project-id @option.project_id@ \
           --component-id @option.component_id@  \
-          --component-type @option.component_type@ \
-          --group-id @option.group_id@
+          --component-type @option.component_type@
     - description: add sonar-project.properties to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@

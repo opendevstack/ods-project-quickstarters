@@ -31,12 +31,12 @@
         git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
         package_name: ${option.package_name}'
     - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout -b production origin/production
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
     - description: init jupyter notebook
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/jupyter-notebook && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: setup quickstarter for continuous integration
       jobref:
-        args: -component_id ${option.component_id} -project_id ${option.project_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}
+        args: -component_type jupyter-notebook -component_id ${option.component_id} -project_id ${option.project_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}
         group: common
         name: prepare-continuous-integration-rshiny
         nodeStep: 'true'

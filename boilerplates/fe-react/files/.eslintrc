@@ -8,16 +8,67 @@
     "browser": true,
     "commonjs": true,
     "node": true,
-    "es6": true
+    "es6": true,
+    "jest/globals": true
   },
-  "plugins": ["import", "react"],
+  "settings": {
+    "react": {
+      "createClass": "createReactClass", // Regex for Component Factory to use,
+      // default to "createReactClass"
+      "pragma": "React",  // Pragma to use, default to "React"
+      "version": "15.0", // React version, default to the latest React stable release
+      "flowVersion": "0.53" // Flow version
+    },
+    "propWrapperFunctions": [ "forbidExtraProps" ] // The names of any functions used to wrap the
+    // propTypes object, e.g. `forbidExtraProps`.
+    // If this isn't set, any propTypes wrapped in
+    // a function will be skipped.
+  },
+  "plugins": ["import", "react", "jest"],
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    },
+    "sourceType": "module"
   },
   "rules": {
-    "no-console": "off",
-    "prefer-arrow-callback": 2,
-    "strict": ["error", "global"],
-    "curly": "warn"
+    "arrow-body-style": [
+      0,
+      "as-needed"
+    ],
+    "func-names": 0,
+    "no-alert": 0,
+    "no-constant-condition": 0,
+    "no-class-assign": 0,
+    "no-labels": 0,
+    "no-unused-labels": 0,
+    "no-restricted-syntax": 0,
+    "import/imports-first": 0,
+    "import/newline-after-import": 0,
+    "import/no-dynamic-require": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/no-named-as-default": 0,
+    "import/no-unresolved": 2,
+    "import/prefer-default-export": 0,
+    "no-case-declarations": 0,
+    "one-var": 0,
+    "no-plusplus": 0,
+    "max-len": 0,
+    "newline-per-chained-call": 0,
+    "no-confusing-arrow": 0,
+    "no-console": 1,
+    "no-use-before-define": 0,
+    "prefer-template": 2,
+    "class-methods-use-this": 0,
+    "react/no-did-mount-set-state": 0,
+    "react/require-extension": 0,
+    "react/self-closing-comp": 0,
+    "require-yield": 0,
+    "import/no-webpack-loader-syntax": 0,
+    "no-extra-semi": 0,
+    "no-mixed-spaces-and-tabs": 0,
+    "no-unexpected-multiline": 0
   }
 }

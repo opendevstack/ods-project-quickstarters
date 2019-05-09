@@ -82,8 +82,6 @@ for devenv in dev test ; do
         oc process cd//component-route PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
     fi
 
-    # create build pipelines
-    oc process cd//component-pipeline PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} BITBUCKET_REPO=${BITBUCKET_REPO} | oc create -n ${PROJECT}-cd -f-
     # create image build configs
     oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
 done

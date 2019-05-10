@@ -1,0 +1,31 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",    
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "AIRFLOW_EXECUTOR": "openshift_plugin.OpenShiftExecutor",
+                "AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY": "ip-addr-of-registry:5000/${NAMESPACE}/airflow-worker",
+                "AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG": "latest",
+                "AIRFLOW__OPENSHIFT_PLUGIN__OPENSHIFT_CONSOLE_URL": "https://base.url.to.openshift.console.com",
+                "ELASTICSEARCH_URL": "http://airflow-elasticsearch.${NAMESPACE}.svc:9200",
+                "POSTGRES_HOST": "airflow-postgresql.${NAMESPACE}.svc"
+            },
+            "kind": "ConfigMap",
+            "metadata": {
+                "labels": {
+                    "cluster": "airflow"
+                },
+                "name": "airflow-environment"
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "description": "Namespace where ElasticSearch is being deployed",
+            "name": "NAMESPACE",
+            "required": true
+        }
+    ]
+}

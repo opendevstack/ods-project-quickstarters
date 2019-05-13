@@ -22,16 +22,28 @@ case $key in
     PROJECT="$2"
     shift # past argument
     ;;
-    -c|--component)
-    COMPONENT="$2"
-    shift # past argument
-    ;;
     -b|--bitbucket)
     BITBUCKET_REPO="$2"
     shift # past argument
     ;;
     -ne|--nexus)
     NEXUS_HOST="$2"
+    shift # past argument
+    ;;
+    -oc|--oc-console)
+    OC_CONSOLE_URL="$2"
+    shift # past argument
+    ;;
+    -oa|--oc-api)
+    OC_API_URL="$2"
+    shift # past argument
+    ;;
+    -r|--docker-registry)
+    OC_DOCKER_REPOSITORY_HOST="$2"
+    shift # past argument
+    ;;
+    -h|--oc-route-host)
+    OPENSHIFT_APP_HOST="$2"
     shift # past argument
     ;;
     *)
@@ -45,36 +57,65 @@ if [ -z ${PROJECT+x} ]; then
     echo "PROJECT is unset, but required";
     exit 1;
 else echo "PROJECT=${PROJECT}"; fi
-if [ -z ${COMPONENT+x} ]; then
-    echo "COMPONENT is unset, but required";
-    exit 1;
-else echo "COMPONENT=${COMPONENT}"; fi
 if [ -z ${NEXUS_HOST+x} ]; then
     echo "NEXUS_HOST is unset, but required";
     exit 1;
 else echo "NEXUS_HOST=${NEXUS_HOST}"; fi
+if [ -z ${OC_API_URL+x} ]; then
+    echo "OC_API_URL is unset, but required";
+    exit 1;
+else echo "OC_API_URL=${OC_API_URL}"; fi
+if [ -z ${OC_CONSOLE_URL+x} ]; then
+    echo "OC_CONSOLE_URL is unset, but required";
+    exit 1;
+else echo "OC_CONSOLE_URL=${OC_CONSOLE_URL}"; fi
+if [ -z ${OC_DOCKER_REPOSITORY_HOST+x} ]; then
+    echo "OC_DOCKER_REPOSITORY_HOST is unset, but required";
+    exit 1;
+else echo "OC_DOCKER_REPOSITORY_HOST=${OC_DOCKER_REPOSITORY_HOST}"; fi
+if [ -z ${OPENSHIFT_APP_HOST+x} ]; then
+    echo "OPENSHIFT_APP_HOST is unset, but required";
+    exit 1;
+else echo "OPENSHIFT_APP_HOST=${OPENSHIFT_APP_HOST}"; fi
 
-
+environments=(playground)
 # iterate over different environments
-for ENV in dev test ; do
+for ENV in ${environments[@]} ; do
+
+    RESOURCES=$(oc get dc,bc,svc,secret,pvc,route,sa -l cluster=airflow --ignore-not-found -n ${PROJECT}-${ENV})
+
+    if [[ ! -z ${RESOURCES} ]]; then
+        echo "Environemnt ${PROJECT}-${ENV} has airflow resources:"
+        echo ""
+        echo "$RESOURCES"
+        echo ""
+        echo "Skipping..."
+        continue
+    fi
+
+    FERNET_KEY=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64)
 
     # Creating service account and bindings
     oc create -f templates/service-account.json -n ${PROJECT}-${ENV}
     oc create rolebinding airflow-admin-binding --serviceaccount ${PROJECT}-${ENV}:airflow --clusterrole admin -n ${PROJECT}-${ENV}
 
-    # Creating PostgreSQL resources 
-    oc process -f templates/postgresql-persistent.json | oc create -n ${PROJECT}-${ENV} -f - 
+    # Creating PostgreSQL resources
+    oc process -f templates/postgresql-persistent.json | oc create -n ${PROJECT}-${ENV} -f -
 
     # Creating ElasticSearch resources
-    oc process -f ../../../ocp-templates/templates/elasticsearch/elasticsearch-persistent-master-template.yaml \
+    oc process -f ../../ocp-templates/templates/elasticsearch/elasticsearch-persistent-master-template.yaml \
         COMPONENT_NAME=airflow-elasticsearch \
         CLUSTER_NAME=airflow \
         NAMESPACE=${PROJECT}-${ENV} \
         VOLUME_SIZE_IN_GI=1 | oc create -n ${PROJECT}-${ENV} -f -
 
     # Create Airflow resources
-    # TODO:  Values to be set/defined "Docker Registry IP/HOST", "OpenShift console URL"
-    oc process -f templates/airflow.json NAMESPACE=${PROJECT}-${ENV} | oc create -n ${PROJECT}-${ENV} -f -
+    oc process -f templates/airflow.json \
+        OC_API_URL=${OC_API_URL} \
+        OC_CONSOLE_URL=${OC_CONSOLE_URL} \
+        OC_DOCKER_REPOSITORY_HOST=${OC_DOCKER_REPOSITORY_HOST} \
+        AIRFLOW_FERNET_KEY=${FERNET_KEY} \
+        OPENSHIFT_APP_HOST=${OPENSHIFT_APP_HOST} \
+        NAMESPACE=${PROJECT}-${ENV} | oc create -n ${PROJECT}-${ENV} -f -
 
-    
 done

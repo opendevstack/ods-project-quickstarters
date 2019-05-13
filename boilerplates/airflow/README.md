@@ -37,7 +37,7 @@ can be found using the label `cluster=airflow`. The created resources are:
     * `airflow-worker` : Worker image which Airflow uses for executing the tasks
 * Deployment Configs and Services:
     * `airflow-webserver` : Airflow Web Server
-    * `airflow-scheduler` : Airflow Scheduler
+    * `airflow-scheduler` : Airflow Scheduler (* Only Deployment Config)
     * `airflow-postgresql` :  Airflow matadata database
     * `airflow-elasticsearch`: Worker log database 
     * `airflow-kibana`: Interface for exploring Airflow logs in ElasticSearch

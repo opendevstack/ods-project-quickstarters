@@ -318,7 +318,7 @@
                     "spec": {
                         "containers": [
                             {
-                                "name": "airflow",
+                                "name": "airflow-webserver",
                                 "image": "${SHARED_IMAGE_NAMESPACE}/${AIRFLOW_IMAGE_NAME}:${AIRFLOW_IMAGE_TAG}",
                                 "ports": [
                                     {

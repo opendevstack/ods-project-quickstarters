@@ -115,7 +115,7 @@ for ENV in ${environments[@]} ; do
         VOLUME_SIZE_IN_GI=1 | oc create -n ${PROJECT}-${ENV} -f -
 
     SA_TOKEN=$(oc describe sa airflow -n ${PROJECT}-${ENV} | grep "Tokens:" | cut -d':' -f2 | tr -d '[:space:]')
-    echo "$SA_TOKEN"
+
     # Create Airflow resources
     oc process -f templates/airflow.json \
         OC_API_URL=${OC_API_URL} \

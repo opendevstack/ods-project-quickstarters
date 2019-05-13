@@ -19,6 +19,8 @@ objects:
     kind: PersistentVolumeClaim
     metadata:
       name: ${COMPONENT_NAME}
+      labels:
+        cluster: ${CLUSTER_NAME}
     spec:
       accessModes:
         - ReadWriteOnce

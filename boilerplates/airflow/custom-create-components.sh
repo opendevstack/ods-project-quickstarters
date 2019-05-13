@@ -39,7 +39,7 @@ case $key in
     shift # past argument
     ;;
     -r|--docker-registry)
-    OC_DOCKER_REPOSITORY_HOST="$2"
+    OC_DOCKER_REGISTRY="$2"
     shift # past argument
     ;;
     -h|--oc-route-host)
@@ -69,25 +69,30 @@ if [ -z ${OC_CONSOLE_URL+x} ]; then
     echo "OC_CONSOLE_URL is unset, but required";
     exit 1;
 else echo "OC_CONSOLE_URL=${OC_CONSOLE_URL}"; fi
-if [ -z ${OC_DOCKER_REPOSITORY_HOST+x} ]; then
-    echo "OC_DOCKER_REPOSITORY_HOST is unset, but required";
+if [ -z ${OC_DOCKER_REGISTRY+x} ]; then
+    echo "OC_DOCKER_REGISTRY is unset, but required";
     exit 1;
-else echo "OC_DOCKER_REPOSITORY_HOST=${OC_DOCKER_REPOSITORY_HOST}"; fi
+else echo "OC_DOCKER_REGISTRY=${OC_DOCKER_REGISTRY}"; fi
 if [ -z ${OPENSHIFT_APP_HOST+x} ]; then
     echo "OPENSHIFT_APP_HOST is unset, but required";
     exit 1;
 else echo "OPENSHIFT_APP_HOST=${OPENSHIFT_APP_HOST}"; fi
 
-environments=(playground)
+environments=(test)
 # iterate over different environments
 for ENV in ${environments[@]} ; do
 
-    RESOURCES=$(oc get dc,bc,svc,secret,pvc,route,sa -l cluster=airflow --ignore-not-found -n ${PROJECT}-${ENV})
+    RESOURCES=$(oc get dc,bc,svc,secret,pvc,route,sa,rolebinding,cm -l cluster=airflow --ignore-not-found -n ${PROJECT}-${ENV})
 
     if [[ ! -z ${RESOURCES} ]]; then
         echo "Environemnt ${PROJECT}-${ENV} has airflow resources:"
         echo ""
         echo "$RESOURCES"
+        echo ""
+        echo ""
+        echo "To clean all resources, the command:"
+        echo "      oc delete dc,bc,svc,secret,pvc,route,sa,rolebinding,cm -l cluster=airflow  -n ${PROJECT}-${ENV} && oc delete rolebinding airflow-admin-binding  -n ${PROJECT}-${ENV}"
+        echo "can be used."
         echo ""
         echo "Skipping..."
         continue
@@ -109,13 +114,16 @@ for ENV in ${environments[@]} ; do
         NAMESPACE=${PROJECT}-${ENV} \
         VOLUME_SIZE_IN_GI=1 | oc create -n ${PROJECT}-${ENV} -f -
 
+    SA_TOKEN=$(oc describe sa airflow -n ${PROJECT}-${ENV} | grep "Tokens:" | cut -d':' -f2 | tr -d '[:space:]')
+    echo "$SA_TOKEN"
     # Create Airflow resources
     oc process -f templates/airflow.json \
         OC_API_URL=${OC_API_URL} \
         OC_CONSOLE_URL=${OC_CONSOLE_URL} \
-        OC_DOCKER_REPOSITORY_HOST=${OC_DOCKER_REPOSITORY_HOST} \
+        OC_DOCKER_REGISTRY=${OC_DOCKER_REGISTRY} \
         AIRFLOW_FERNET_KEY=${FERNET_KEY} \
         OPENSHIFT_APP_HOST=${OPENSHIFT_APP_HOST} \
+        OPENSHIFT_OAUTH_SERVICE_ACCOUNT_SECRET=${SA_TOKEN} \
         NAMESPACE=${PROJECT}-${ENV} | oc create -n ${PROJECT}-${ENV} -f -
 
 done

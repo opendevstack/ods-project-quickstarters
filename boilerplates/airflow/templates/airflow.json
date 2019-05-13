@@ -526,20 +526,17 @@
         {
             "description": "Namespace where the shared images are stored",
             "name": "SHARED_IMAGE_NAMESPACE",
-            "required": true,
-            "default": "shared-services"
+            "value": "shared-services"
         },
         {
             "description": "Airflow shared image stream name ",
             "name": "AIRFLOW_IMAGE_NAME",
-            "required": true,
-            "default": "airflow"
+            "value": "airflow"
         },
         {
             "description": "Airflow shared image tag which should be used",
             "name": "AIRFLOW_IMAGE_TAG",
-            "required": true,
-            "default": "1.10.3"
+            "value": "1.10.3"
         },
         {
             "description": "Fernet key for securing stored Airflow Connection",
@@ -549,13 +546,17 @@
         {
             "name": "VOLUME_CAPACITY",
             "description": "Size of the PVC for Airflow Webserver and Scheduler",
-            "required": true,
-            "default": "512Mi"
+            "value": "512Mi"
         },
         {
             "name": "OPENSHIFT_APP_HOST",
             "description": "Host for all OpenShift app routes",
-            "required": true            
+            "required": true
+        },
+        {
+            "name" : "OPENSHIFT_OAUTH_SERVICE_ACCOUNT_SECRET",
+            "description": "OAuth service account token secret",
+            "required": true
         }
     ]
 }

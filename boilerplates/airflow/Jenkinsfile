@@ -66,10 +66,6 @@ def stagePublishDAGs(def context) {
         sh "oc rsync --no-perms=true --delete=true --exclude=.keep --exclude=__pycache__ src/dags ${airflow_webserver_info[0]}:/opt/app-root/src/airflow/ -n ${context.targetProject}"
         sh "oc rsync --no-perms=true --delete=true --exclude=.keep --exclude=__pycache__ src/dags ${airflow_scheduler_info[0]}:/opt/app-root/src/airflow/ -n ${context.targetProject}"
 
-        // RSync of plugins is not set to --delete=true to avoid removing all standard plugins
-        sh "oc rsync --no-perms=true --exclude=.keep --exclude=__pycache__ src/plugins ${airflow_webserver_info[0]}:/opt/app-root/src/airflow/ -n ${context.targetProject}"
-        sh "oc rsync --no-perms=true --exclude=.keep --exclude=__pycache__ src/plugins ${airflow_scheduler_info[0]}:/opt/app-root/src/airflow/ -n ${context.targetProject}"
-
 
     }
 }

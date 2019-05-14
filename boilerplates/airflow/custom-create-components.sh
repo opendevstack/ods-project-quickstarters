@@ -78,7 +78,7 @@ if [ -z ${OPENSHIFT_APP_HOST+x} ]; then
     exit 1;
 else echo "OPENSHIFT_APP_HOST=${OPENSHIFT_APP_HOST}"; fi
 
-environments=(test)
+environments=(test dev)
 # iterate over different environments
 for ENV in ${environments[@]} ; do
 

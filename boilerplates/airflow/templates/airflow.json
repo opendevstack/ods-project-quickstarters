@@ -529,7 +529,13 @@
                     "type": "Binary"
                 },
                 "strategy": {
-                    "dockerStrategy": {},
+                    "dockerStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "airflow:1.10.3",
+                            "namespace": "shared-services"
+                        }
+                    },
                     "type": "Docker"
                 }
             }

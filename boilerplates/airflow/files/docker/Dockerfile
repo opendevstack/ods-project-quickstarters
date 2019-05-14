@@ -1,4 +1,5 @@
-FROM 172.30.21.196:5000/shared-services/airflow:1.10.3
+# This is a dummy value which OpenShift replaces during build time
+FROM oc.registry.url/shared-services/airflow:1.10.3
 
 ARG nexus_username
 ARG nexus_password
@@ -6,7 +7,6 @@ ARG nexus_url
 
 COPY dist/requirements.txt ${AIRFLOW_HOME}/
 COPY dist/dags ${AIRFLOW_HOME}/dags
-COPY dist/plugins ${AIRFLOW_HOME}/plugins
 COPY dist/dag_deps ${AIRFLOW_HOME}/dag_deps
 COPY scripts/setup.py ${AIRFLOW_HOME}/dag_deps
 

@@ -23,6 +23,11 @@ while [[ "$#" > 0 ]]; do case $1 in
   *) echo "Unknown parameter passed: $1"; exit 1;;
 esac; shift; done
 
+if [[ "$COMPONENT" != "airflow-worker" ]]; then
+  echo "the component must be named airflow-worker"
+  exit 1
+fi
+
 cd $TARGET_DIR
 
 # Fail if not airflow-worker

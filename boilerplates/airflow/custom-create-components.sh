@@ -105,11 +105,11 @@ for ENV in ${environments[@]} ; do
     FERNET_KEY=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64)
 
     # Creating service account and bindings
-    oc create -f templates/service-account.json -n ${PROJECT}-${ENV}
+    oc create -f templates/service-account.yaml -n ${PROJECT}-${ENV}
     oc create rolebinding airflow-admin-binding --serviceaccount ${PROJECT}-${ENV}:airflow --clusterrole admin -n ${PROJECT}-${ENV}
 
     # Creating PostgreSQL resources
-    oc process -f templates/postgresql-persistent.json | oc create -n ${PROJECT}-${ENV} -f -
+    oc process -f templates/postgresql-persistent.yaml | oc create -n ${PROJECT}-${ENV} -f -
 
     # Creating ElasticSearch resources
     oc process -f ../../ocp-templates/templates/elasticsearch/elasticsearch-persistent-master-template.yaml \
@@ -121,7 +121,7 @@ for ENV in ${environments[@]} ; do
     SA_TOKEN=$(oc describe sa airflow -n ${PROJECT}-${ENV} | grep "Tokens:" | cut -d':' -f2 | tr -d '[:space:]')
 
     # Create Airflow resources
-    oc process -f templates/airflow.json \
+    oc process -f templates/airflow.yaml \
         OC_API_URL=${OC_API_URL} \
         OC_CONSOLE_URL=${OC_CONSOLE_URL} \
         OC_DOCKER_REGISTRY=${OC_DOCKER_REGISTRY} \

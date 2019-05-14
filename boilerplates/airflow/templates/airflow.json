@@ -100,13 +100,9 @@
             },
             "spec": {
                 "strategy": {
-                    "type": "Rolling",
-                    "rollingParams": {
-                        "updatePeriodSeconds": 1,
-                        "intervalSeconds": 1,
-                        "timeoutSeconds": 600,
-                        "maxUnavailable": "25%",
-                        "maxSurge": "25%"
+                    "type": "Recreate",
+                    "recreateParams": {
+                        "timeoutSeconds": 600
                     },
                     "resources": {},
                     "activeDeadlineSeconds": 21600
@@ -236,7 +232,7 @@
                                 ],
                                 "terminationMessagePath": "/dev/termination-log",
                                 "terminationMessagePolicy": "File",
-                                "imagePullPolicy": "IfNotPresent"
+                                "imagePullPolicy": "Always"
                             }
                         ],
                         "volumes": [
@@ -268,13 +264,9 @@
             },
             "spec": {
                 "strategy": {
-                    "type": "Rolling",
-                    "rollingParams": {
-                        "updatePeriodSeconds": 1,
-                        "intervalSeconds": 1,
-                        "timeoutSeconds": 600,
-                        "maxUnavailable": "25%",
-                        "maxSurge": "25%"
+                    "type": "Recreate",
+                    "recreateParams": {
+                        "timeoutSeconds": 600
                     },
                     "resources": {},
                     "activeDeadlineSeconds": 21600
@@ -418,7 +410,7 @@
                                 ],
                                 "terminationMessagePath": "/dev/termination-log",
                                 "terminationMessagePolicy": "File",
-                                "imagePullPolicy": "IfNotPresent"
+                                "imagePullPolicy": "Always"
                             }
                         ],
                         "volumes": [
@@ -500,6 +492,47 @@
                 },
                 "wildcardPolicy": "None"
             }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "labels": {
+                    "cluster": "airflow",
+                    "component": "airflow-worker"
+                },
+                "name": "airflow-worker"
+            },
+            "spec": {
+                "dockerImageRepository": "airflow-worker"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "labels": {
+                    "cluster": "airflow",
+                    "component": "airflow-worker"
+                },
+                "name": "airflow-worker"
+            },
+            "spec": {
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "airflow-worker:latest"
+                    }
+                },
+                "runPolicy": "Serial",
+                "source": {
+                    "type": "Binary"
+                },
+                "strategy": {
+                    "dockerStrategy": {},
+                    "type": "Docker"
+                }
+            }
         }
     ],
     "parameters": [
@@ -554,7 +587,7 @@
             "required": true
         },
         {
-            "name" : "OPENSHIFT_OAUTH_SERVICE_ACCOUNT_SECRET",
+            "name": "OPENSHIFT_OAUTH_SERVICE_ACCOUNT_SECRET",
             "description": "OAuth service account token secret",
             "required": true
         }

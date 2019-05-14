@@ -82,7 +82,7 @@ environments=(test)
 # iterate over different environments
 for ENV in ${environments[@]} ; do
 
-    RESOURCES=$(oc get dc,bc,svc,secret,pvc,route,sa,rolebinding,cm -l cluster=airflow --ignore-not-found -n ${PROJECT}-${ENV})
+    RESOURCES=$(oc get dc,bc,svc,secret,pvc,route,sa,rolebinding,cm,is -l cluster=airflow --ignore-not-found -n ${PROJECT}-${ENV})
 
     if [[ ! -z ${RESOURCES} ]]; then
         echo "Environemnt ${PROJECT}-${ENV} has airflow resources:"
@@ -91,7 +91,7 @@ for ENV in ${environments[@]} ; do
         echo ""
         echo ""
         echo "To clean all resources, the command:"
-        echo "      oc delete dc,bc,svc,secret,pvc,route,sa,rolebinding,cm -l cluster=airflow  -n ${PROJECT}-${ENV} && oc delete rolebinding airflow-admin-binding  -n ${PROJECT}-${ENV}"
+        echo "      oc delete dc,bc,svc,secret,pvc,route,sa,rolebinding,cm,is -l cluster=airflow  -n ${PROJECT}-${ENV} && oc delete rolebinding airflow-admin-binding  -n ${PROJECT}-${ENV}"
         echo "can be used."
         echo ""
         echo "Skipping..."

@@ -1,5 +1,5 @@
 def final projectId = '@project_id@'
-def final componentId = '@component_id@'
+def final componentId = 'airflow-worker'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry

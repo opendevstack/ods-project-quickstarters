@@ -80,6 +80,10 @@ else echo "OPENSHIFT_APP_HOST=${OPENSHIFT_APP_HOST}"; fi
 
 environments=(test dev)
 # iterate over different environments
+echo "--------------"
+oc version
+echo "--------------"
+
 for ENV in ${environments[@]} ; do
 
     RESOURCES=$(oc get dc,bc,svc,secret,pvc,route,sa,rolebinding,cm,is -l cluster=airflow --ignore-not-found -n ${PROJECT}-${ENV})

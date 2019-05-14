@@ -25,6 +25,8 @@ esac; shift; done
 
 cd $TARGET_DIR
 
+# Fail if not airflow-worker
+
 mkdir -p $COMPONENT
 
 cd $COMPONENT

@@ -485,7 +485,9 @@ do
 		echo "!!! Project ${curr_ocp_namespace} already exists - skipping creation"
     fi
 
-	if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]]; then 
+	secretexists=$(oc get secret | grep "odocp")
+
+	if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ ! $secretexists == *"odocp"* ]]; then 
 		echo "Creating OCP OD pull secret for ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}"
 		oc create secret docker-registry odocp  --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
 		oc secrets link deployer odocp --for=pull                                   

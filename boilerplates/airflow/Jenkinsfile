@@ -41,10 +41,9 @@ def stageDAGTest(def context) {
 
 def stageUnitTest(def context) {
     stage('Unit Tests') {
-        sh 'pip install --user -r src/requirements.txt'
+        sh "pip install -i ${context.nexusHostWithBasicAuth}/repository/pypi-all/simple -r src/requirements.txt --user"
         sh './test_all.sh'
         junit 'artifacts/**/*.xml'
-
     }
 }
 

@@ -30,7 +30,10 @@ fi
 
 cd $TARGET_DIR
 
-# Fail if not airflow-worker
+if [[ "$COMPONENT" != "airflow-worker" ]]; then
+  echo "the component must be named airflow-worker"
+  exit 1
+fi
 
 mkdir -p $COMPONENT
 

@@ -1,9 +1,7 @@
 # This is a dummy value which OpenShift replaces during build time
 FROM oc.registry.url/shared-services/airflow:1.10.3
 
-ARG nexus_username
-ARG nexus_password
-ARG nexus_url
+ARG nexusHostWithBasicAuth
 
 COPY dist/requirements.txt ${AIRFLOW_HOME}/
 COPY dist/dags ${AIRFLOW_HOME}/dags
@@ -14,7 +12,7 @@ USER root
 
 RUN pip install ${AIRFLOW_HOME}/dag_deps && \
     if [[ ! -z ${nexus_url} ]]; \
-    then pip install -i https://${nexus_username}:${nexus_password}@${nexus_url:8}/repository/pypi-all/simple -r ${AIRFLOW_HOME}/requirements.txt; \
+    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r ${AIRFLOW_HOME}/requirements.txt; \
     else pip install -r ${AIRFLOW_HOME}/requirements.txt; \
     fi
 

@@ -8,6 +8,7 @@ ENV TERM linux
 
 ARG projectHome=/opt/app-root/src
 ARG home=${projectHome}
+ARG nexusHostWithBasicAuth
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -55,13 +56,20 @@ RUN chown -R prophet: ${projectHome} && \
     chgrp -R 0 ${projectHome} && \
     chmod -R g=u ${projectHome} && \
     chmod g=u /etc/passwd && \
-    chmod u+x ${projectHome}/run.sh
+    chmod +x ${projectHome}/run.sh
 
 EXPOSE 8080
 
 ENV HOME=${projectHome}
 WORKDIR ${projectHome}
 
+RUN pip install --upgrade pip && \
+    cd src \
+    if [[ ! -z ${nexusHost} ]]; then  \
+        pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    else \
+        pip install -r requirements.txt; \
+    fi
 
 USER 1001
 

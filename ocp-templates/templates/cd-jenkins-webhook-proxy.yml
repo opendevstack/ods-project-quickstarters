@@ -72,6 +72,8 @@ objects:
         - env:
           - name: REPO_BASE
             value: '${REPO_BASE}'
+          - name: PROTECTED_BRANCHES
+            value: ${PROTECTED_BRANCHES}
           - name: TRIGGER_SECRET
             valueFrom:
               secretKeyRef:
@@ -114,5 +116,7 @@ parameters:
   value: cd
 - name: REPO_BASE
   value: REPO_BASE
+- name: PROTECTED_BRANCHES
+  value: "master,develop,production,staging,release/"
 - name: PIPELINE_TRIGGER_SECRET
   value: PIPELINE_TRIGGER_SECRET

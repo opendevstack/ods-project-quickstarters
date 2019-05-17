@@ -18,7 +18,6 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-python",
   projectId: projectId,
   componentId: componentId,
-  openshiftBuildTimeout: 25,
   branchToEnvironmentMapping: [
     'master': 'test',
     '*': 'dev'
@@ -26,20 +25,36 @@ odsPipeline(
 ) { context ->
   stageBuild(context)
   stageScanForSonarqube(context)
-  stageStartOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context, [nexusHostWithBasicAuth: context.nexusHostWithBasicAuth])
   stageDeployToOpenshift(context)
+  stageTriggerAllBuilds(context)
 }
 
 def stageBuild(def context) {
-  stage('Build') {
-    withEnv(["TAGVERSION=${context.tagversion}"]) {
-      sh "python src/tests.py"
-      // PEP8
-      sh '''
-         pycodestyle --show-source --show-pep8 src/*
-         pycodestyle --statistics -qq src/*
-      '''
-    }
-    sh "cp -r src docker/dist"
+  withEnv(["TAGVERSION=${context.tagversion}"]) {
+      stage('Test') {
+        sh """
+              pip install --user virtualenv &&
+              virtualenv venv &&
+              . \$(pwd)/venv/bin/activate &&
+              pip install -r src/test_requirements.txt &&
+              export PYTHONPATH="src" &&
+              cd src/tests && nosetests -v
+          """
+      }
+      stage('PEP8') {
+        // Stage is VERY IMPORTANT! Do not remove or comment!
+        sh """
+             cd src &&
+             pycodestyle --show-source --show-pep8 . &&
+             pycodestyle --statistics -qq .
+        """
+      }
+      stage('Build') {
+         sh """
+            mkdir docker/dist
+            cp -r src docker/dist
+          """
+      }
   }
 }

@@ -24,7 +24,7 @@ odsPipeline(
   ]
 ) { context ->
   patchBuildConfig(context)
-  stageStartOpenshiftBuild(context)
+  stageStartOpenshiftBuild(context, [nexusHostWithBasicAuth: context.nexusHostWithBasicAuth])
   stageDeployToOpenshift(context)
 }
 

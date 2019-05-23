@@ -4,10 +4,8 @@ FROM registry.access.redhat.com/rhscl/python-36-rhel7
 
 MAINTAINER "Stefan Klingelschmitt" <stefan.klingelschmitt@boehringer-ingelheim.com>
 
+ARG nexusHostWithBasicAuth
 
-ARG NEXUS_USERNAME
-ARG NEXUS_PASSWORD
-ARG NEXUS_URL
 
 WORKDIR /app
 
@@ -17,10 +15,9 @@ COPY requirements.txt /app
 
 USER 1001
 # From load pip install for caching docker build layers
-RUN pip install --upgrade pip && \
-    if [[ ! -z ${NEXUS_URL} ]]; \
-    then pip install -i https://${NEXUS_USERNAME}:${NEXUS_PASSWORD}@${NEXUS_URL:8}/repository/pypi-all/simple -r requirements.txt; \
-    else pip install -r requirements.txt; \
+RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 
 USER root

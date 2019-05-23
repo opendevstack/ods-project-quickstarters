@@ -2,7 +2,6 @@ import argparse
 import time
 
 import requests
-from requests import RequestException
 from requests.auth import HTTPBasicAuth
 
 
@@ -29,26 +28,17 @@ def start_training(host_url, http_auth):
         indicates the success of the result of the training process
 
     """
-    response = None
-    count = 0
+
     print("Training server is on: {0}".format(host_url))
+    response = requests.get(
+        '{0}/start'.format(host_url), auth=http_auth, stream=True)
 
-    while count < 30:
-        # noinspection PyBroadException
-        try:
-            response = requests.get(
-                '{0}/start'.format(host_url), auth=http_auth, stream=True)
-            success = True
-            return success
-        except (ConnectionRefusedError, ConnectionError, OSError, RequestException):
-            count += 1
-            time.sleep(5)
-            continue
-
-    if not response or response.status_code != 202:
+    if response.status_code != 202:
         print("Training service not reachable!")
         success = False
-        return success
+    else:
+        success = True
+    return success
 
 
 def wait_for_training():

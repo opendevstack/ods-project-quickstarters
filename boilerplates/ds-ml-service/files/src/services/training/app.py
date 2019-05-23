@@ -11,7 +11,7 @@ from flask.templating import render_template
 from model.trainer import train
 from services.infrastructure.environment import debug_mode, execution_environment, \
     DSI_EXECUTE_ON_LOCAL, DSI_EXECUTE_ON_SSH, ssh_host, \
-    ssh_username, ssh_password, ssh_port, DSI_EXECUTE_ON, training_auth
+    ssh_username, ssh_password, ssh_port, DSI_EXECUTE_ON, training_auth, dvc_remote
 from services.infrastructure.flask import init_flask, status
 from services.infrastructure.git_info import GIT_COMMIT, GIT_COMMIT_SHORT, GIT_BRANCH, \
     GIT_LAST_CHANGE, GIT_REPO_NAME
@@ -41,13 +41,18 @@ def start_training():
     try:
         environment = execution_environment()
         if environment == DSI_EXECUTE_ON_LOCAL:
-            train()
+            if dvc_remote():
+                train(dvc_data_repo=dvc_remote(), dvc_ssh_user=ssh_username(),
+                      dvc_ssh_password=ssh_password())
+            else:
+                train()
         elif environment == DSI_EXECUTE_ON_SSH:
             connection = SSHRemoteExecutor(host=ssh_host(),
                                            username=ssh_username(),
                                            password=ssh_password(),
                                            debug_mode=debug_mode() or flask_args.debug,
-                                           port=ssh_port())
+                                           port=ssh_port(),
+                                           dvc_remote=dvc_remote())
 
             connection.setup_prerequisites()
             connection.run_training()

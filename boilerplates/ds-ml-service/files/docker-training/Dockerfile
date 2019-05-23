@@ -1,8 +1,6 @@
 FROM registry.access.redhat.com/rhscl/python-36-rhel7
 
-ARG nexus_username
-ARG nexus_password
-ARG nexus_url
+
 WORKDIR /app
 
 ENV DSI_MINICONDA_PACKAGE_VERSION="3.6.0"
@@ -10,9 +8,7 @@ ENV DSI_MINICONDA_PACKAGE_PATH=/app/miniconda3.sh
 ENV PYTHONPATH=$PYTHONPATH:/app
 ENV DSI_PACKAGE=/app/app.tar.gz
 
-ENV NEXUS_USERNAME=$nexus_username
-ENV NEXUS_PASSWORD=$nexus_password
-ENV NEXUS_URL=$nexus_url
+ARG nexusHostWithBasicAuth
 
 # Front load pip install, miniconda download for caching docker build layers
 COPY dist/requirements.txt /app
@@ -23,10 +19,9 @@ RUN curl --silent --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MI
 
 USER 1001
 
-RUN pip install --upgrade pip && \
-    if [[ ! -z ${nexus_url} ]]; \
-    then pip install -i https://${nexus_username}:${nexus_password}@${nexus_url:8}/repository/pypi-all/simple -r requirements.txt; \
-    else pip install -r requirements.txt; \
+RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 
 # Copying all the code
@@ -39,7 +34,8 @@ RUN chgrp -R 0 /app && \
     chmod -R g=u /app && \
     chmod +x /app/run.sh && \
     chmod g+w /etc/passwd && \
-    tar zcf /app/app.tar.gz *
+    touch /app/app.tar.gz && \
+    tar zcf /app/app.tar.gz ./ --exclude=./app.tar.gz
 
 
 USER 1001

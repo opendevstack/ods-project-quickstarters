@@ -1,3 +1,5 @@
+import json
+
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
 
@@ -23,6 +25,7 @@ class ModelWrapper(object):
         contains name of the features that are finally feed to the model, after possible
         feature engineering
     """
+
     def __init__(self):
         self.model = LogisticRegression()
         self.source_features = ["sepalLength", "sepalWidth", "petalWidth"]

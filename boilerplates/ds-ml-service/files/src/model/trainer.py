@@ -9,8 +9,12 @@ from services.infrastructure.git_info import GIT_COMMIT
 
 from sklearn.metrics import accuracy_score
 
+from services.infrastructure.remote.dvc.data_sync import DataSync
 
-def train(model_name=GIT_COMMIT, train_data='train.csv'):
+
+def train(model_name=GIT_COMMIT, train_data='resources/train.csv', dvc_data_repo=None,
+          dvc_ssh_user=None,
+          dvc_ssh_password=None):
     """This function is the training entry point and should not be removed. Executes the
     *ModelWrapper.prep_and_train* and saves the model using *joblib*. MANDATORY
 
@@ -25,6 +29,17 @@ def train(model_name=GIT_COMMIT, train_data='train.csv'):
         given the trained model a name to store. Default: git_commit id.
     train_data : String
         path where to find the train data.
+    dvc_data_repo :  String
+    dvc_ssh_user : String
+    dvc_ssh_password : String
+
+    Examples
+    --------
+    In order to pull /optional) dependencies over the integrated data versioning provided by dvc,
+    do:
+        $ syncer = DataSync(dvc_data_repo, dvc_ssh_user, dvc_ssh_password)
+        $ syncer.pull_data_dependencies()
+    This will synchronize the dvc data dependencies and training can be conducted
     """
     # where to get the data -> hard coded for now
     data = pd.read_csv(train_data)
@@ -47,9 +62,9 @@ if __name__ == "__main__":
     parser.add_argument("--output", "-o", type=str, help="output model name", default="local")
     parsed_args = parser.parse_args()
 
-    train(model_name="local", train_data=parsed_args.input)
+    train(model_name=GIT_COMMIT, train_data=parsed_args.input)
 
-    model = joblib.load("local.model")
+    model = joblib.load("{}.model".format(GIT_COMMIT))
 
     # load test Dataframe
     test_df = pd.read_csv("resources/test.csv")

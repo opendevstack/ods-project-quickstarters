@@ -20,7 +20,7 @@ RUN curl --silent --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MI
 USER 1001
 
 RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
-    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
     else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 

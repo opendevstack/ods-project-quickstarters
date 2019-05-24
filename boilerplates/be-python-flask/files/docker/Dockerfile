@@ -64,7 +64,7 @@ ENV HOME=${projectHome}
 WORKDIR ${projectHome}
 
 RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
-    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
     else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 

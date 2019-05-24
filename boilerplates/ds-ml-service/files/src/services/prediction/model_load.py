@@ -6,6 +6,9 @@ from requests.exceptions import RequestException
 from services.infrastructure.environment import training_auth
 
 
+import os
+
+
 def load_remote_model(train_pod_url, git_commit):
     """Helper function for loading a model from the remote training service. Using the *getmodel*
     endpoint of the training service.
@@ -36,7 +39,10 @@ def load_remote_model(train_pod_url, git_commit):
         with open(git_commit, 'wb') as f:
             f.write(response.content)
 
+        print(response.content)
         print("model loaded")
+        print(os.listdir())
+        print(git_commit)
         predictor = joblib.load(git_commit)
         return predictor
     except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError,
@@ -55,5 +61,5 @@ def load_model(train_pod_url, git_commit):
     """
     predictor = load_remote_model(train_pod_url, git_commit)
     if not predictor:
-        predictor = joblib.load("resources/local.model")
+        predictor = joblib.load("{}.model".format(git_commit))
     return predictor

@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build --prod --build-optimizer --progress=false",
     "test": "ng test --watch=false --progress=false --code-coverage",
-    "lint": "ng lint --type-check=true",
+    "lint": "ng lint",
     "e2e": "ng e2e"
   },
   "private": true,

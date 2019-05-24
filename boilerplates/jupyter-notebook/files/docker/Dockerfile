@@ -2,7 +2,7 @@
 
 FROM registry.access.redhat.com/rhscl/python-36-rhel7
 
-MAINTAINER "Stefan Klingelschmitt" <stefan.klingelschmitt@boehringer-ingelheim.com>
+LABEL maintainer="Stefan Klingelschmitt <stefan.klingelschmitt@boehringer-ingelheim.com>"
 
 ARG nexusHostWithBasicAuth
 

@@ -63,12 +63,9 @@ EXPOSE 8080
 ENV HOME=${projectHome}
 WORKDIR ${projectHome}
 
-RUN pip install --upgrade pip && \
-    cd src \
-    if [[ ! -z ${nexusHost} ]]; then  \
-        pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
-    else \
-        pip install -r requirements.txt; \
+RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 
 USER 1001

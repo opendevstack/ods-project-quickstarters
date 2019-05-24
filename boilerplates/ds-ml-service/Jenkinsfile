@@ -4,10 +4,10 @@ def final componentId = '@component_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
 def sharedLibraryRepository
 def dockerRegistry
-def training_route
-def training_pod_info
-def training_password
-def training_username
+def trainingRoute
+def trainingPodInfo
+def trainingPassword
+def trainingUsername
 
 def trainingConfig = [
     "docker-training"  : "${componentId}-training-service",
@@ -62,10 +62,10 @@ pycodestyle --statistics -qq src/*
 
 def stageUnitTestsTraining(def context) {
     stage('Unittests') {
-        training_pod_info = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-        print("Found pod name: ${training_pod_info[0]}")
-        if (training_pod_info[2] == "Running") {
-            sh(returnStdout: true, script: " oc project ${context.targetProject} && oc exec ${training_pod_info[0]} bash ./run_unittests.sh ")
+        trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+        print("Found pod name: ${trainingPodInfo[0]}")
+        if (trainingPodInfo[2] == "Running") {
+            sh(returnStdout: true, script: " oc project ${context.targetProject} && oc exec ${trainingPodInfo[0]} bash ./run_unittests.sh ")
         }
     }
 }
@@ -81,28 +81,28 @@ def stageTraining(def context) {
     stage('Train Model') {
         sh(returnStdout: true, script:"pip install -i ${context.nexusHostWithBasicAuth}/repository/pypi-all/simple requests --user")
 
-        training_route = "http://localhost:8080"
+        trainingRoute = "http://localhost:8080"
 
-        training_password = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep password: | cut -d':' -f2 ").trim()
-        training_username = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep username: | cut -d':' -f2 ").trim()
-        training_password = sh(returnStdout: true, script:"echo \"${training_password}\" | base64 --decode").trim()
-        training_username = sh(returnStdout: true, script:"echo \"${training_username}\" | base64 --decode").trim()
+        trainingPassword = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep password: | cut -d':' -f2 ").trim()
+        trainingUsername = sh(returnStdout: true, script:"oc get secret ${context.componentId}-training-secret -o yaml -n ${context.targetProject} | grep username: | cut -d':' -f2 ").trim()
+        trainingPassword = sh(returnStdout: true, script:"echo \"${trainingPassword}\" | base64 --decode").trim()
+        trainingUsername = sh(returnStdout: true, script:"echo \"${trainingUsername}\" | base64 --decode").trim()
 
-        sh "oc port-forward ${training_pod_info[0]} 8080 -n ${context.targetProject} &"
+        sh "oc port-forward ${trainingPodInfo[0]} 8080 -n ${context.targetProject} &"
         sh "pip install requests"
-        sh  "python3 jenkinsfile_helper.py --training-service ${training_route} --username \"${training_username}\" --password \"${training_password}\""
+        sh  "python3 jenkinsfile_helper.py --training-service ${trainingRoute} --username \"${trainingUsername}\" --password \"${trainingPassword}\""
     }
 }
 
 
 def stageIntegrationTestTraining(def context) {
     stage('Integration Tests') {
-        training_pod_info = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-        print("Found pod name: ${training_pod_info[0]}")
-        if (training_pod_info[2] == "Running") {
-            sh(returnStdout: true, script: " oc project ${context.targetProject} && oc exec ${training_pod_info[0]} bash ./run_integration_tests.sh ")
+        trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+        print("Found pod name: ${trainingPodInfo[0]}")
+        if (trainingPodInfo[2] == "Running") {
+            sh(returnStdout: true, script: " oc project ${context.targetProject} && oc exec ${trainingPodInfo[0]} bash ./run_integration_tests.sh ")
         }
-        print("Pod ${training_pod_info[0]} is not running... cannot execute integration tests")
+        print("Pod ${trainingPodInfo[0]} is not running... cannot execute integration tests")
     }
 }
 
@@ -159,12 +159,12 @@ def stageMultipleDeployToOpenshift(def context, def stageName, def buildConfigs 
         stageDeployToOpenshift(context)
     }
     while(true) {
-    training_pod_info = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-    print("Found pod name: ${training_pod_info[0]}")
-    if (training_pod_info[2] == "Running") {
-        print("Pod ${training_pod_info[0]} is running!!!")
+    trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+    print("Found pod name: ${trainingPodInfo[0]}")
+    if (trainingPodInfo[2] == "Running") {
+        print("Pod ${trainingPodInfo[0]} is running!!!")
         break
     }
-    print("Pod ${training_pod_info[0]} is still not running...")
+    print("Pod ${trainingPodInfo[0]} is still not running...")
     }
 }

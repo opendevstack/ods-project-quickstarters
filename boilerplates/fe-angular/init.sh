@@ -78,4 +78,4 @@ echo "copy custom files from quickstart to generated project"
 rm ./package.json
 rm ./tslint.json
 cp -rv $SCRIPT_DIR/files/. .
-sed -i -e "s/\$COMPONENT/${COMPONENT}/" ./package.json
+sed -i "s/\$COMPONENT/${COMPONENT}/" ./package.json

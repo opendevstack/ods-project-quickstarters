@@ -33,9 +33,6 @@ cd $COMPONENT
 
 sudo chown -R $OWNER .
 
-# Change typescript version to 2.8.0 as a workaround for https://github.com/ReactiveX/rxjs/issues/4512
-sed -i -e 's|\(.*"typescript"\): "\(.*\)"\(.*\)|\1: '"\"2.8.1\"\3|" ./package.json
-
 echo "Configure headless chrome in karma.conf.j2"
 read -r -d "" CHROME_CONFIG << EOM || true
     browsers: \['ChromeNoSandboxHeadless'\],\\
@@ -78,4 +75,7 @@ sed -i.bak "s|org/opendevstack/projectId|$repo_path|g" $SCRIPT_DIR/files/docker/
 rm $SCRIPT_DIR/files/docker/Dockerfile.bak
 
 echo "copy custom files from quickstart to generated project"
+rm ./package.json
+rm ./tslint.json
 cp -rv $SCRIPT_DIR/files/. .
+sed -i -e "s/\$COMPONENT/${COMPONENT}/" ./package.json

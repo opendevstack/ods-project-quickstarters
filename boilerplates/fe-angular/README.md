@@ -72,7 +72,7 @@ The Jenkinsfile is provisioned with this quick starter to ease CI/CD process.
 In Jenkinsfile, there are various stages
   * stageBuild - Builds the application by running `yarn install`, `yarn build` command and copies output folder `dist` into `docker/dist` folder.
   * stageUnitTest - Runs unit test cases by executing command `yarn test`.
-  * stageLint - Runs `ng lint` profiler by running command `npm run lint`.
+  * stageLint - Runs `ng lint` profiler by running command `yarn lint`.
 
 ## Builder Slave used
 

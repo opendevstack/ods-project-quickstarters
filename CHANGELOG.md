@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-05-28
+
 ### Added
 - Rundeck `prepare-continous integration` job can now be used to upgrade an existing git repository ([#110](https://github.com/opendevstack/ods-project-quickstarters/pull/110))
 - New quickstarter `be-docker-plain`: useful for starting with a plain `Dockerfile` and no BE/FE framework on top ([#97](https://github.com/opendevstack/ods-project-quickstarters/issues/97))
@@ -10,11 +12,14 @@
 - Documentation of all quickstarters and slaves added
 
 ### Changed
+- Python quickstarter should use nexus as artifact repo ([#27](https://github.com/opendevstack/ods-project-quickstarters/issues/27))
 - Jupyter & R-Shiny quickstarters are now based on new Openresty-based WAF image ([#103](https://github.com/opendevstack/ods-project-quickstarters/pull/103))
 
 ### Fixed
 - Rshiny quickstarter broken - due to refactoring and webhook proxy introduction ([#200](https://github.com/opendevstack/ods-project-quickstarters/issues/200)) & ([#184](https://github.com/opendevstack/ods-project-quickstarters/issues/184))
 - Create-projects.sh seeds wrong jenkins SA rights & misses default SA for webhook proxy bug ([#189](https://github.com/opendevstack/ods-project-quickstarters/issus/189))
+- import metadata: docker pull secrets are not created in an existing project - breaks oc import-image ([#202](https://github.com/opendevstack/ods-project-quickstarters/issues/202))
+- Import Script is not replacing urls for sonarqube in DCs ([#145](https://github.com/opendevstack/ods-project-quickstarters/issues/145))
 
 ## [1.0.2] - 2019-04-02
 

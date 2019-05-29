@@ -52,12 +52,13 @@
     commands:
     - description: clone quickstarter project - origin/task/tailor-for-update-templates
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/task/tailor-for-update-templates
-    - description: create component in openshift
-      jobref:
-        args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
-        group: openshift
-        name: create-component-qs-38
-        nodeStep: 'true'
+    - description: generate openshift folder in generated project if needed.
+      script: |-
+        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/
+        PROJECT="@option.project_id@" \
+        COMPONENT="@option.component_id@" \
+        TARGET_DIR="@option.quickstarter_directory@" \
+        /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/init-openshift.sh
     - description: add Jenkinsfile to generated project
       script: |-
         sudo mkdir -p @option.quickstarter_directory@

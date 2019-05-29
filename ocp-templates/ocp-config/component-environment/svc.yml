@@ -2,10 +2,8 @@ apiVersion: v1
 kind: Template
 labels:
   template: component-template
-  app: '${PROJECT}'
+  app: '${PROJECT}-${COMPONENT}'
   branch: '${BRANCH}'
-  component: '${COMPONENT}'
-  env: '${ENV}'
 objects:
   - apiVersion: v1
     kind: Service
@@ -21,10 +19,8 @@ objects:
           protocol: TCP
           targetPort: 8080
       selector:
-        app: '${PROJECT}'
-        component: '${COMPONENT}'
+        app: '${PROJECT}-${COMPONENT}'
         deploymentconfig: '${COMPONENT}'
-        env: '${ENV}'
       sessionAffinity: None
       type: ClusterIP
 parameters:

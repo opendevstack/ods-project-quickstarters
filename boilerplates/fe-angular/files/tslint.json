@@ -5,15 +5,11 @@
     "node_modules/rxjs-tslint"
   ],
   "rules": {
-    "arrow-return-shorthand": true,
-    "callable-types": true,
-    "class-name": true,
     "cognitive-complexity": true,
     "comment-format": [
       true,
       "check-space"
     ],
-    "curly": true,
     "deprecation": {
       "severity": "warn"
     },
@@ -28,7 +24,6 @@
       true,
       "spaces"
     ],
-    "interface-over-type-literal": true,
     "label-position": true,
     "max-line-length": [
       true,
@@ -62,7 +57,6 @@
     "no-duplicate-string": false,
     "no-duplicate-super": true,
     "no-empty": false,
-    "no-empty-interface": true,
     "no-eval": true,
     "no-inferrable-types": [
       true,
@@ -70,10 +64,8 @@
     ],
     "no-misused-new": true,
     "no-non-null-assertion": true,
-    "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-string-throw": true,
-    "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
     "no-unused-expression": true,

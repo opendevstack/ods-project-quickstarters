@@ -13,7 +13,7 @@ the ODS [jenkins shared library](https://github.com/opendevstack/ods-jenkins-sha
 
 ### Currently available slaves
 1. [Maven / Gradle](maven/README.md) 
-1. [Nodejs 8](nodejs8-angular/README.md)
+1. [nodeJS 10](nodejs10-angular/README.md)
 1. [Scala & SBT](scala/README.md)
 1. [Python](python/README.md)
 

@@ -46,7 +46,8 @@ def stageBuild(def context) {
               . \$(pwd)/venv/bin/activate &&
               pip install -r src/test_requirements.txt &&
               export PYTHONPATH="src" &&
-              cd src/tests && nosetests -v
+              cd src/tests &&
+              nosetests -v --with-coverage --cover-xml --cover-erase --cover-inclusive --cover-package=..
           """
       }
       stage('PEP8') {

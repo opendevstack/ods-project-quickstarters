@@ -33,9 +33,6 @@ cd $COMPONENT
 
 sudo chown -R $OWNER .
 
-# Change typescript version to 2.8.0 as a workaround for https://github.com/ReactiveX/rxjs/issues/4512
-sed -i -e 's|\(.*"typescript"\): "\(.*\)"\(.*\)|\1: '"\"2.8.1\"\3|" ./package.json
-
 echo "Configure headless chrome in karma.conf.j2"
 read -r -d "" CHROME_CONFIG << EOM || true
     browsers: \['ChromeNoSandboxHeadless'\],\\
@@ -77,5 +74,21 @@ repo_path=$(echo "$GROUP" | tr . /)
 sed -i.bak "s|org/opendevstack/projectId|$repo_path|g" $SCRIPT_DIR/files/docker/Dockerfile
 rm $SCRIPT_DIR/files/docker/Dockerfile.bak
 
+# The following commands copy custom files over the generated ones from the call
+# of "ng new" above. The custom files were created based on the generated ones
+# and the following changes:
+#   - package.json:
+#       - replaced value of "name" with placeholder "$COMPONENT"
+#       - added parameters to the commands in "scripts"
+#       - added "devDependencies" for "rxjs-tslint" and "tslint-sonarts"
+#   - tslint.json:
+#       - added linter rules from "rxjs-tslint" and "tslint-sonarts"
+#       - explicitly mention or disable some of the stricter SonarQube rules:
+#         "cognitive-complexity", "no-commented-code", "no-duplicate-string"
+#
+# Please note: When updating to a newer Angular version, please update those files accordingly.
 echo "copy custom files from quickstart to generated project"
+rm ./package.json
+rm ./tslint.json
 cp -rv $SCRIPT_DIR/files/. .
+sed -i "s/\$COMPONENT/${COMPONENT}/" ./package.json

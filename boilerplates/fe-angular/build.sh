@@ -1,6 +1,10 @@
 #!/bin/bash
 
+# Please note: When updating to a newer Angular version, please also update
+# files under "./files" that overwrite generated ones
+# see details on bottom of "./init.sh"
 ANGULAR_CLI_VERSION=6.0.7
+
 JENKINS_SLAVE=cd/jenkins-slave-nodejs8-angular:latest
 
 while [[ $# -gt 1 ]]
@@ -37,7 +41,7 @@ sudo docker pull \
 
 sudo docker tag \
   ${OCP_DOCKER_REGISTRY}/${JENKINS_SLAVE} ${JENKINS_SLAVE}
-  
+
 sudo docker build \
   --rm \
   -t ng:latest -t ng:$ANGULAR_CLI_VERSION \

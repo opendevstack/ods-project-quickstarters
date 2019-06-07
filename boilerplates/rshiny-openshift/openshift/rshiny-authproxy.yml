@@ -2,9 +2,7 @@ apiVersion: v1
 kind: Template
 labels:
   template: rshiny-authproxy
-  app: ${PROJECT}
-  component: ${COMPONENT}-authproxy
-  env: '${ENV}'
+  app: '${PROJECT}-${COMPONENT}'
 parameters:
 - description: The name of the application project.
   displayName: Project

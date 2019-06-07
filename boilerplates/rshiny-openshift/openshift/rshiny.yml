@@ -2,9 +2,7 @@ apiVersion: v1
 kind: Template
 labels:
   template: rshiny
-  app: '${PROJECT}'
-  component: '${COMPONENT}'
-  env: '${ENV}'
+  app: '${PROJECT}-${COMPONENT}'
 parameters:
 - description: The name of the application project.
   displayName: Project

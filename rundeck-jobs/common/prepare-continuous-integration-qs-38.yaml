@@ -52,7 +52,8 @@
     commands:
     - description: clone quickstarter project - origin/task/tailor-for-update-templates
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/task/tailor-for-update-templates
-    - description: generate openshift folder in generated project if needed.
+    - description: setup openshift folder in generated project if not provided.
+      # This is used by the shared library to call  tailor to create/update OpenShift resources.
       script: |-
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/
         PROJECT="@option.project_id@" \

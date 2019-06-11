@@ -1,4 +1,4 @@
-- description: 'Setup Jenkins and openshift and push to github '
+- description: 'Setup Jenkins pipeline to process openshift when building pushed bitbucket repo.'
   executionEnabled: true
   group: common
   id: a4b3dd35-49f1-4cde-a3ea-18ab8690326b
@@ -40,13 +40,26 @@
   sequence:
     commands:
     - description: clone quickstarter project
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters && cd ods-project-quickstarters && git checkout origin/production
-    - description: create rshiny app in openshift
-      jobref:
-        args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
-        group: openshift
-        name: create-rshiny
-        nodeStep: 'true'
+      exec: >-
+        mkdir /tmp/rundeck_${job.id}_${job.execid} &&
+        cd  /tmp/rundeck_${job.id}_${job.execid} &&
+        git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git &&
+        cd ods-project-quickstarters &&
+        git checkout origin/production
+    - description: clone oc config project
+      exec: >-
+        cd /tmp/rundeck_${job.id}_${job.execid} &&
+        git clone ${globals.bitbucket_sshhost}/opendevstack/ods-configuration.git &&
+        cd ods-configuration &&
+        git checkout origin/master
+    - description: setup openshift folder in generated project.
+      # This is used by the shared library to call  tailor to create/update OpenShift resources.
+      script: |-
+        cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/
+        PROJECT="@option.project_id@" \
+        COMPONENT="@option.component_id@" \
+        TARGET_DIR="@option.quickstarter_directory@" \
+        /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/rshiny-openshift/init-rshiny-openshift.sh
     - description: add Jenkinsfile to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@

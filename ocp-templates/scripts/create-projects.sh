@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -eu
+
 # This script creates the 3 OCP projects we currently require for every
 # OD project.
 # * project-cd  : containing jenkins
@@ -20,14 +22,6 @@ case $key in
     PROJECT="$2"
     shift # past argument
     ;;
-    -u|--cd_user)
-    CD_USER="$2"
-    shift # past argument
-    ;;
-    -w|--cd_pwd)
-    CD_USER_PWD="$2"
-    shift # past argument
-    ;;
 	-a|--project_admins)
     OD_PRJ_ADMINS="$2"
     shift # past argument
@@ -41,7 +35,8 @@ case $key in
     shift # past argument
     ;;
     *)
-    echo "Ignoring unknown option: $1"
+        echo "Unknown option: $1. Exiting."
+        exit 1
     ;;
 esac
 shift # past argument or value

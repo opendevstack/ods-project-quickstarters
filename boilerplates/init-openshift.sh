@@ -65,6 +65,7 @@ TAILOR_ENV
 namespace ${PROJECT}-${ENV}
 param-file ${PROJECT}-${ENV}.env
 svc,dc,is,bc
+ignore-unknown-parameters true
 ignore-path bc:/spec/output/to/name,bc:/spec/output/imageLabels
 TAILORFILE
 done

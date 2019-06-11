@@ -19,7 +19,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: ${COMPONENT}:latest
+        name: ${COMPONENT}:${TAGVERSION}
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -43,4 +43,8 @@ parameters:
 - description: The environment stage.
   displayName: Environment
   name: ENV
+  required: true
+- description: The version to be used .
+  displayName: Environment
+  name: TAGVERSION
   required: true

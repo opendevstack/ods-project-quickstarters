@@ -1,5 +1,5 @@
 - description: |-
-    TEST - Setup Jenkins pipeline and openshift and push to bitbucket
+    TEST - Setup Jenkins pipeline to process openshift when building pushed bitbucket repo.
 
     Testing for [Replace upload-templates.sh with tailor · Issue #38 · opendevstack/ods-project-quickstarters](https://github.com/opendevstack/ods-project-quickstarters/issues/38)
   executionEnabled: true

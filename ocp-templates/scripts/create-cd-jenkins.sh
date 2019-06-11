@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -ux
 
 # This script sets up the cd/jenkins-master and the associated webhook proxy.
 
@@ -29,7 +30,8 @@ case $key in
     shift
     ;;
     *)
-    echo "Ignoring unknown option: $1"
+        echo "Unknown option: $1. Exiting."
+        exit 1
     ;;
 esac
 shift # past argument or value

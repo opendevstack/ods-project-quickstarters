@@ -44,7 +44,7 @@ parameters:
   displayName: Environment
   name: ENV
   required: true
-- description: The version to be used .
-  displayName: Environment
+- description: The version to be used.
+  displayName: tag version
   name: TAGVERSION
   required: true

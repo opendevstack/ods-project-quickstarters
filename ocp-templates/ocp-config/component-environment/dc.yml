@@ -33,7 +33,7 @@ objects:
             env: '${ENV}'
         spec:
           containers:
-            - image: '${PROJECT}-${ENV}/${COMPONENT}:latest'
+            - image: '${PROJECT}-${ENV}/${COMPONENT}:${TAGVERSION}'
               imagePullPolicy: IfNotPresent
               name: '${COMPONENT}'
               ports:
@@ -60,7 +60,7 @@ objects:
               - '${COMPONENT}'
             from:
               kind: ImageStreamTag
-              name: '${COMPONENT}:latest'
+              name: '${COMPONENT}:${TAGVERSION}'
               namespace: '${PROJECT}-${ENV}'
           type: ImageChange
 parameters:
@@ -85,4 +85,8 @@ parameters:
     displayName: Memory Limit
     description: Maxiroutemum amount of memory the Node.js container can use.
     value: 1Gi
+    required: true
+  - name: TAGVERSION
+    displayName: tag version
+    description: The version to be used.
     required: true

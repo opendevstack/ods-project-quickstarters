@@ -33,11 +33,15 @@ def load_remote_model(train_pod_url, git_commit):
             auth=HTTPBasicAuth(username=username, password=password),
             stream=True)
 
-        with open(git_commit, 'wb') as f:
-            f.write(response.content)
+        if response.status_code == 200:
+            with open(git_commit, 'wb') as f:
+                f.write(response.content)
+            predictor = joblib.load(git_commit)
+            print("model loaded")
+        else:
+            print("/getmodel endpoint from training pod returned: {0}".format(response.content))
+            return None
 
-        print("model loaded")
-        predictor = joblib.load(git_commit)
         return predictor
     except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError,
             ConnectionResetError, RequestException):
@@ -55,5 +59,5 @@ def load_model(train_pod_url, git_commit):
     """
     predictor = load_remote_model(train_pod_url, git_commit)
     if not predictor:
-        predictor = joblib.load("resources/local.model")
+        predictor = joblib.load("{}.model".format(git_commit))
     return predictor

@@ -16,7 +16,9 @@ respectively,
 developed in the current commit either locally on OpenShift or execute the training on a remote
 linux system using ssh. The training process is wrapped into a flask server to be able to monitor
  and possible restart the training process. Moreover, the training service offers an endpoint
- for downloading the created model afterwards.
+ for downloading the created model afterwards. Additionally, unittests and 
+ integration tests are executed on the training pod, in order to not depend on operating 
+ dependencies in the jenkins slave.
 
  - The `docker-prediction` container provides a simple flask service for getting new predictions out
  of your model by making json posts to the prediction REST endpoint.
@@ -25,7 +27,7 @@ linux system using ssh. The training process is wrapped into a flask server to b
 ### Jenkins ###
 The `Jenkinsfile` organizes the correct succession of spinning up the training, executing it and
 starting the new deployment of the prediction service.
-Additionally, it executes unittest ensuring the code is functionally before a new training
+Additionally, it triggers unittest ensuring the code is functionally before a new training
 process is started.
  Moreover, integration tests are run against the reproduced model wrapped into the prediction 
  REST endpoint to
@@ -115,6 +117,47 @@ When done: stop the containers
 ```
 [Ctrl+C]
 ```
+
+## Data Versioning ##
+In order to ensure complete reproducibility, in case train and/or test data can't be committed to
+ a git repository due to size or confidentiality/data privacy considerations, data versioning can
+  be achieved using the built in [dvc](https://dvc.org) data version capabilities.`
+  Moreover, technical user account is needed so that the CI/CD pipeline is able to pull the data 
+  dependencies from the remote data versioning repository.
+  
+Do the following steps in order to make use of the data versioning capabilities  
+1. Initialize the quickstarter repository as a `dvc` repository:  
+```dvc init``` 
+2. Setup the a remote repository on a remote ssh machine, e.g. Data Lake   
+```dvc remote add <remote_name>  ssh://<remote_server>:/<path_to_storage>```
+3. Configure authentification. For local development you can set your own user account, assuming 
+it has access to `<path_to_storage>` or use a technical user account.  
+```dvc remote modify <remote_repository_name> user <technical_user_account>```   
+and set the prompt for password, so that you don't commit your password to the repository   
+```dvc remote modify <remote_name> ask_password True```
+4. Start adding files that should be tracked by data versioning   
+``` dvc add <some_file>```   
+this will create a new file with meta information about `<some_file>` called `<some_file>.dvc`. 
+This meta file needs to be tracked with git, so that it is ensured that each git commit is linked
+ with a specific data version   
+ ```git add .gitignore <some_file>.dvc```
+5. Modify your train() and potentially the integration tests to pull the data dependencies from 
+the remote repository. A helper class is provided in `src/services/remote/dvc/data_sync.py` that can
+ be used as follows:       
+ ```from services.infrastructure.remote.dvc.data_sync import DataSync ```   
+ ```syncer = DataSync(dvc_data_repo, dvc_ssh_user, dvc_ssh_password)```
+```syncer.pull_data_dependency(file_name)```
+6. Commit your code and push the data versioned files to the remote repository  
+````git commit````    
+```dvc push -r <remote_name>```   
+```git push```
+
+7. In order for a successful Jenkins build, the following environment variables need to be set in
+ the `training` pod deployment: `DSI_DVC_REMOTE`, `DSI_SSH_USERNAME`, `DSI_SSH_PASSWORD
+ 
+ 
+  
+
 
 ## Example & Example Dataset ##
 An example implementation of a custom model is given in `src/model`, to demonstrate how to organize
@@ -218,6 +261,7 @@ There is not need for any kind of payload in all endpoints.
 | DSI_SSH_PASSWORD | SSH password for remote execution  | string |
 | DSI_SSH_HTTP_PROXY | HTTP proxy url for remote execution. This is needed if the remote machine needs the proxy for download packages and resources  | string |
 | DSI_SSH_HTTPS_PROXY | HTTPS proxy url for remote execution. This is needed if the remote machine needs the proxy for download packages and resources  | string |
+| DSI_DVC_REMOTE | Name of the dvc remote repository that has been initialized with dvc  | string |
 
 ### Environment Variables for prediction ###
 

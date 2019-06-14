@@ -46,6 +46,7 @@ class TestIntegrationPrediction(unittest.TestCase):
             predicted_values.append(res)
 
         # get accuracy
-        accuracy = accuracy_score(predicted_values, self.test_data["Species"].values.tolist())
+        accuracy = accuracy_score(predicted_values, self.test_data[
+            self.predictor.target_variable].values.tolist())
         print(accuracy)
         self.assertGreaterEqual(accuracy, self.min_performance)

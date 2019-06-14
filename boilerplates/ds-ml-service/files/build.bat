@@ -24,7 +24,6 @@ del temp.txt
 del docker-training\dist\ /S /Q
 del docker-prediction\dist\ /S /Q
 
-
 xcopy /s src docker-training\dist\
 xcopy /s src docker-prediction\dist\
 xcopy /s resources docker-training\dist\

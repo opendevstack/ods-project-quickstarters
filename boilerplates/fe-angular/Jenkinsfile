@@ -20,7 +20,7 @@ library identifier: 'ods-library@production', retriever: modernSCM(
   eg. to create and set your own builder slave instead of 
   the node js slave used here - the code of the slave can be found at
   https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular
- */ 
+ */
 odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
   projectId: projectId,
@@ -41,7 +41,9 @@ odsPipeline(
 def stageBuild(def context) {
   stage('Build') {
     withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}"]) {
+      sh "yarn --version"
       sh "yarn install"
+      sh "yarn ng version"
       sh "yarn build"
     }
     sh "cp -r dist/${context.componentId} docker/dist"
@@ -49,13 +51,13 @@ def stageBuild(def context) {
 }
 
 def stageUnitTest(def context) {
-    stage('Unit Test') {
-      sh "yarn test -- --single-run --progress false"
-    }
+  stage('Unit Test') {
+    sh "yarn test"
+  }
 }
 
 def stageLint(def context) {
   stage('Lint') {
-    sh "npm run lint"
+    sh "yarn lint"
   }
 }

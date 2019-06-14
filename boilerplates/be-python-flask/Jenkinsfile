@@ -31,37 +31,44 @@ odsPipeline(
   ]
 ) { context ->
   stageBuild(context)
-  stageScanForSonarqube(context)
   stageStartOpenshiftBuild(context, [nexusHostWithBasicAuth: context.nexusHostWithBasicAuth])
   stageDeployToOpenshift(context)
-  stageTriggerAllBuilds(context)
 }
 
 def stageBuild(def context) {
   withEnv(["TAGVERSION=${context.tagversion}"]) {
       stage('Test') {
-        sh """
-              pip install --user virtualenv &&
-              virtualenv venv &&
-              . \$(pwd)/venv/bin/activate &&
-              pip install -r src/test_requirements.txt &&
-              export PYTHONPATH="src" &&
-              cd src/tests && nosetests -v
-          """
+        def status = sh(
+          script: """
+            pip install --user virtualenv &&
+            virtualenv venv &&
+            . \$(pwd)/venv/bin/activate &&
+            pip install -r src/test_requirements.txt &&
+            export PYTHONPATH="src" &&
+            cd src/tests &&
+            nosetests -v --with-xunit --with-coverage --cover-xml --cover-erase --cover-inclusive --cover-package=..
+          """,
+          returnStatus: true
+        )
+        junit 'src/tests/*.xml'
+        stageScanForSonarqube(context)
+        if (status != 0) {
+          error "One or more unit tests failed!"
+        }
       }
       stage('PEP8') {
         // Stage is VERY IMPORTANT! Do not remove or comment!
         sh """
-             cd src &&
-             pycodestyle --show-source --show-pep8 . &&
-             pycodestyle --statistics -qq .
+          cd src &&
+          pycodestyle --show-source --show-pep8 . &&
+          pycodestyle --statistics -qq .
         """
       }
       stage('Build') {
          sh """
-            mkdir docker/dist
-            cp -r src docker/dist
-          """
+           mkdir docker/dist
+           cp -r src docker/dist
+         """
       }
   }
 }

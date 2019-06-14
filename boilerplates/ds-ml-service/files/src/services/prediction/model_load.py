@@ -6,6 +6,9 @@ from requests.exceptions import RequestException
 from services.infrastructure.environment import training_auth
 
 
+import os
+
+
 def load_remote_model(train_pod_url, git_commit):
     """Helper function for loading a model from the remote training service. Using the *getmodel*
     endpoint of the training service.

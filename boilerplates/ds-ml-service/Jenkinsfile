@@ -89,7 +89,6 @@ def stageTraining(def context) {
         trainingUsername = sh(returnStdout: true, script:"echo \"${trainingUsername}\" | base64 --decode").trim()
 
         sh "oc port-forward ${trainingPodInfo[0]} 8080 -n ${context.targetProject} &"
-        sh "pip install requests"
         sh  "python3 jenkinsfile_helper.py --training-service ${trainingRoute} --username \"${trainingUsername}\" --password \"${trainingPassword}\""
     }
 }

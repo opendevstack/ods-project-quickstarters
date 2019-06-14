@@ -61,7 +61,7 @@ def start_training():
             raise Exception("{0} has a unknown value '{1}'".format(DSI_EXECUTE_ON, environment))
 
         logging.getLogger(__name__).info("Training execution ended!!!")
-    except Exception:
+    except Exception as training_exc:
         # This exception is broad because we cannot forseen all possible exceptions in
         # the DS train code.
         # Also, since this train is beeing executed in a separed thread all exceptions
@@ -71,8 +71,7 @@ def start_training():
         traceback.print_exc(file=f)
         f.seek(0)
         logging.getLogger(__name__).error(f.read())
-    finally:
-        _executor.futures.pop(TRAINING_KEY)
+        raise ValueError(training_exc)
 
 
 @app.route('/')
@@ -103,7 +102,7 @@ def get_model():
         return send_file(filename_or_fp=file,
                          mimetype="octet-stream",
                          attachment_filename=model_path,
-                         as_attachment=True)
+                         as_attachment=True), 200
     else:
         return jsonify({'error': "Model could not be found"}), 404
 
@@ -163,9 +162,14 @@ def finished():
 
     """
     if _executor.futures.running(TRAINING_KEY):
-        return jsonify({'finished': False})
+        return jsonify({'finished': False}), 200
     else:
-        return jsonify({'finished': True})
+        training_exc = _executor.futures.exception(TRAINING_KEY)
+        _executor.futures.pop(TRAINING_KEY)
+        if training_exc:
+            return jsonify({'finished': "Training ended with error: {}".format(training_exc)}), 500
+        else:
+            return jsonify({'finished': True}), 200
 
 
 if __name__ == '__main__':

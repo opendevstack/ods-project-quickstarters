@@ -26,7 +26,8 @@ esac; shift; done
 cd $TARGET_DIR
 
 echo "Init react app"
-npm init react-app $COMPONENT --use-npm
+sudo docker run --rm -v $PWD:/data -w /data node \
+  npm init react-app $COMPONENT --use-npm
 
 cd $COMPONENT
 

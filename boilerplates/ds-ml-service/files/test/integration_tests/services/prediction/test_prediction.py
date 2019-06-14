@@ -6,6 +6,8 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 
 from services.prediction.app import app
+# from services.infrastructure.remote.dvc.data_sync import DataSync
+# from services.infrastructure.environment import ssh_username, ssh_password, dvc_remote
 
 
 class TestIntegrationPrediction(unittest.TestCase):
@@ -17,6 +19,10 @@ class TestIntegrationPrediction(unittest.TestCase):
         self.username = "user"
         self.password = "password"
         app.config['USERS'][self.username] = self.password
+
+        # Keep in mind to also sync the test data, if you trained remotely
+        # syncer = DataSync(dvc_remote(), ssh_username(), ssh_password())
+        # syncer.pull_data_dependency(<test_training_file>)
 
         # read held back test data
         self.test_data = pd.read_csv("resources/test.csv")

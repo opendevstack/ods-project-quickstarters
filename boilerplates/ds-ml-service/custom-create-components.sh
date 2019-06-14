@@ -70,15 +70,15 @@ for devenv in dev test ; do
         if [ ${type} = "training-service" ]; then
             oc create secret generic ${COMPONENT}-training-secret --from-literal=username=${COMPONENT}-training-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${PROJECT}-${devenv}
             oc set triggers dc/${COMPONENT}-${type} --from-config --remove -n ${PROJECT}-${devenv}
-            oc env dc/${COMPONENT}-${type} --env=DSI_EXECUTE_ON=LOCAL -n ${PROJECT}-${devenv}
-            oc env dc/${COMPONENT}-${type} --from=secret/${COMPONENT}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${PROJECT}-${devenv}
+            oc set env dc/${COMPONENT}-${type} --env=DSI_EXECUTE_ON=LOCAL -n ${PROJECT}-${devenv}
+            oc set env dc/${COMPONENT}-${type} --from=secret/${COMPONENT}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${PROJECT}-${devenv}
             oc set triggers dc/${COMPONENT}-${type} --from-config -n ${PROJECT}-${devenv}
         else
             oc create secret generic ${COMPONENT}-prediction-secret --from-literal=username=${COMPONENT}-prediction-username --from-literal=password=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64  | rev | cut -b 2- | rev | tr -cd '[:alnum:]'` -n ${PROJECT}-${devenv}
             oc set triggers dc/${COMPONENT}-${type} --from-config --remove -n ${PROJECT}-${devenv}
-            oc env dc/${COMPONENT}-${type} --env=DSI_TRAINING_BASE_URL=http://${COMPONENT}-training-service.${PROJECT}-${devenv}.svc:8080 -n ${PROJECT}-${devenv}
-            oc env dc/${COMPONENT}-${type} --from=secret/${COMPONENT}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${PROJECT}-${devenv}
-            oc env dc/${COMPONENT}-${type} --from=secret/${COMPONENT}-prediction-secret --prefix=DSI_PREDICTION_SERVICE_ -n ${PROJECT}-${devenv}
+            oc set env dc/${COMPONENT}-${type} --env=DSI_TRAINING_BASE_URL=http://${COMPONENT}-training-service.${PROJECT}-${devenv}.svc:8080 -n ${PROJECT}-${devenv}
+            oc set env dc/${COMPONENT}-${type} --from=secret/${COMPONENT}-training-secret --prefix=DSI_TRAINING_SERVICE_ -n ${PROJECT}-${devenv}
+            oc set env dc/${COMPONENT}-${type} --from=secret/${COMPONENT}-prediction-secret --prefix=DSI_PREDICTION_SERVICE_ -n ${PROJECT}-${devenv}
             oc set triggers dc/${COMPONENT}-${type} --from-config -n ${PROJECT}-${devenv}
         fi
 

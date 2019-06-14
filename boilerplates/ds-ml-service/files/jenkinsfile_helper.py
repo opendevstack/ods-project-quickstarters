@@ -59,7 +59,6 @@ def wait_for_training():
                 '{0}/finished'.format(host), auth=auth, stream=True)
             res_json = response.json()
             if res_json['finished']:
-
                 if response.status_code == 500:
                     raise Exception(res_json)
                 finished = True

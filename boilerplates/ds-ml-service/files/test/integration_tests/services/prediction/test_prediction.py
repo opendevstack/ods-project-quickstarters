@@ -22,7 +22,7 @@ class TestIntegrationPrediction(unittest.TestCase):
 
         # Keep in mind to also sync the test data, if you trained remotely
         # syncer = DataSync(dvc_remote(), ssh_username(), ssh_password())
-        # syncer.pull_data_dependencies()
+        # syncer.pull_data_dependency(<test_training_file>)
 
         # read held back test data
         self.test_data = pd.read_csv("resources/test.csv")

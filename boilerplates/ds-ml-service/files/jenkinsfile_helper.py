@@ -42,7 +42,7 @@ def start_training(host_url, http_auth):
 
 
 def wait_for_training():
-    """check every 5 seconds if the training has finished using the *finished* endpoint fromt he
+    """check every 5 seconds if the training has finished using the *finished* endpoint from the
     training service
 
     Returns
@@ -59,6 +59,8 @@ def wait_for_training():
                 '{0}/finished'.format(host), auth=auth, stream=True)
             res_json = response.json()
             if res_json['finished']:
+                if response.status_code == 500:
+                    raise Exception(res_json)
                 finished = True
                 print("Training finished")
                 return finished

@@ -21,7 +21,7 @@ def train(model_name=GIT_COMMIT, train_data='resources/train.csv', dvc_data_repo
     Notes
     -----
     This function can also be used for your local exploration/development. See the
-    >>> if __name__ and "__main__"
+    # >>> if __name__ and "__main__"
 
     Parameters
     ----------
@@ -38,7 +38,7 @@ def train(model_name=GIT_COMMIT, train_data='resources/train.csv', dvc_data_repo
     In order to pull /optional) dependencies over the integrated data versioning provided by dvc,
     do:
         $ syncer = DataSync(dvc_data_repo, dvc_ssh_user, dvc_ssh_password)
-        $ syncer.pull_data_dependencies()
+        $ syncer.pull_data_dependency(train_data)
     This will synchronize the dvc data dependencies and training can be conducted
     """
     # where to get the data -> hard coded for now
@@ -46,6 +46,7 @@ def train(model_name=GIT_COMMIT, train_data='resources/train.csv', dvc_data_repo
 
     # initiate & train model
     logging.getLogger(__name__).info("Starting classification training...")
+
     classification_model = ModelWrapper()
     classification_model.prep_and_train(data)
     logging.getLogger(__name__).info("Starting classification training... Done")

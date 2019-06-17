@@ -1,45 +1,96 @@
-# Python & Flask Server (be-python-flask)
+#Python Flask Quickstarter (be-python-flask) 
+The project supports generation of Python Flask project boilerplate and quick 
+installation and integration of it with OpenShift CD pipelines.
 
-## Purpose of this quickstarter
-Use this quickstarter when you want to build a [python](http://flask.pocoo.org/docs/1.0/tutorial/) based server application, e.g. for a trained data science model or for hard data crunching
+##Purpose of this quickstarter
+The quickstarter is simmple WEB-server written on Python using Flask framework.
+The package allows easily build a Python project, using different Python modules
+and frameworks.
+It contains the basic setup for Docker, Jenkins, SonarQube and OpenShift.
 
-It contains the basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).
+##What files / architecture is generated?
+    
+    ├── Jenkinsfile - This file contains Jenkins build configuration settings
+    ├── README.md
+    ├── files
+    │   ├── docker - This folder contains Docker configuration settings
+    │   │   ├── Dockerfile
+    │   │   └── run.sh - This bash script solves issue with permissions for a container user
+    │   └── src
+    │       ├── app.py - This file is the main entry point in the project. 
+    │       ├── requirements.txt - This file contains a list of required Python modules to run application
+    │       ├── static
+    │       │   ├── css
+    │       │   │   └── main.css
+    │       │   └── img
+    │       │       └── bix.jpg
+    │       ├── templates - Flask view teplates
+    │       │   └── base.html
+    │       ├── test_requirements.txt - This file contains a list of required Python modules to runt tests
+    │       └── tests
+    │           ├── __init__.py
+    │           └── tests.py
+    ├── init.sh 
+    └── sonar-project.properties - This file contains SonarQube configuration settings
+    
+##Frameworks used
+- [Flask](http://flask.pocoo.org/)
+- [Nose](https://nose.readthedocs.io/en/latest/)
 
-## What files / architecture is generated?
+##Usage - how do you start after you provisioned this quickstarter
+The project should be started automatically by OpenShift. Server should be started
+on the port 8080 in the debug mode.
+```python
+app.run('0.0.0.0', 8080, debug=True)
+```
+To disable a debug mode set debug to **False**.
 
-## Frameworks used
-1.  [Python (^3)](https://docs.python.org/3/tutorial/)
+To run application locally - specify the next command in a console:
+```bash
+python app.py
+```
+If you run application the first time, please install dependencies with the next
+command:
+```bash
+pip install -r requirements.txt
+```
+It is recommended when you work with a Python project use separated environment 
+for every of your project. For this purpose usually iis used 
+[virtualenv](https://virtualenv.pypa.io/en/latest/) package.
 
-## Usage - how do you start after you provisioned this quickstarter
+```bash
+# Command install virtualenv package (run only once)
+pip install virtualenv
+# Creates virtual environment 'venv' (will be located in the folder venv) (run only once)
+virtualenv venv
 
-1. In case of added/changed requirements.txt do `install --user -r requirements.txt` in the `src` dir.
-1. In `src` run your app thru `python3 app.py`
+# Initiate virtual environment for the project (every time)
+source venv/bin/activate
 
-## How this quickstarter is built thru jenkins
+# Runs installation of required modules in the virtual environment (run only once)
+pip install -r requirements.txt
 
-The build pipeline is defined in the `Jenkinsfile` in the project root. The mains stages of the pipeline are, 
-1.  Build :  `python` command will be executed to test your applicaton and then the `src` dir will be copied to the `docker/dist` folder. 
-
-``` python
-def stageBuild(def context) {
-  stage('Build') {
-    withEnv(["TAGVERSION=${context.tagversion}"]) {
-      sh "python src/tests.py"
-      // PEP8
-      sh '''
-         pycodestyle --show-source --show-pep8 src/*
-         pycodestyle --statistics -qq src/*
-      '''
-    }
-    sh "cp -r src docker/dist"
-  }
-}
+# Start your application
+python app.py
 ```
 
-## Builder Slave used 
-This quickstarter uses the
-[Python3 slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python)
-builder slave
+##How this quickstarter is built through Jenkins
+The Jenkinsfile is provisioned with this quick starter to ease CI/CD process. In Jenkinsfile, there are various stages:
 
-## Known limitations
-n/a
+
+- **Test** - Runs unit test cases by executing command:
+    ```bash
+    nosetests -v
+    ```
+- **PEP** 8 - Runs lint profiler by running command:
+    ```bash
+    pycodestyle --show-source --show-pep8 . &&
+    pycodestyle --statistics -qq .
+    ```
+- **Build** - Builds the application, copies output folder dist into docker/dist folder.
+
+##Builder Slave used
+This quickstarter uses [Python](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python) builder slave Jenkins builder slave.
+
+##Known limitations
+NA

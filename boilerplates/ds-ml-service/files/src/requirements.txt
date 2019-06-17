@@ -7,3 +7,4 @@ numpy==1.16.0
 joblib==0.13.1
 fabric==2.4.0
 Flask-HTTPAuth==3.2.4
+dvc==0.35.7

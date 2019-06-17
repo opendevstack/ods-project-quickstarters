@@ -1,3 +1,4 @@
+/* generated jenkins file used for building and deploying @component_id@ in projects @project_id@ */
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
@@ -13,7 +14,13 @@ library identifier: 'ods-library@1.0.x', retriever: modernSCM(
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
 
-// See readme of shared library for usage and customization.
+/*
+  See readme of shared library for usage and customization
+  @ https://github.com/opendevstack/ods-jenkins-shared-library/blob/master/README.md
+  eg. to create and set your own builder slave instead of 
+  the node js slave used here - the code of the slave can be found at
+  https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular
+ */
 odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-nodejs8-angular",
   projectId: projectId,
@@ -33,8 +40,8 @@ odsPipeline(
 def stageBuild(def context) {
   stage('Build') {
     withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}"]) {
-      sh "yarn install"
-      sh "yarn build"
+      sh "npm ci"
+      sh "npm run build"
     }
     sh "cp -r build docker/dist"
   }
@@ -43,7 +50,7 @@ def stageBuild(def context) {
 def stageUnitTest(def context) {
     stage('Unit Test') {
       withEnv(["CI=true"]){
-        sh "yarn test"
+        sh "npm test"
       }
     }
 }

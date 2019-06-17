@@ -1,22 +1,21 @@
 FROM registry.access.redhat.com/rhscl/python-36-rhel7
 
-ARG nexus_username
-ARG nexus_password
-ARG nexus_url
+ARG nexusHostWithBasicAuth
 
 WORKDIR /app
 
 ENV PYTHONPATH=$PYTHONPATH:/app
 
+
 COPY dist/requirements.txt /app
+
 
 USER 1001
 
 # Front load pip install for caching docker build layers
-RUN pip install --upgrade pip && \
-    if [[ ! -z ${nexus_url} ]]; \
-    then pip install -i https://${nexus_username}:${nexus_password}@${nexus_url:8}/repository/pypi-all/simple -r requirements.txt; \
-    else pip install -r requirements.txt; \
+RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 
 COPY dist /app

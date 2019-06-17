@@ -16,6 +16,8 @@ DSI_SSH_PORT = "DSI_SSH_PORT"
 DSI_SSH_HTTPS_PROXY = "DSI_SSH_HTTPS_PROXY"
 DSI_SSH_HTTP_PROXY = "DSI_SSH_HTTP_PROXY"
 
+DSI_DVC_REMOTE = "DSI_DVC_REMOTE"
+
 NEXUS_USERNAME = "NEXUS_USERNAME"
 NEXUS_PASSWORD = "NEXUS_PASSWORD"
 NEXUS_URL = "NEXUS_URL"
@@ -100,6 +102,19 @@ def ssh_port() -> int:
 
     """
     return int(os.getenv(DSI_SSH_PORT, "22"))
+
+
+def dvc_remote() -> Optional[str]:
+    """Variable indicating, if set that it the data dependencies should be pulled from the
+    particular dvc remote repository
+
+    Returns
+    -------
+    str
+        Returns DSI_DVC_REMOTE environment variable value
+
+    """
+    return os.getenv(DSI_DVC_REMOTE)
 
 
 def dsi_package() -> Optional[str]:

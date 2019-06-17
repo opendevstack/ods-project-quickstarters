@@ -24,7 +24,11 @@ del temp.txt
 del docker-training\dist\ /S /Q
 del docker-prediction\dist\ /S /Q
 
-
 xcopy /s src docker-training\dist\
 xcopy /s src docker-prediction\dist\
-copy resources\train.csv docker-training\dist\
+xcopy /s resources docker-training\dist\
+xcopy /s .dvc docker-training\dist\
+
+copy test\run_integration_tests.sh docker-training\dist
+copy test\run_unittests.sh docker-training\dist
+

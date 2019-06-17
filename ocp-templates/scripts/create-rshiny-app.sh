@@ -49,8 +49,6 @@ else echo "COMPONENT=${COMPONENT}"; fi
 for devenv in dev test ; do
   # create resources
   oc process cd//rshiny-app PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
-  # create build pipelines
-  oc process cd//component-pipeline PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} BITBUCKET_REPO=${BITBUCKET_REPO} | oc create -n ${PROJECT}-cd -f-
   # create image build configs
   oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
 done

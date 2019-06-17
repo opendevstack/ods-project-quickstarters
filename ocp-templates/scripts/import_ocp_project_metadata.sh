@@ -439,6 +439,7 @@ do
 	
 	oc project ${curr_ocp_namespace} >& /dev/null
 	
+	# assumption : if the project is there - it was created via opendevstack ...
     if [ $? -ne 0 ]; then 
         echo "Could not find project ${curr_ocp_namespace} - creating"
         
@@ -461,13 +462,6 @@ do
 			oc create -f project.yml$tmp_postfix
 		fi
 		
-		
-		# hacky ... 
-		for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
-		do		
-			oc policy add-role-to-user admin ${admin_user}
-		done
-
 		# admin for the creating SA and image pull rights
 		oc policy add-role-to-user admin system:serviceaccount:${OD_OCP_CD_SA_TARGET}
 		oc policy add-role-to-user system:image-puller system:serviceaccount:${OD_OCP_CD_SA_TARGET}
@@ -475,7 +469,7 @@ do
 		oc policy add-role-to-user view system:authenticated
 
 		# if jenkins CD is NOT part of the import it does not make sense to try to create the linking SA 
-		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"$cd"* ]];
+		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"cd"* ]];
 		then
 			echo "creating service account jenkins to modify build configs during jenkins build"
 			oc policy add-role-to-user admin system:serviceaccount:${project_name}-cd:jenkins -n ${project_name}-${ocp_proj_namespace_suffix}
@@ -486,19 +480,28 @@ do
 		if [[ $ocp_proj_namespace_suffix == "cd" ]]; then 
 			echo "--  not creating pull secret to OCP, this is CD - just adding image pull rights"
 			oc policy add-role-to-user system:image-puller system:serviceaccount:${project_name}-cd:jenkins -n cd
-		else
-			if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]]; then 
-				echo "Creating OCP OD pull secret"
-				oc create secret docker-registry odocp  --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
-				oc secrets link deployer odocp --for=pull                                   
-				oc secrets link default odocp --for=pull
-			else
-				echo "OCP OD Token not set - assuming local build"
-			fi
 		fi
 	else
 		echo "!!! Project ${curr_ocp_namespace} already exists - skipping creation"
     fi
+
+	secretkey=odocp
+	secretexists=$(oc get secret | grep "$secretkey")
+
+	if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ ! $secretexists == *"$secretkey"* ]]; then 
+		echo "Creating OCP OD pull secret for ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}"
+		oc create secret docker-registry ${secretkey} --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
+		oc secrets link deployer ${secretkey} --for=pull                                   
+		oc secrets link default ${secretkey} --for=pull
+	else
+		echo "OCP OD Token not set - assuming local build"
+	fi
+
+	# add admins
+	for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
+	do		
+		oc policy add-role-to-user admin ${admin_user}
+	done
 		
 	echo
     echo "    importing persistent volume claims"

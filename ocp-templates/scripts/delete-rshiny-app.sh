@@ -46,9 +46,9 @@ if [ -z ${COMPONENT+x} ]; then
     exit 1;
 else echo "COMPONENT=${COMPONENT}"; fi
 
-echo "deleting resources"
-oc process cd//rshiny-app PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=dev | oc delete -n ${PROJECT}-dev -f-
-echo "deleting cd pipeline"
-oc process cd//component-pipeline PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} BITBUCKET_REPO=${BITBUCKET_REPO} | oc delete -n ${PROJECT}-cd -f-
-echo "deleting environment bc"
-oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
+for devenv in dev test ; do
+	echo "deleting resources"
+	oc process cd//rshiny-app PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
+	echo "deleting environment bc"
+	oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc delete -n ${PROJECT}-${devenv} -f-
+done

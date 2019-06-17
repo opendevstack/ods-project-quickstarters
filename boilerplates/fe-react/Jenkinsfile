@@ -40,8 +40,8 @@ odsPipeline(
 def stageBuild(def context) {
   stage('Build') {
     withEnv(["TAGVERSION=${context.tagversion}", "NEXUS_HOST=${context.nexusHost}"]) {
-      sh "yarn install"
-      sh "yarn build"
+      sh "npm ci"
+      sh "npm run build"
     }
     sh "cp -r build docker/dist"
   }
@@ -50,7 +50,7 @@ def stageBuild(def context) {
 def stageUnitTest(def context) {
     stage('Unit Test') {
       withEnv(["CI=true"]){
-        sh "yarn test"
+        sh "npm test"
       }
     }
 }

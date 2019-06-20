@@ -79,7 +79,7 @@ def stageBuild(def context) {
 
 def stageTraining(def context) {
     stage('Train Model') {
-        sh(returnStdout: true, script:"pip install -i ${context.nexusHostWithBasicAuth}/repository/pypi-all/simple requests --user")
+        sh(returnStdout: true, script:"pip install -i ${context.nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${context.nexusHost.tokenize('//')[1]}  requests --user")
 
         trainingRoute = "http://localhost:8080"
 

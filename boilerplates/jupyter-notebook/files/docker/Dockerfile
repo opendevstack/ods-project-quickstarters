@@ -5,6 +5,7 @@ FROM registry.access.redhat.com/rhscl/python-36-rhel7
 LABEL maintainer="Stefan Klingelschmitt <stefan.klingelschmitt@boehringer-ingelheim.com>"
 
 ARG nexusHostWithBasicAuth
+ARG nexusHostWithoutScheme
 
 WORKDIR /app
 
@@ -15,7 +16,7 @@ COPY requirements.txt /app
 USER 1001
 # From load pip install for caching docker build layers
 RUN if [ ! -z ${nexusHostWithBasicAuth} ]; \
-    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r requirements.txt; \
+    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r src/requirements.txt; \
     else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 

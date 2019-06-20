@@ -133,7 +133,9 @@ private void patchBuildConfig(def context, def componentId = null) {
         context.tagversion
     }"},
     {"op": "replace", "path": "/spec/strategy/dockerStrategy", "value":{"buildArgs":[
-        {"name": "nexusHostWithBasicAuth" ,"value": "${context.nexusHostWithBasicAuth}"}]}},
+            {"name": "nexusHostWithBasicAuth" ,"value": "${context.nexusHostWithBasicAuth}"},
+            {"name": "nexusHostWithoutScheme" ,"value": "${context.nexusHost.tokenize('//')[1]}"}
+        ]}},
     ]' -n ${context.targetProject}"""
 }
 

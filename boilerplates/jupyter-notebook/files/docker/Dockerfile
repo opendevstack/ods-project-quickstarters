@@ -16,7 +16,7 @@ COPY requirements.txt /app
 USER 1001
 # From load pip install for caching docker build layers
 RUN if [ ! -z ${nexusHostWithBasicAuth} ]; \
-    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r src/requirements.txt; \
+    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r requirements.txt; \
     else pip install --upgrade pip && pip install -r requirements.txt; \
     fi
 

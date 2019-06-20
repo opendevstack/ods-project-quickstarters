@@ -9,6 +9,8 @@ ENV TERM linux
 ARG projectHome=/opt/app-root/src
 ARG home=${projectHome}
 ARG nexusHostWithBasicAuth
+ARG nexusHostWithoutScheme
+
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -64,7 +66,7 @@ ENV HOME=${projectHome}
 WORKDIR ${projectHome}
 
 RUN if [ ! -z ${nexusHostWithBasicAuth} ]; \
-    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithBasicAuth}/repository/pypi-all/simple -r src/requirements.txt; \
+    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r src/requirements.txt; \
     else pip install --upgrade pip && pip install -r src/requirements.txt; \
     fi
 

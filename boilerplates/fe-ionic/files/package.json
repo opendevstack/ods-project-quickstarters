@@ -46,6 +46,7 @@
     "@angular/cli": "^1.5.0",
     "@angular/router": "^4.4.6",
     "@types/jasmine": "^2.6.3",
+    "@types/node": "^8.0.0",
     "ionic-mocks": "^0.13.0",
     "jasmine-core": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",

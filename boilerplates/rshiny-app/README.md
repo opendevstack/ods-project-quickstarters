@@ -3,9 +3,16 @@
 Provisions a Rshiny application within openshift using crowd authentification.
 
 ## What files / architecture is generated?
-+-- Jenkinsfile  
-+-- Dockerfile    
-+-- app.R
+
+```
+.
+├── Jenkinsfile - This file contains Jenkins build configuration settings
+├── README.md - This readme file
+├── docker - This folder contains Docker configuration settings and main R shiny app
+    ├── Dockerfile
+    └── app.R
+```
+
 
 ## Frameworks used
 [R](https://www.tutorialspoint.com/r/index.htm)/[Rshiny](https://shiny.rstudio.com/tutorial/)

@@ -51,8 +51,8 @@ read -r -d "" CHROME_CONFIG << EOM || true
       },\\
     },
 EOM
-sed -i "s|\s*browsers: \['Chrome'\],|$CHROME_CONFIG|" ./src/karma.conf.js
-sed -i "s|\(browsers:\)|    \1|g" ./src/karma.conf.js
+sed -i "s|\s*browsers: \['Chrome'\],|$CHROME_CONFIG|" ./karma.conf.js
+sed -i "s|\(browsers:\)|    \1|g" ./karma.conf.js
 
 echo "Configure headless chrome in protractor.conf.js"
 read -r -d '' PROTRACTOR_CONFIG << EOM || true

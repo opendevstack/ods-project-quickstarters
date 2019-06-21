@@ -3,9 +3,9 @@
 # Please note: When updating to a newer Angular version, please also update
 # files under "./files" that overwrite generated ones
 # see details on bottom of "./init.sh"
-ANGULAR_CLI_VERSION=6.0.7
+ANGULAR_CLI_VERSION=8.0.3
 
-JENKINS_SLAVE=cd/jenkins-slave-nodejs8-angular:latest
+JENKINS_SLAVE=cd/jenkins-slave-nodejs10-angular:latest
 
 while [[ $# -gt 1 ]]
 do

@@ -32,7 +32,7 @@ RUN set -ex  && \
         m4 \
         automake \
         gettext \
-    ' \
+    ' && \
     apt-get update -yqq && \
     apt-get upgrade -yqq && \
     apt-get install -yqq --no-install-recommends \

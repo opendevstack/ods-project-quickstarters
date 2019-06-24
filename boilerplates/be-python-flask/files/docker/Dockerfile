@@ -1,6 +1,6 @@
 FROM python:3.7.0-slim
 
-MAINTAINER "Andras Gyacsok" <andras.gyacsok@boehringer-ingelheim.com>
+LABEL maintainer="Andras Gyacsok <andras.gyacsok@boehringer-ingelheim.com>"
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -10,7 +10,6 @@ ARG projectHome=/opt/app-root/src
 ARG home=${projectHome}
 ARG nexusHostWithBasicAuth
 ARG nexusHostWithoutScheme
-
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -32,7 +31,7 @@ RUN set -ex  && \
         m4 \
         automake \
         gettext \
-    ' \
+    ' && \
     apt-get update -yqq && \
     apt-get upgrade -yqq && \
     apt-get install -yqq --no-install-recommends \
@@ -49,7 +48,6 @@ RUN set -ex  && \
     # CLEAN UP
     apt-get autoremove -yqq --purge && \
     apt-get clean
-
 
 COPY run.sh ${projectHome}
 COPY dist ${projectHome}

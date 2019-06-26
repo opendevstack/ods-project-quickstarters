@@ -3,11 +3,66 @@ kind: Template
 labels:
   template: component-template
   app: '${PROJECT}-${COMPONENT}'
-  branch: '${BRANCH}'
 objects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        description: Exposes and load balances the application pods
+        service.alpha.openshift.io/dependencies: '[]'
+      labels:
+        branch: '${BRANCH}'
+      name: '${COMPONENT}'
+    spec:
+      ports:
+      -   name: 8080-tcp
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app: '${PROJECT}-${COMPONENT}'
+        deploymentconfig: '${COMPONENT}'
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      annotations:
+        description: Keeps track of changes in the application image
+      name: '${COMPONENT}'
+    spec:
+      dockerImageRepository: '${COMPONENT}'
+      lookupPolicy:
+        local: false
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      annotations:
+        description: Defines how to build the application
+      name: ${COMPONENT}
+    spec:
+      failedBuildsHistoryLimit: 5
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${COMPONENT}:${TAGVERSION}
+      postCommit: {}
+      resources: {}
+      runPolicy: Serial
+      source:
+        type: Binary
+        binary: {}
+      strategy:
+        type: Docker
+        dockerStrategy: {}
+      successfulBuildsHistoryLimit: 5
+      triggers: []
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
+      labels:
+        branch: '${BRANCH}'
       name: '${COMPONENT}'
     spec:
       replicas: 1
@@ -75,6 +130,11 @@ parameters:
   - name: ENV
     displayName: Environment
     description: The environment stage.
+    required: true
+  - name: BRANCH
+    displayName: Branch
+    description: The branch (either 'feature' or 'master').
+    value: feature
     required: true
   - name: BRANCH
     displayName: Branch

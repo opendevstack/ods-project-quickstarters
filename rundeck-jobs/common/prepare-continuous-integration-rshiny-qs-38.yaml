@@ -44,17 +44,19 @@
   sequence:
     commands:
     - description: clone quickstarter project
-      exec: >-
-        mkdir /tmp/rundeck_${job.id}_${job.execid} &&
-        cd  /tmp/rundeck_${job.id}_${job.execid} &&
-        git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git &&
-        cd ods-project-quickstarters &&
+      script: |-
+        mkdir "/tmp/rundeck_@job.id@_@job.execid@"
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
+        cd ods-project-quickstarters
+        # Here the branch can be changed for testing purposes
         git checkout origin/task/tailor-for-update-templates
     - description: clone oc config project
-      exec: >-
-        cd /tmp/rundeck_${job.id}_${job.execid} &&
-        git clone ${globals.bitbucket_sshhost}/opendevstack/ods-configuration.git &&
-        cd ods-configuration &&
+      script: |-
+        mkdir "/tmp/rundeck_@job.id@_@job.execid@"
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
+        cd ods-configuration
         git checkout origin/task/tailor-for-update-templates
     - description: setup openshift folder in generated project.
       # This is used by the shared library to call  tailor to create/update OpenShift resources.
@@ -62,8 +64,9 @@
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/
         PROJECT="@option.project_id@" \
         COMPONENT="@option.component_id@" \
+        COMPONENT_TYPE="option.component_type@" \
         TARGET_DIR="@option.quickstarter_directory@" \
-        /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/rshiny-openshift/init-rshiny-openshift.sh
+        /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/init-openshift.sh
     - description: add Jenkinsfile to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R @option.quickstarter_directory@

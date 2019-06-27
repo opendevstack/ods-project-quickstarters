@@ -58,6 +58,13 @@
         cd ods-project-quickstarters
         # Here the branch can be changed for testing purposes
         git checkout origin/task/tailor-for-update-templates
+    - description: clone oc config project
+      script: |-
+        mkdir "/tmp/rundeck_@job.id@_@job.execid@"
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
+        cd ods-configuration
+        git checkout origin/task/tailor-for-update-templates
     - description: setup openshift folder in generated project if not provided.
       # This is used by the shared library to call  tailor to create/update OpenShift resources.
       script: |-

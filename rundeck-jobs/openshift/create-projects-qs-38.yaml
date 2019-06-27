@@ -26,18 +26,21 @@
       exec: 'echo project_id: ${option.project_id} openshift_api_token: bb${option.openshift_api_token}bb'
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
-    - description: clone oc script project
-      exec: >-
-          cd /tmp/rundeck_${job.id}_${job.execid} &&
-          git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git &&
-          cd ods-project-quickstarters &&
-          git checkout origin/task/tailor-for-update-templates
+    - description: clone quickstarter project
+      script: |-
+        mkdir "/tmp/rundeck_@job.id@_@job.execid@"
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
+        cd ods-project-quickstarters
+        # Here the branch can be changed for testing purposes
+        git checkout origin/production
     - description: clone oc config project
-      exec: >-
-          cd /tmp/rundeck_${job.id}_${job.execid} &&
-          git clone ${globals.bitbucket_sshhost}/opendevstack/ods-configuration.git &&
-          cd ods-configuration &&
-          git checkout origin/task/tailor-for-update-templates
+      script: |-
+        mkdir "/tmp/rundeck_@job.id@_@job.execid@"
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
+        cd ods-configuration
+        git checkout origin/master
     - description: create docker container for running script with tailor
       exec: >-
           cd /tmp/rundeck_${job.id}_${job.execid} &&

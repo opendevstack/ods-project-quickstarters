@@ -66,7 +66,7 @@
         cd ods-configuration
         git checkout origin/task/tailor-for-update-templates
     - description: setup openshift folder in generated project if not provided.
-      # This is used by the shared library to call  tailor to create/update OpenShift resources.
+      # The shared library to call  tailor to create/update OpenShift resources.
       script: |-
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/
         # env variables must be on same line as invoked command.

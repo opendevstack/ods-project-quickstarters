@@ -9,7 +9,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@feature/tailor-deploy-debug', retriever: modernSCM(
+library identifier: 'ods-library@production', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])

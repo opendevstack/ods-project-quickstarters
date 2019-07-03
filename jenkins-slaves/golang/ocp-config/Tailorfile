@@ -1,0 +1,5 @@
+namespace cd
+selector app=jenkins-slave-golang
+param-dir ../../../../ods-configuration/ods-project-quickstarters/jenkins-slaves/golang/ocp-config
+
+bc,is

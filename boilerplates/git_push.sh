@@ -30,7 +30,7 @@ if [ $files == 0 ]; then
 else
 	echo "Upgrading existing project: ${git_url_ssh}"
 	mv "$cloned_git_fld_name"/* .
-	mv "$cloned_git_fld_name"/.* .
+	mv "$cloned_git_fld_name"/.[!.]* .
 fi
 
 rm -rf "$cloned_git_fld_name"

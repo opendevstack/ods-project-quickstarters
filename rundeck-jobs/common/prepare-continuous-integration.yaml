@@ -20,6 +20,7 @@
     - fe-angular
     - fe-ionic
     - fe-react
+    - be-docker-plain
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true

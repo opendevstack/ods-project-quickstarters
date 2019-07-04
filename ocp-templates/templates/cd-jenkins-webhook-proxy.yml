@@ -72,6 +72,8 @@ objects:
         - env:
           - name: REPO_BASE
             value: '${REPO_BASE}'
+          - name: PROTECTED_BRANCHES
+            value: ${PROTECTED_BRANCHES}
           - name: TRIGGER_SECRET
             valueFrom:
               secretKeyRef:
@@ -87,6 +89,8 @@ objects:
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
+        serviceAccount: jenkins
+        serviceAccountName: jenkins
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
@@ -114,5 +118,7 @@ parameters:
   value: cd
 - name: REPO_BASE
   value: REPO_BASE
+- name: PROTECTED_BRANCHES
+  value: "master,develop,production,staging,release/"
 - name: PIPELINE_TRIGGER_SECRET
   value: PIPELINE_TRIGGER_SECRET

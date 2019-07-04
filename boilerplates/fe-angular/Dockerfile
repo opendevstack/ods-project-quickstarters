@@ -1,8 +1,8 @@
-FROM cd/jenkins-slave-nodejs8-angular
+FROM cd/jenkins-slave-nodejs10-angular
 
-MAINTAINER "Andreas Bellmann" <andreas.bellmann@opitz-consulting.com>
+LABEL maintainer="Balram Chavan <balram_morsing.chavan@boehringer-ingelheim.com>"
 
-ARG ANGULAR_CLI_VERSION=6.0.7
+ARG ANGULAR_CLI_VERSION=8.0.3
 
 RUN npm install -g @angular/cli@$ANGULAR_CLI_VERSION && \
     ng version

@@ -1,14 +1,14 @@
-#Python Flask Quickstarter (be-python-flask) 
+# Python Flask Quickstarter (be-python-flask) 
 The project supports generation of Python Flask project boilerplate and quick 
 installation and integration of it with OpenShift CD pipelines.
 
-##Purpose of this quickstarter
+## Purpose of this quickstarter
 The quickstarter is simmple WEB-server written on Python using Flask framework.
 The package allows easily build a Python project, using different Python modules
 and frameworks.
 It contains the basic setup for Docker, Jenkins, SonarQube and OpenShift.
 
-##What files / architecture is generated?
+## What files / architecture is generated?
     
     ├── Jenkinsfile - This file contains Jenkins build configuration settings
     ├── README.md
@@ -33,11 +33,11 @@ It contains the basic setup for Docker, Jenkins, SonarQube and OpenShift.
     ├── init.sh 
     └── sonar-project.properties - This file contains SonarQube configuration settings
     
-##Frameworks used
+## Frameworks used
 - [Flask](http://flask.pocoo.org/)
 - [Nose](https://nose.readthedocs.io/en/latest/)
 
-##Usage - how do you start after you provisioned this quickstarter
+## Usage - how do you start after you provisioned this quickstarter
 The project should be started automatically by OpenShift. Server should be started
 on the port 8080 in the debug mode.
 ```python
@@ -74,7 +74,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-##How this quickstarter is built through Jenkins
+## How this quickstarter is built through Jenkins
 The Jenkinsfile is provisioned with this quick starter to ease CI/CD process. In Jenkinsfile, there are various stages:
 
 
@@ -89,8 +89,8 @@ The Jenkinsfile is provisioned with this quick starter to ease CI/CD process. In
     ```
 - **Build** - Builds the application, copies output folder dist into docker/dist folder.
 
-##Builder Slave used
+## Builder Slave used
 This quickstarter uses [Python](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python) builder slave Jenkins builder slave.
 
-##Known limitations
+## Known limitations
 NA

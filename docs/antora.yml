@@ -1,0 +1,6 @@
+name: ods-project-quickstarters
+title: ODS Project Quickstarters
+version: 1.1
+nav: 
+- modules/ROOT/nav.adoc
+

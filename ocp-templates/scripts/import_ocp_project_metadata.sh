@@ -115,6 +115,10 @@ case $key in
     OD_VERBOSE="$2"
     shift # past argument
     ;;
+    --skip-config-validation)
+    SKIP_CONF_VALIDATION="$2"
+    shift # past argument
+    ;;
     *)
     # unknown option
     ;;
@@ -172,14 +176,21 @@ fi
 scriptdir=$(pwd)
 
 # find the right configuration to use based on the target API host passed parameter
-targetconfig=$(grep -H $OD_OCP_TARGET_HOST $scriptdir/migration_config/ocp_project_config_target | cut -d ':' -f1)
+targetconfig=$(grep -H $OD_OCP_TARGET_HOST $scriptdir/migration_config/ocp_project_config_target* | cut -d ':' -f1)
 
 if [[ -f "$targetconfig" ]]; then
 	echo "> sourcing env target config from $targetconfig"
 	source $targetconfig
 else
-	echo "Target cluster config could NOT be located - this is a must to successfully run this script"
+	echo "Target cluster config $targetconfig, for cluster $OD_OCP_TARGET_HOST could NOT be located - this is a must to successfully run this script"
 	exit 1
+fi
+
+if [[ -z ${OD_EXCLUDE_NAMESPACES} ]]; then 
+    # fallback
+	echo ">>> no namespace exclusions set - cd / shared-images / openshift and rhscl"
+	echo
+    OD_EXCLUDE_NAMESPACES=cd,shared-images,openshift,rhscl
 fi
 
 # checkout git repo (standard naming)
@@ -260,6 +271,129 @@ fi
 
 OD_PRJ_ADMINS=$OD_PRJ_ADMINS,$OD_OCP_CD_SA_TARGET
 
+if [[ ! "$SKIP_CONF_VALIDATION" = "true" ]]; then
+    if grep -q $OD_OCP_TARGET_HOST $sourceconfig; then
+        echo "Source and Target cluster are the same. Validating configuration..."
+
+
+        if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+            if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+                echo "Target domain is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+                echo "Target nexus url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_SQ_URL" ]]; then
+                echo "Target Sonarqube url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+            if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+                echo "Target bitbucket url is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+        if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+            if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
+                echo "Target service account is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+
+    else
+        echo "Source and Target cluster are NOT the same. Validating configuration..."
+
+        if [[ -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+            echo "Source domain is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+            echo "Target domain is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ "$OD_OCP_SOURCE_APP_DOMAIN" = "$OD_OCP_TARGET_APP_DOMAIN" ]]; then
+            echo "Source and Target domains are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+
+        if [[ -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+            echo "Source nexus url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+            echo "Target nexus url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ "$OD_OCP_SOURCE_NEXUS_URL" = "$OD_OCP_TARGET_NEXUS_URL" ]]; then
+            echo "Source and Target nexus urls are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+
+        if [[ -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+            echo "Source Sonarqube url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_TARGET_SQ_URL" ]]; then
+            echo "Target Sonarqube url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ "$OD_OCP_SOURCE_SQ_URL" = "$OD_OCP_TARGET_SQ_URL" ]]; then
+            echo "Source and Target Sonarqube urls are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+            echo "Source bitbucket url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+            echo "Target bitbucket url is empty. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ "$OD_OCP_SOURCE_BITBUCKET_URL" = "$OD_OCP_TARGET_BITBUCKET_URL" ]]; then
+            echo "Source and Target bitbuckets urls are the same. It should be different when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
+            "Source space for Jenkins image is not set. It should be set when importing into a different cluster"
+            exit 1
+        fi
+
+        if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+            if [[ -z "$OD_OCP_CD_SA_TARGET" ]]; then
+                echo "Target service account is empty while source is not. It should be to prevent errors"
+                exit 1
+            fi
+        fi
+    fi
+else
+    echo "WARNING!!! Validation was skipped"
+fi
+
+
+
 # Test if the login token is provided to execute the login or just use current session
 if [ -z "$OD_OCP_TARGET_TOKEN" ]; then
   echo "Skiping 'oc login'... using current oc '`oc whoami`' session"
@@ -305,6 +439,7 @@ do
 	
 	oc project ${curr_ocp_namespace} >& /dev/null
 	
+	# assumption : if the project is there - it was created via opendevstack ...
     if [ $? -ne 0 ]; then 
         echo "Could not find project ${curr_ocp_namespace} - creating"
         
@@ -315,7 +450,10 @@ do
         
 		oc new-project ${curr_ocp_namespace} || exit 1
 		# create the baseline with service accounts, role bindings - and switch SA account
-		cat project.yml | sed -e "s|$OD_OCP_CD_SA_SOURCE|$OD_OCP_CD_SA_TARGET|g" > project.yml$tmp_postfix
+		cp project.yml project.yml$tmp_postfix
+		if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
+		    sed -i -e "s|$OD_OCP_CD_SA_SOURCE|$OD_OCP_CD_SA_TARGET|g" project.yml$tmp_postfix
+		fi
 
 
 		if [ "$OD_USE_APPLY" = true ]; then
@@ -324,45 +462,46 @@ do
 			oc create -f project.yml$tmp_postfix
 		fi
 		
-		
-		# hacky ... 
-		for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
-		do		
-			oc policy add-role-to-user admin ${admin_user}
-		done
-
-		# fixme - likely too many rights
+		# admin for the creating SA and image pull rights
 		oc policy add-role-to-user admin system:serviceaccount:${OD_OCP_CD_SA_TARGET}
 		oc policy add-role-to-user system:image-puller system:serviceaccount:${OD_OCP_CD_SA_TARGET}
-		oc policy add-role-to-user edit system:authenticated
-		oc policy add-role-to-user system:image-puller default
-		oc policy add-role-to-user edit default
-		oc policy add-role-to-user system:image-puller system:serviceaccount:${project_name}:default -n cd
+		# everyone authenticated can see
+		oc policy add-role-to-user view system:authenticated
 
 		# if jenkins CD is NOT part of the import it does not make sense to try to create the linking SA 
-		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"$cd"* ]];
+		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"cd"* ]];
 		then
-			echo "creating service account jenkins to modify build config during jenkins build"
+			echo "creating service account jenkins to modify build configs during jenkins build"
 			oc policy add-role-to-user admin system:serviceaccount:${project_name}-cd:jenkins -n ${project_name}-${ocp_proj_namespace_suffix}
 			echo
 		fi
 		
 		# add pull rights against ocp OD dedicated - for NON CD projects - otherwise we even pull the jenkins image and that we dont want
 		if [[ $ocp_proj_namespace_suffix == "cd" ]]; then 
-			echo "--  not creating pull secret to OCP, this is CD"
-		else
-			if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]]; then 
-				echo "Creating OCP OD pull secret"
-				oc create secret docker-registry odocp  --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
-				oc secrets link deployer odocp --for=pull                                   
-				oc secrets link default odocp --for=pull
-			else
-				echo "OCP OD Token not set - assuming local build"
-			fi
+			echo "--  not creating pull secret to OCP, this is CD - just adding image pull rights"
+			oc policy add-role-to-user system:image-puller system:serviceaccount:${project_name}-cd:jenkins -n cd
 		fi
 	else
 		echo "!!! Project ${curr_ocp_namespace} already exists - skipping creation"
     fi
+
+	secretkey=odocp
+	secretexists=$(oc get secret | grep "$secretkey")
+
+	if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ ! $secretexists == *"$secretkey"* ]]; then 
+		echo "Creating OCP OD pull secret for ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}"
+		oc create secret docker-registry ${secretkey} --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
+		oc secrets link deployer ${secretkey} --for=pull                                   
+		oc secrets link default ${secretkey} --for=pull
+	else
+		echo "OCP OD Token not set - assuming local build"
+	fi
+
+	# add admins
+	for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
+	do		
+		oc policy add-role-to-user admin ${admin_user}
+	done
 		
 	echo
     echo "    importing persistent volume claims"
@@ -414,7 +553,14 @@ do
 		skip_replace=false
 		
 		# replace hosts
-		cat $template_config_json | sed -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  > $template_config_json$tmp_postfix
+		cp $template_config_json $template_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $template_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $template_config_json$tmp_postfix
+		fi
 
 		occomm=$(eval_oc_artifact_status)$template_config_json$tmp_postfix
 	
@@ -434,7 +580,15 @@ do
 		skip_replace=false
 		
 		# replace hosts
-		cat $cmap_config_json | sed -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  > $cmap_config_json$tmp_postfix
+
+		cp $cmap_config_json $cmap_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $cmap_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $cmap_config_json$tmp_postfix
+		fi
 
 		occomm=$(eval_oc_artifact_status)$cmap_config_json$tmp_postfix
 	
@@ -451,8 +605,27 @@ do
 			echo "No artifacts fround that match $dc_config_json"
 			break
 		fi
-		
-		cat $dc_config_json | sed -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g" -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" -e "s|namespace: $OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE|namespace: $OD_OCP_SHARED_SPACE_TARGET|g" -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" > $dc_config_json$tmp_postfix
+
+		cp  $dc_config_json $dc_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_NEXUS_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g"  $dc_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_SQ_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_SQ_URL|$OD_OCP_TARGET_SQ_URL|g"  $dc_config_json$tmp_postfix
+		fi
+
+   		sed  -i -e "s|$project_name-$ocp_proj_namespace_suffix|$curr_ocp_namespace|g" $dc_config_json$tmp_postfix
+
+
+		if [[ ! -z "$OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE" ]]; then
+		    sed  -i -e "s|namespace: $OD_OCP_JENKINS_MASTER_IMAGE_SPACE_SOURCE|namespace: $OD_OCP_SHARED_SPACE_TARGET|g" $dc_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SHARED_SPACE_SOURCE" ]]; then
+		    sed  -i -e "s|$OD_OCP_SHARED_SPACE_SOURCE|$OD_OCP_SHARED_SPACE_TARGET|g" $dc_config_json$tmp_postfix
+		fi
+
 
 		artifact_file=${dc_config_json}
 		artifactName=$(eval_oc_artifact_name)
@@ -470,9 +643,19 @@ do
 		
 		echo " --> checking for referenced project image - stream: $ref_imagestreamWithRegistry"
 		
+		exlude_this_namespace=false
+		
+		# check for any exclusions
+		for exclude_namespace in $(echo $OD_EXCLUDE_NAMESPACES | sed -e 's/,/ /g');
+		do
+			if [[ $ref_imagestreamOwningProject == $exclude_namespace ]]; then
+				exlude_this_namespace=true
+				echo "... setting exclusion for image $ref_imagestreamWithRegistry based on $OD_EXCLUDE_NAMESPACES"
+			fi
+		done
+		
 		# dont do any import on shared images from shared-image namespace and from CD
-		if [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ $ref_imagestreamOwningProject != "shared-services" ]] && [[ $ref_imagestreamOwningProject != "cd" ]]; then 		
-			
+		if [ "$exlude_this_namespace" = false ] && [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]]; then
 			echo "Importing remote images ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} into ${ref_imagestreamName}"
 			oc import-image ${ref_imagestreamName} --from=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} --confirm
 		else
@@ -512,8 +695,16 @@ do
 
 		artifact_file=${bc_config_json}
 		skip_replace=false
-		
-		cat $bc_config_json | sed -e "s|$OD_OCP_SOURCE_NEXUS_URL|$OD_OCP_TARGET_NEXUS_URL|g" -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g" > $bc_config_json$tmp_postfix
+
+		cp $bc_config_json $bc_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $bc_config_json$tmp_postfix
+		fi
+
+		if [[ ! -z "$OD_OCP_SOURCE_BITBUCKET_URL" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $bc_config_json$tmp_postfix
+		fi
+
 		
 		occomm=$(eval_oc_artifact_status)$bc_config_json$tmp_postfix
 		eval ${occomm}
@@ -531,8 +722,12 @@ do
 	
 		artifact_file=${route_config_json}
 		skip_replace=false
-		
-		cat $route_config_json | sed -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" > $route_config_json$tmp_postfix
+
+		cp $route_config_json $route_config_json$tmp_postfix
+		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
+		     sed -i -e "s|$OD_OCP_SOURCE_APP_DOMAIN|$OD_OCP_TARGET_APP_DOMAIN|g" $route_config_json$tmp_postfix
+		fi
+
 		if [ ! -z "$OD_TO_PROJECT" ]; then
 			sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$OD_TO_PROJECT|g" $route_config_json$tmp_postfix
 		fi

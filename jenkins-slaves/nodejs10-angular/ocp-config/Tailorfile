@@ -1,0 +1,5 @@
+namespace cd
+selector app=jenkins-slave-nodejs10-angular
+param-dir ../../../../ods-configuration/ods-project-quickstarters/jenkins-slaves/nodejs10-angular/ocp-config
+
+bc,is

@@ -6,9 +6,4 @@ if ! whoami &> /dev/null; then
   fi
 fi
 
-# Install custom python package if requirements.txt is present
-if [ -e "requirements.txt" ]; then
-    $(which pip) install --user -r requirements.txt
-fi
-
-exec python3 app.py
+cd src && exec python3 app.py

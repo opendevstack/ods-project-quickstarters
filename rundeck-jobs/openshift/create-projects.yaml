@@ -17,6 +17,8 @@
     valueExposed: true
   - description: the admin of the project, must be the openshift username
     name: project_admin
+  - description: the groups with special entitlements, key value pairs with semicolon, can be null than everyone can edit
+    name: project_groups
   scheduleEnabled: true
   sequence:
     commands:
@@ -29,7 +31,7 @@
     - description: create docker container for openshift client
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
     - description: create openshift projects (dev / test / cd with jenkins)
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c "oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && ./create-projects.sh -p ${option.project_id} -n ${globals.nexus_host} -a ${option.project_admin}"
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c "oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && ./create-projects.sh -p ${option.project_id} -n ${globals.nexus_host} -a ${option.project_admin} -e ${option.project_groups}"
     keepgoing: false
     strategy: node-first
   uuid: 00f767ef-347f-480e-8ad3-bf2aed3abf5d

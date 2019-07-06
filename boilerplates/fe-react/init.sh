@@ -25,17 +25,18 @@ esac; shift; done
 
 cd $TARGET_DIR
 
-mkdir -p $COMPONENT
+echo "Init react app"
+sudo docker run --rm -v $PWD:/data -w /data node \
+  npm init react-app $COMPONENT --use-npm
 
 cd $COMPONENT
 
 sudo chown -R $OWNER .
 
-echo "fix nexus repo path"
+echo "Fix nexus repo path"
 repo_path=$(echo "$GROUP" | tr . /)
 sed -i.bak "s|org/opendevstack/projectId|$repo_path|g" $SCRIPT_DIR/files/docker/Dockerfile
 rm $SCRIPT_DIR/files/docker/Dockerfile.bak
 
-echo "copy files from quickstart to generated project"
+echo "Copy files from quickstart to generated project"
 cp -rv $SCRIPT_DIR/files/. .
-

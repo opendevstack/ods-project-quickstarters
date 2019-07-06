@@ -30,6 +30,9 @@ objects:
     namespace: ${PROJECT}-${ENV}
   spec:
     output:
+      imageLabels:
+      - name: "ods.application.name"
+        value: "application"     
       to:
         kind: ImageStreamTag
         name: ${COMPONENT}:latest

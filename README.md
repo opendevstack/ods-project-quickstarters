@@ -10,6 +10,7 @@ This repository contains quickstarters, which are basically templates that help 
 - [Backend - NodeJS/Express](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-node-express/README.md)
 - [Frontend - Angular](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-angular/README.md)
 - [Frontend - React](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-react/README.md)
+- [Frontend - Vue](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-vue/README.md)
 - [E2E test - Cypress](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/e2e-cypress/README.md)
 - [Mobile - Ionic](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-ionic/README.md)
 - [Data Science - Machine Learning](https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/ds-ml-service/README.md)

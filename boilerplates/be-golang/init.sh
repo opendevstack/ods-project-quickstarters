@@ -34,3 +34,7 @@ sudo chown -R $OWNER .
 echo "copy files from quickstart to generated project"
 cp -rv $SCRIPT_DIR/files/. .
 
+echo "go mod init"
+echo "module example.com/$PROJECT/$COMPONENT" > go.mod
+echo "" >> go.mod
+echo "go 1.12" >> go.mod

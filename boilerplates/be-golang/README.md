@@ -20,7 +20,10 @@ None, except the ODS [Jenkins Shared Library](https://github.com/opendevstack/od
 
 ## Usage - how do you start after you provisioned this quickstarter
 Simply start to write Go code, e.g. by extending `main.go`. No further adjustments
-should be necessary.
+should be necessary. Typically, you'd want to use Go modules:
+```
+go mod init example.com/project/component
+```
 
 ## How this quickstarter is built through Jenkins
 There are six steps:

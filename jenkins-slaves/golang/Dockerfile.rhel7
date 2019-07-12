@@ -11,6 +11,8 @@ RUN cd /tmp && \
     cd - && \
     mkdir /go
 
+RUN curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.17.1
+
 ENV PATH $PATH:/usr/local/go/bin
 
 WORKDIR /go

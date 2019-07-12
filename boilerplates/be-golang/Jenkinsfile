@@ -31,6 +31,7 @@ odsPipeline(
   ]
 ) { context ->
   stageCheckFormat(context)
+  stageLint(context)
   stageScanForSonarqube(context)
   stageUnitTest(context)
   stageBuild(context)
@@ -48,16 +49,27 @@ def stageCheckFormat(def context) {
   }
 }
 
+def stageLint(def context) {
+  stage('Lint') {
+    sh "golangci-lint run"
+  }
+}
+
 def stageBuild(def context) {
   stage('Build') {
     def binary = "app_linux_amd64"
-    sh "CGO_ENABLED=0 go build -o docker/${binary}"
+    withEnv(["CGO_ENABLED=0"]) {
+      sh "go build -o docker/${binary}"
+    }
   }
 }
 
 def stageUnitTest(def context) {
   stage('Unit Test') {
-    sh "CGO_ENABLED=0 go test ./..."
+    def gopkgs = sh(script: 'go list ./... | grep -v /vendor', returnStdout: true)
+    withEnv(["GOPKGS=${gopkgs}", "CGO_ENABLED=0"]) {
+      sh 'go test -v -cover $GOPKGS'
+    }
   }
 }
 

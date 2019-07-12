@@ -51,7 +51,9 @@ def stageCheckFormat(def context) {
 
 def stageLint(def context) {
   stage('Lint') {
-    sh "golangci-lint run"
+    withEnv(["CGO_ENABLED=0"]) {
+      sh "golangci-lint run"
+    }
   }
 }
 

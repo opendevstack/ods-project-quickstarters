@@ -2,6 +2,8 @@
 
 Vue quickstarter project
 
+For pull requests and discussion regarding direction, please pull in @akhilsoman, @m-apsolon
+
 ## Purpose of this quickstarter
  
 This quickstarter booststrap a [Vue.js](https://vuejs.org/) application with [TypeScript](https://www.typescriptlang.org/) support. It contains the basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).

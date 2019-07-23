@@ -89,6 +89,8 @@ def stageTraining(def context) {
         trainingUsername = sh(returnStdout: true, script:"echo \"${trainingUsername}\" | base64 --decode").trim()
 
         sh "oc port-forward ${trainingPodInfo[0]} 8080 -n ${context.targetProject} &"
+        // wait for port-forward to map the ports or for 10s
+	    sh "timeout 10s bash -c 'until ! curl -v --silent http://localhost:8080 2>&1 | grep -m 1 \"Connection refused\"; do sleep 1 ; done'; echo -e \\\\a"
         sh  "python3 jenkinsfile_helper.py --training-service ${trainingRoute} --username \"${trainingUsername}\" --password \"${trainingPassword}\""
     }
 }

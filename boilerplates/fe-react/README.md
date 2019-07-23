@@ -2,6 +2,9 @@
 
 React quickstarter project
 
+For pull requests and discussion regarding direction, please pull in @velcrin, @m-apsolon
+
+
 ## Purpose of this quickstarter
 
 This quickstarter generates a React project for developing web pages using [Create React App](https://facebook.github.io/create-react-app/).

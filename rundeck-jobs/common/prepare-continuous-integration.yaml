@@ -22,6 +22,7 @@
     - fe-react
     - be-docker-plain
     - be-golang
+    - fe-vue
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true

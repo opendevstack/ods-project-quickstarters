@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 - Quickstarter `be-docker-plain` now builds a running container based on alpine instead of RHEL ([#260](https://github.com/opendevstack/ods-project-quickstarters/issues/260)).
+- Quickstarter `ds-ml-service` with unified docker file ([#272](https://github.com/opendevstack/ods-project-quickstarters/issues/272)).
 
 ## [1.1.0] - 2019-05-28
 

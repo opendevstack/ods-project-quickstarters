@@ -6,8 +6,13 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 
 from services.prediction.app import app
-# from services.infrastructure.remote.dvc.data_sync import DataSync
-# from services.infrastructure.environment import ssh_username, ssh_password, dvc_remote
+from services.infrastructure.git_info import GIT_COMMIT
+
+from model.model_wrapper import ModelWrapper
+#import services.prediction.app as prediction_server
+
+from services.infrastructure.remote.dvc.data_sync import DataSync
+from services.infrastructure.environment import dvc_remote, ssh_username, ssh_password
 
 
 class TestIntegrationPrediction(unittest.TestCase):
@@ -20,13 +25,14 @@ class TestIntegrationPrediction(unittest.TestCase):
         self.password = "password"
         app.config['USERS'][self.username] = self.password
 
-        # Keep in mind to also sync the test data, if you trained remotely
-        # syncer = DataSync(dvc_remote(), ssh_username(), ssh_password())
-        # syncer.pull_data_dependency(<test_training_file>)
+        app.config['MODEL'] = ModelWrapper.load(GIT_COMMIT)
+
+        # in case of using data versioning, don't forget to pull test data from remote data repo
 
         # read held back test data
         self.test_data = pd.read_csv("resources/test.csv")
         self.min_performance = 0.8
+
         self.predictor = app.config['MODEL']
 
     def test_accuracy(self):

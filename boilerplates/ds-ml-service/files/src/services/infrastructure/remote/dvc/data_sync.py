@@ -33,9 +33,11 @@ class DataSync(object):
             2. deactivate the prompt for password insertion
             3. write the technical account's password in the config
         """
-        logging.getLogger(__name__).info("Pulling right data version from remote dvc storage...")
+        logging.getLogger(__name__).info(
+            "Pulling right data version from remote dvc storage...")
         # add/overwrite technical user in dvc config
-        subprocess.check_call(["dvc", "remote", "modify", self.remote_repo, "user", self.user])
+        subprocess.check_call(
+            ["dvc", "remote", "modify", self.remote_repo, "user", self.user])
 
         # unset ask for password option to avoid prompt
         subprocess.check_call(["dvc", "remote", "modify", self.remote_repo, "ask_password",

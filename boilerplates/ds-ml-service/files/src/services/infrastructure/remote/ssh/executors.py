@@ -155,9 +155,9 @@ mkdir {0}""".strip().format(self._target_folder),
             self._logger.info(line)
 
     def save_model_locally(self) -> None:
-        """Saves the remote trained model in the local machine/pod as GIT_COMMIT.model"""
+        """Saves the remote trained model in the local machine/pod as GIT_COMMIT"""
 
-        model_file = "{0}/{1}/{2}.model".format(self._home_folder, self._environment_name,
+        model_file = "{0}/{1}/{2}".format(self._home_folder, self._environment_name,
                                                 GIT_COMMIT)
         self._logger.info("Downloading the model from {0}...".format(model_file))
         self._connection.get(model_file, "/app/{0}".format(os.path.basename(model_file)))

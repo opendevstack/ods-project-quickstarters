@@ -96,7 +96,7 @@ def get_model():
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'error': "Model is not ready"}), 404
 
-    model_path = "{0}.model".format(GIT_COMMIT)
+    model_path = "{0}".format(GIT_COMMIT)
     if os.path.exists(model_path):
         file = open(model_path, 'rb')
         return send_file(filename_or_fp=file,

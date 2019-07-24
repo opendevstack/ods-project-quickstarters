@@ -21,14 +21,12 @@ set /p GIT_TOP_LEVEL=<temp.txt
 @echo GIT_LAST_CHANGE = "Local Test on Windows machine" >> src/services/infrastructure/git_info.py
 del temp.txt
 
-del docker-training\dist\ /S /Q
-del docker-prediction\dist\ /S /Q
+del docker\dist\ /S /Q
 
-xcopy /s src docker-training\dist\
-xcopy /s src docker-prediction\dist\
-xcopy /s resources docker-training\dist\
-xcopy /s .dvc docker-training\dist\
+xcopy /s src docker\dist\
+xcopy /s resources docker\dist\
+xcopy /s .dvc docker\dist\
 
-copy test\run_integration_tests.sh docker-training\dist
-copy test\run_unittests.sh docker-training\dist
+copy test\run_integration_tests.sh docker\dist
+copy test\run_unittests.sh docker\dist
 

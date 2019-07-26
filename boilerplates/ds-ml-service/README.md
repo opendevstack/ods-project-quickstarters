@@ -206,6 +206,7 @@ services:
 The training pod starts an asynchronous training task. Only one
 training task can run at a time.
 
+
 ## Endoints ##
 
 ### Training Endpoint ###
@@ -249,3 +250,33 @@ There is not need for any kind of payload in all endpoints.
 | DSI_TRAINING_SERVICE_PASSWORD | Password of the training service | string, required |
 | DSI_PREDICTION_SERVICE_USERNAME | Username to be set as default username for accessing the service | string, required |
 | DSI_PREDICTION_SERVICE_PASSWORD | Password to be set as default password for accessing the service | string, required |
+
+
+## How this quickstarter is built through jenkins
+
+The build pipeline is defined in the `Jenkinsfile` in the project root. The main stages of the pipeline are:
+1. Prepare build
+2. Sonarqube checks
+3. Build training image
+4. Deploy training pod
+5. Unittests
+6. Execute/reproduce training either on openshift pod or in ssh remote machine
+7. Integration test against the newly trained model wrapped in the flask `/prediction` endpoint
+8. Build prediction image
+9. Deploy prediction service
+
+
+## Builder slave used
+
+[jenkins-slave-python](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python)
+
+
+## Frameworks used
+
+- Python 3.6
+- Python Flask 1.0.2
+
+
+## Known limitions
+
+- Not ready for R models yet

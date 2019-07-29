@@ -3,16 +3,16 @@ This boilerplate enables data scientists to develop, serve, version models withi
 pipeline hosted on OpenShift with the goal in mind that one does not have to take care/change
 much of the needed pipeline and infrastructure.
 
+For pull requests and discussion regarding direction, please pull in @hugowschneider, @sklingel and @gerardcl
+
 ## Basic Setup ##
 The boilerplate provides a two pod setup in OpenShift, one pod for training service and one pod for
 prediction service.
 
-### Docker ###
-Each service has their own `Dockerfile`, under `docker-prediction` and `docker-training`
-respectively,
-  which can be changed according to your requirements in regards to operating system dependencies.
+### Container services ###
+From one `Dockerfile`, under `docker` folder, both `training` and `prediction` services are built. If required, one can edit it in order to provide different dependency management workflows for each service.
 
-- The `docker-training` container provides a pod that is able to reproduce/retrain the model that is
+- The `training` service provides a pod that is able to reproduce/retrain the model that is
 developed in the current commit either locally on OpenShift or execute the training on a remote
 linux system using ssh. The training process is wrapped into a flask server to be able to monitor
  and possible restart the training process. Moreover, the training service offers an endpoint
@@ -20,9 +20,9 @@ linux system using ssh. The training process is wrapped into a flask server to b
  integration tests are executed on the training pod, in order to not depend on operating
  dependencies in the jenkins slave.
 
- - The `docker-prediction` container provides a simple flask service for getting new predictions out
+ - The `prediction` service provides a simple flask service for getting new predictions out
  of your model by making json posts to the prediction REST endpoint.
- The prediction service downloads the newly trained model from the training pod after startup.
+ The prediction service is already built with the newly trained model from the training pod.
 
 ### Jenkins ###
 The `Jenkinsfile` organizes the correct succession of spinning up the training, executing it and
@@ -83,40 +83,16 @@ trained.
 
 Make sure your specified all dependencies in the `requirements.txt`.
 
+
+
+
 ## How to Develop your Model Locally ##
 It is recommended to develop your code against the python interpreter & dependencies specified in the docker images.
 This can be easily achieved, either by using an IDE that supports that (e.g. PyCharm) or by doing
 manually in the docker container.
 
-The whole setup (prediction and training service) can be tested using the attached docker-compose
 
-### Local deployment (docker-compose) - testing the services ###
 
-Any new change: Generate `/dist` folder for both training and prediction containers
-```
-./build.sh
-```
-
-Setup the right values for the environment variables in `docker-compose.yml` file wherever there
-is a definition like `THIS_PARAMETER_SHOULD_BE_NOT_COMMITED`
-```
-vim docker-compose.yml
-```
-
-Build the images defined in `docker-compose.yml`
-```
-docker-compose build
-```
-
-Run the images defined in `docker-compose.yml`
-```
-docker-compose up
-```
-
-When done: stop the containers
-```
-[Ctrl+C]
-```
 
 ## Data Versioning ##
 In order to ensure complete reproducibility, in case train and/or test data can't be committed to
@@ -165,7 +141,8 @@ custom code.
 A Logistic Regression using scikit-learn with some (unnecessary) feature cleaning and engineering
  is trained on the iris data flower set.
 
-**Iris flower data set**. (n.d.). In Wikipedia. Retrieved January 7, 2019, from [Iris_flower_data_set](https://en.wikipedia.org/wiki/Iris_flower_data_set)
+**Iris flower data set**. (n.d.). In Wikipedia. Retrieved January 7, 2019, from https://en
+.wikipedia.org/wiki/Iris_flower_data_set
 
 ## Structure of the quick starter ##
 
@@ -229,6 +206,7 @@ services:
 The training pod starts an asynchronous training task. Only one
 training task can run at a time.
 
+
 ## Endoints ##
 
 ### Training Endpoint ###
@@ -262,10 +240,6 @@ There is not need for any kind of payload in all endpoints.
 | DSI_SSH_HTTPS_PROXY | HTTPS proxy url for remote execution. This is needed if the remote machine needs the proxy for download packages and resources  | string |
 | DSI_DVC_REMOTE | Name of the dvc remote repository that has been initialized with dvc  | string |
 
-### Frameworks used
-
-- python 3.6
-
 ### Environment Variables for prediction ###
 
 | Environment Variable | Description | Allowed Values |
@@ -277,11 +251,12 @@ There is not need for any kind of payload in all endpoints.
 | DSI_PREDICTION_SERVICE_USERNAME | Username to be set as default username for accessing the service | string, required |
 | DSI_PREDICTION_SERVICE_PASSWORD | Password to be set as default password for accessing the service | string, required |
 
+
 ## How this quickstarter is built through jenkins
 
 The build pipeline is defined in the `Jenkinsfile` in the project root. The main stages of the pipeline are:
 1. Prepare build
-2. Sonarcube checks
+2. Sonarqube checks
 3. Build training image
 4. Deploy training pod
 5. Unittests
@@ -294,6 +269,13 @@ The build pipeline is defined in the `Jenkinsfile` in the project root. The main
 ## Builder slave used
 
 [jenkins-slave-python](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python)
+
+
+## Frameworks used
+
+- Python 3.6
+- Python Flask 1.0.2
+
 
 ## Known limitions
 

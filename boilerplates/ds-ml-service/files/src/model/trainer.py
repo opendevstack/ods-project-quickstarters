@@ -1,7 +1,6 @@
 import argparse
 import logging
 
-import joblib
 import pandas as pd
 
 from model.model_wrapper import ModelWrapper
@@ -50,10 +49,9 @@ def train(model_name=GIT_COMMIT, train_data='resources/train.csv', dvc_data_repo
     classification_model = ModelWrapper()
     classification_model.prep_and_train(data)
     logging.getLogger(__name__).info("Starting classification training... Done")
-    # save model
-    with open("{0}.model".format(model_name), 'wb') as file:
-        logging.getLogger(__name__).info("Persisting the model...")
-        joblib.dump(value=classification_model, filename=file)
+
+    logging.getLogger(__name__).info("Persisting the model...")
+    classification_model.save(model_name)
 
 
 if __name__ == "__main__":
@@ -65,7 +63,7 @@ if __name__ == "__main__":
 
     train(model_name=GIT_COMMIT, train_data=parsed_args.input)
 
-    model = joblib.load("{}.model".format(GIT_COMMIT))
+    model = ModelWrapper.load(GIT_COMMIT)
 
     # load test Dataframe
     test_df = pd.read_csv("resources/test.csv")

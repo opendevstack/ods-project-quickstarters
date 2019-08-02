@@ -1,3 +1,4 @@
+/* generated jenkins file used for building and deploying @component_id@ in projects @project_id@ */
 def final projectId = '@project_id@'
 def final componentId = '@component_id@'
 def final credentialsId = "${projectId}-cd-cd-user-with-password"
@@ -13,7 +14,13 @@ library identifier: 'ods-library@production', retriever: modernSCM(
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
 
-// See readme of shared library for usage and customization.
+/*
+  See readme of shared library for usage and customization
+  @ https://github.com/opendevstack/ods-jenkins-shared-library/blob/master/README.md
+  eg. to create and set your own builder slave instead of 
+  the maven/gradle slave used here - the code of the slave can be found at
+  https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/maven
+ */ 
 odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-maven",
   projectId: projectId,

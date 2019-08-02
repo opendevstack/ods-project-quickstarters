@@ -31,5 +31,6 @@ cd $COMPONENT
 
 sudo chown -R $OWNER .
 
-echo "copy custom files from quickstart to generated project"
+echo "copy custom files from quickstart to generated project and the README"
+cp -rv $SCRIPT_DIR/README.md $SCRIPT_DIR/files/README.md
 cp -rv $SCRIPT_DIR/files/. .

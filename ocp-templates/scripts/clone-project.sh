@@ -83,10 +83,12 @@ curl --fail -s --user $CREDENTIALS -G $import_url -d raw -o import.sh
 
 cd migration_config
 echo $(pwd)
-source_url="https://$BITBUCKET_HOST/projects/opendevstack/repos/ods-configuration/raw/ods-project-quickstarters/ocp-templates/scripts/ocp_project_config_source"
-curl --fail -s --user $CREDENTIALS -G $source_url -d raw -o ocp_project_config_source
-target_url="https://$BITBUCKET_HOST/projects/opendevstack/repos/ods-configuration/raw/ods-project-quickstarters/ocp-templates/scripts/ocp_project_config_target"
-curl --fail -s --user $CREDENTIALS -G $target_url -d raw -o ocp_project_config_target
+
+echo "Creating source file"
+echo "oc_env=$OPENSHIFT_HOST" > ocp_project_config_source
+
+echo "Creating target file"
+echo "oc_env=$OPENSHIFT_HOST" > ocp_project_config_target
 
 cd ..
 echo $(pwd)

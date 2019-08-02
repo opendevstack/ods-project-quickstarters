@@ -52,7 +52,8 @@ class SSHRemoteExecutor(object):
     >>> ssh_executor.save_model_locally()
     """
 
-    def __init__(self, host: str, username: str, password: str, port: int = 22, debug_mode: bool = False) -> None:
+    def __init__(self, host: str, username: str, password: str, port: int = 22,
+                 debug_mode: bool = False, dvc_remote=None) -> None:
         """Initializes the remote executor
 
         Parameters
@@ -67,6 +68,9 @@ class SSHRemoteExecutor(object):
             SSH Port number
         debug_mode: bool
             Enables debug mode during remote execution
+        dvc_remote: str, None
+            Name of dvc remote that should be used to pull versioned data dependencies
+
         """
 
         self._logger = logging.getLogger(__name__)
@@ -77,6 +81,10 @@ class SSHRemoteExecutor(object):
                                                   connect_kwargs={
                                                       "password": password
                                                   })
+
+        self._dvc_remote = dvc_remote
+        self._dvc_user = username
+        self._dvc_password = password
 
         self._environment_name = "{0}-{1}".format(git_info.GIT_REPO_NAME,
                                                   git_info.GIT_BRANCH.replace("/", "-"))
@@ -124,9 +132,16 @@ mkdir {0}""".strip().format(self._target_folder),
             $              --env self._environment_name \
             $              [<if self._debug_mode> --debug]
         """
-        train_script = "{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0} {" \
-                       "1}".strip().\
-            format(self._target_folder, "--debug" if self._debug_mode else "")
+        # remote training with remote dvc repository
+        if self._dvc_remote:
+            train_script = "{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0} " \
+                           "--debug {1} --dvc_remote {2} --dvc_user {3} --dvc_password {4}". \
+                strip().format(self._target_folder, self._debug_mode, self._dvc_remote,
+                               self._dvc_user, self._dvc_password)
+        else:
+            train_script = "{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0} " \
+                           "--debug {1}".strip().\
+                format(self._target_folder, self._debug_mode)
 
         result = self._connection.run(
             command=self._create_run_script(train_script),
@@ -140,9 +155,9 @@ mkdir {0}""".strip().format(self._target_folder),
             self._logger.info(line)
 
     def save_model_locally(self) -> None:
-        """Saves the remote trained model in the local machine/pod as GIT_COMMIT.model"""
+        """Saves the remote trained model in the local machine/pod as GIT_COMMIT"""
 
-        model_file = "{0}/{1}/{2}.model".format(self._home_folder, self._environment_name,
+        model_file = "{0}/{1}/{2}".format(self._home_folder, self._environment_name,
                                                 GIT_COMMIT)
         self._logger.info("Downloading the model from {0}...".format(model_file))
         self._connection.get(model_file, "/app/{0}".format(os.path.basename(model_file)))
@@ -247,6 +262,25 @@ mkdir {0}""".strip().format(self._target_folder),
         self._logger.info("Creating conda environment '{0}'... Done!".format(
             self._environment_name)
         )
+
+        ## install pip in conda
+        self._logger.info("Installing pip {} environment...".format(self._environment_name))
+        activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder,
+                                                                  self._environment_name)
+        install_pip_cmd = "conda install --yes pip"
+        deactivate = "source {0}/miniconda/bin/deactivate".format(self._home_folder)
+        self._check_exit_code(error_message="Installing pip... Failed!",
+                              result=self._connection.run(
+                                  command="{0} && "
+                                          "{1} && "
+                                          "{2}".format(activate,
+                                                       install_pip_cmd,
+                                                       deactivate),
+                                  hide=not self._debug_mode,
+                                  warn=True,
+                                  env=self.env()))
+
+        self._logger.info("Installing pip {} environment... Done!".format(self._environment_name))
 
     def env(self, reload=False) -> dict:
         """Creates the dictionary of environment variables used during remote script execution

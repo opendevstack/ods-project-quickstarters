@@ -29,5 +29,9 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
 
 # Upgrade PIP
 RUN pip3 install --upgrade pip \
-        && pip3 -V \
-        && pip3 install virtualenv pycodestyle
+    && pip3 -V \
+    && pip3 install virtualenv pycodestyle
+        
+# Configure PIP SSL validation
+RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
+    && pip config list

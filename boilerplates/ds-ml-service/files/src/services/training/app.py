@@ -11,7 +11,7 @@ from flask.templating import render_template
 from model.trainer import train
 from services.infrastructure.environment import debug_mode, execution_environment, \
     DSI_EXECUTE_ON_LOCAL, DSI_EXECUTE_ON_SSH, ssh_host, \
-    ssh_username, ssh_password, ssh_port, DSI_EXECUTE_ON, training_auth
+    ssh_username, ssh_password, ssh_port, DSI_EXECUTE_ON, training_auth, dvc_remote
 from services.infrastructure.flask import init_flask, status
 from services.infrastructure.git_info import GIT_COMMIT, GIT_COMMIT_SHORT, GIT_BRANCH, \
     GIT_LAST_CHANGE, GIT_REPO_NAME
@@ -41,13 +41,18 @@ def start_training():
     try:
         environment = execution_environment()
         if environment == DSI_EXECUTE_ON_LOCAL:
-            train()
+            if dvc_remote():
+                train(dvc_data_repo=dvc_remote(), dvc_ssh_user=ssh_username(),
+                      dvc_ssh_password=ssh_password())
+            else:
+                train()
         elif environment == DSI_EXECUTE_ON_SSH:
             connection = SSHRemoteExecutor(host=ssh_host(),
                                            username=ssh_username(),
                                            password=ssh_password(),
                                            debug_mode=debug_mode() or flask_args.debug,
-                                           port=ssh_port())
+                                           port=ssh_port(),
+                                           dvc_remote=dvc_remote())
 
             connection.setup_prerequisites()
             connection.run_training()
@@ -56,7 +61,7 @@ def start_training():
             raise Exception("{0} has a unknown value '{1}'".format(DSI_EXECUTE_ON, environment))
 
         logging.getLogger(__name__).info("Training execution ended!!!")
-    except Exception:
+    except Exception as training_exc:
         # This exception is broad because we cannot forseen all possible exceptions in
         # the DS train code.
         # Also, since this train is beeing executed in a separed thread all exceptions
@@ -66,8 +71,7 @@ def start_training():
         traceback.print_exc(file=f)
         f.seek(0)
         logging.getLogger(__name__).error(f.read())
-    finally:
-        _executor.futures.pop(TRAINING_KEY)
+        raise ValueError(training_exc)
 
 
 @app.route('/')
@@ -92,13 +96,13 @@ def get_model():
     if _executor.futures.running(TRAINING_KEY):
         return jsonify({'error': "Model is not ready"}), 404
 
-    model_path = "{0}.model".format(GIT_COMMIT)
+    model_path = "{0}".format(GIT_COMMIT)
     if os.path.exists(model_path):
         file = open(model_path, 'rb')
         return send_file(filename_or_fp=file,
                          mimetype="octet-stream",
                          attachment_filename=model_path,
-                         as_attachment=True)
+                         as_attachment=True), 200
     else:
         return jsonify({'error': "Model could not be found"}), 404
 
@@ -158,9 +162,14 @@ def finished():
 
     """
     if _executor.futures.running(TRAINING_KEY):
-        return jsonify({'finished': False})
+        return jsonify({'finished': False}), 200
     else:
-        return jsonify({'finished': True})
+        training_exc = _executor.futures.exception(TRAINING_KEY)
+        _executor.futures.pop(TRAINING_KEY)
+        if training_exc:
+            return jsonify({'finished': "Training ended with error: {}".format(training_exc)}), 500
+        else:
+            return jsonify({'finished': True}), 200
 
 
 if __name__ == '__main__':

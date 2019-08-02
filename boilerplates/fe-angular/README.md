@@ -4,8 +4,7 @@ Angular quickstarter project
 
 ## Purpose of this quickstarter
  
-This is a Angular project quickstarter with basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).
-
+User this is a Angular project quickstarter if you want to build a frontend. It contains the basic setup for [Docker](https://www.docker.com/), [Jenkins](https://jenkins.io/), [SonarQube](https://www.sonarqube.org/) and [OpenShift](https://www.openshift.com/).
 
 ## What files / architecture is generated?
  ```
@@ -13,6 +12,7 @@ This is a Angular project quickstarter with basic setup for [Docker](https://www
 ├── Jenkinsfile - This file contains Jenkins build configuration settings
 ├── README.md
 ├── angular.json - This file contains Angular project configuration settings
+├── browserslist - This file is used by the build system to adjust CSS and JS output to support the specified browsers
 ├── docker - This folder contains Docker configuration settings
 │   ├── Dockerfile
 │   └── nginx.vh.default.conf.nginx
@@ -21,7 +21,9 @@ This is a Angular project quickstarter with basic setup for [Docker](https://www
 │   ├── src
 │   │   ├── app.e2e-spec.ts
 │   │   └── app.po.ts
-│   └── tsconfig.e2e.json
+│   └── tsconfig.json
+├── karma.conf.js
+├── package-lock.json - It describes the exact tree that was generated, such that subsequent installs are able to generate identical trees, regardless of intermediate dependency updates. 
 ├── package.json - This file contains scripts to run and node packages dependencies for project
 ├── sonar-project.properties - This file contains SonarQube configuration settings
 ├── src
@@ -32,22 +34,19 @@ This is a Angular project quickstarter with basic setup for [Docker](https://www
 │   │   ├── app.component.ts
 │   │   └── app.module.ts
 │   ├── assets
-│   ├── browserslist
 │   ├── environments
 │   │   ├── environment.prod.ts
 │   │   └── environment.ts
 │   ├── favicon.ico
 │   ├── index.html
-│   ├── karma.conf.js
 │   ├── main.ts
 │   ├── polyfills.ts
 │   ├── styles.scss
-│   ├── test.ts
-│   ├── tsconfig.app.json
-│   ├── tsconfig.spec.json
-│   └── tslint.json
+│   └── test.ts
+├── tsconfig.app.json
 ├── tsconfig.json
-└── tslint.json
+├── tsconfig.spec.json
+├── tslint.json
 
 7 directories, 31 files
 ```
@@ -73,12 +72,12 @@ The Jenkinsfile is provisioned with this quick starter to ease CI/CD process.
 In Jenkinsfile, there are various stages
   * stageBuild - Builds the application by running `yarn install`, `yarn build` command and copies output folder `dist` into `docker/dist` folder.
   * stageUnitTest - Runs unit test cases by executing command `yarn test`.
-  * stageLint - Runs `ng lint` profiler by running command `npm run lint`.
+  * stageLint - Runs `ng lint` profiler by running command `yarn lint`.
 
 ## Builder Slave used
 
 This quickstarter uses
-[Nodejs8-Angular builder slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs8-angular) Jenkins builder slave.
+[Nodejs10-Angular builder slave](https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/nodejs10-angular) Jenkins builder slave.
 
 ## Known limitations
 

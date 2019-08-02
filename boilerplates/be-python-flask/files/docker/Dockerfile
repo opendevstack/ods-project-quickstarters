@@ -1,6 +1,6 @@
 FROM python:3.7.0-slim
 
-MAINTAINER "Andras Gyacsok" <andras.gyacsok@boehringer-ingelheim.com>
+LABEL maintainer="Andras Gyacsok <andras.gyacsok@boehringer-ingelheim.com>"
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -8,6 +8,8 @@ ENV TERM linux
 
 ARG projectHome=/opt/app-root/src
 ARG home=${projectHome}
+ARG nexusHostWithBasicAuth
+ARG nexusHostWithoutScheme
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -29,7 +31,7 @@ RUN set -ex  && \
         m4 \
         automake \
         gettext \
-    ' \
+    ' && \
     apt-get update -yqq && \
     apt-get upgrade -yqq && \
     apt-get install -yqq --no-install-recommends \
@@ -47,7 +49,6 @@ RUN set -ex  && \
     apt-get autoremove -yqq --purge && \
     apt-get clean
 
-
 COPY run.sh ${projectHome}
 COPY dist ${projectHome}
 
@@ -55,13 +56,17 @@ RUN chown -R prophet: ${projectHome} && \
     chgrp -R 0 ${projectHome} && \
     chmod -R g=u ${projectHome} && \
     chmod g=u /etc/passwd && \
-    chmod u+x ${projectHome}/run.sh
+    chmod +x ${projectHome}/run.sh
 
 EXPOSE 8080
 
 ENV HOME=${projectHome}
 WORKDIR ${projectHome}
 
+RUN if [ ! -z ${nexusHostWithBasicAuth} ]; \
+    then pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r src/requirements.txt; \
+    else pip install --upgrade pip && pip install -r src/requirements.txt; \
+    fi
 
 USER 1001
 

@@ -1,6 +1,5 @@
 import argparse
 
-import pandas as pd
 from flask import jsonify, request
 
 from services.infrastructure.environment import training_host_url, debug_mode
@@ -8,23 +7,15 @@ from services.infrastructure.flask import init_flask
 from services.infrastructure.git_info import GIT_COMMIT
 
 from services.infrastructure.logging import initialize_logging
-from services.prediction.model_load import load_model
 from services.infrastructure.environment import prediction_auth
 
+from model.model_wrapper import ModelWrapper
 
 # initialize flask application
 TRAINING_POD_URL = training_host_url()
 app, _executor, auth = init_flask()
 app.config['USERS'] = prediction_auth()
-
-
-# initialize model. Try loading it, fallback (e.g. training service is not up, yet) set it to None.
-# noinspection PyBroadException
-try:
-    app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
-except FileNotFoundError:
-    print("remote model and local backup model can't be found, for the moment....")
-    app.config['MODEL'] = None
+app.config["MODEL"] = ModelWrapper.load(GIT_COMMIT)
 
 
 @app.route('/predict', methods=['POST'])
@@ -46,16 +37,6 @@ def predict():
         { prediction : label/value}
 
     """
-    # check if model has been loaded. if not: try to load it
-    if not app.config["MODEL"]:
-        # noinspection PyBroadException
-        try:
-            app.config["MODEL"] = load_model(TRAINING_POD_URL, GIT_COMMIT)
-        except FileNotFoundError:
-            msg = 'No model for prediction loaded yet'
-            app.logger.error(msg)
-            return jsonify({'error': msg}), 404
-
     # read json submitted with POST
     data = request.get_json(silent=True)
 

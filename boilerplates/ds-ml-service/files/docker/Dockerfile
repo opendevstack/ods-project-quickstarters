@@ -1,0 +1,48 @@
+FROM registry.access.redhat.com/rhscl/python-36-rhel7
+
+ARG nexusHostWithBasicAuth
+ARG nexusHostWithoutScheme
+ARG serviceType
+
+WORKDIR /app
+
+ENV DSI_MINICONDA_PACKAGE_VERSION="3.6.0"
+ENV DSI_MINICONDA_PACKAGE_PATH=/app/miniconda3.sh
+ENV PYTHONPATH=$PYTHONPATH:/app
+ENV DSI_PACKAGE=/app/app.tar.gz
+ENV SERVICE_TYPE="${serviceType}"
+
+RUN echo "Building ${serviceType} image"
+
+# Front load pip install, miniconda download for caching docker build layers
+COPY dist/requirements.txt /app
+USER root
+RUN if [[ ${serviceType} == "training" ]]; \
+    then curl -Lv --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MINICONDA_PACKAGE_VERSION}-Linux-x86_64.sh --output ${DSI_MINICONDA_PACKAGE_PATH}; \
+    fi
+USER 1001
+RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
+    then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r requirements.txt; \
+    else pip install --upgrade pip && pip install -r requirements.txt; \
+    fi
+
+# Copying all the code
+COPY dist /app
+
+USER root
+
+# Is needed that the special user (1001) has the permissions for starting python servers
+RUN chgrp -R 0 /app && \
+    chmod -R g=u /app && \
+    chmod +x /app/run.sh && \
+    chmod g+w /etc/passwd
+
+RUN if [[ ${serviceType} == "training" ]]; \
+    then touch /app/app.tar.gz && tar zcf /app/app.tar.gz ./ --exclude=./app.tar.gz; \
+    fi
+
+USER 1001
+
+EXPOSE 8080
+
+ENTRYPOINT [ "/app/run.sh" ]

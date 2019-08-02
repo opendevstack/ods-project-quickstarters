@@ -1,3 +1,5 @@
+import joblib
+
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
 
@@ -23,6 +25,7 @@ class ModelWrapper(object):
         contains name of the features that are finally feed to the model, after possible
         feature engineering
     """
+
     def __init__(self):
         self.model = LogisticRegression()
         self.source_features = ["sepalLength", "sepalWidth", "petalWidth"]
@@ -116,3 +119,39 @@ class ModelWrapper(object):
 
         data = add_polynomial(df, "sepalLength", "poly_sepalLength")
         return data
+
+    def save(self, filename):
+        """Custom function for saving the `ModelWrapper` instance.
+
+        Notes
+        -----
+        For this exemplary example, 'joblib' is used to simply dump the instance. However,
+        more complicated save scenarios can be thought of, e.g. saving weights of large neural
+        network separately, etc....
+
+        Parameters
+        ----------
+        filename : String
+            name of the file to save class instance to
+        """
+        with open(filename, "wb") as f:
+            joblib.dump(self, f)
+
+    @classmethod
+    def load(cls, filename):
+        """Custom load function for loading an instance of a saved `ModelWrapper`
+
+        Parameters
+        ----------
+        filename : String
+            name of the saved class instance
+
+        Returns
+        -------
+        loaded_modelwrapper : ModelWrapper
+            loaded instance
+        """
+        with open(filename, "rb") as f:
+            loaded_modelwrapper = joblib.load(f)
+            return loaded_modelwrapper
+

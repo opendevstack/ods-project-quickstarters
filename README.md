@@ -55,7 +55,7 @@ Note that those scripts might need parameters to work, and often need to be adju
 
 If you contribute a new quickstarter / boilerplate - please use the provided `README.md` templates
 1. for a `jenkins-slave` - the [`slave template`](__JENKINS_SLAVE_TEMPLATE_README.md)
-1. for a `boilerplace`- the [`boilerplate`](QS_BOILERPLATE_TEMPLATE_README.md)
+1. for a `boilerplace`- the [`boilerplate`](__QS_BOILERPLATE_TEMPLATE_README.md)
 
 ## Upgrade an existing Git repository to OpenDevStack
 

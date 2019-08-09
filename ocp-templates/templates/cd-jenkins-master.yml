@@ -158,7 +158,7 @@ objects:
             limits:
               memory: '${MEMORY_LIMIT}'
             requests:
-              memory: 100Mi
+              memory: '${MEMORY_REQUEST}'
           securityContext:
             capabilities: {}
             privileged: false
@@ -254,6 +254,8 @@ parameters:
   value: "true"
 - name: MEMORY_LIMIT
   value: 2Gi
+- name: MEMORY_REQUEST
+  value: 1Gi
 - name: VOLUME_CAPACITY
   value: 5Gi
 - name: NAMESPACE

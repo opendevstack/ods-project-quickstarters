@@ -94,7 +94,7 @@ objects:
                 limits:
                   memory: '${MEMORY_LIMIT}'
                 requests:
-                  memory: 100Mi
+                  memory: '${MEMORY_REQUEST}'
               terminationMessagePath: /dev/termination-log
           dnsPolicy: ClusterFirst
           restartPolicy: Always
@@ -132,8 +132,13 @@ parameters:
     required: true
   - name: MEMORY_LIMIT
     displayName: Memory Limit
-    description: Maxiroutemum amount of memory the Node.js container can use.
-    value: 1024Mi
+    description: Maximum amount of memory available for the container.
+    value: 512Mi
+    required: true
+  - name: MEMORY_REQUEST
+    displayName: Memory Request
+    description: Minimum amount of memory requested for the container.
+    value: 256Mi
     required: true
 labels:
   template: component-template

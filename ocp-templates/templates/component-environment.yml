@@ -133,12 +133,12 @@ parameters:
   - name: MEMORY_LIMIT
     displayName: Memory Limit
     description: Maximum amount of memory available for the container.
-    value: 600Mi
+    value: 512Mi
     required: true
   - name: MEMORY_REQUEST
     displayName: Memory Request
     description: Minimum amount of memory requested for the container.
-    value: 400Mi
+    value: 256Mi
     required: true
 labels:
   template: component-template

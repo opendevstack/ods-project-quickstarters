@@ -119,7 +119,7 @@ echo "[INFO]: cleanup workplace"
 cd ..
 rm -rf oc_migration_scripts
 
-if [[ -z "$SKIP_TAGS" ]]; then
+if [[ ! -z "$SKIP_TAGS" ]]; then
   echo "[INFO] Skipping imagestream tagging"
   return
 fi

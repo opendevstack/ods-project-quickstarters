@@ -25,9 +25,9 @@ while [[ "$#" > 0 ]]; do case $1 in
   -t=*|--target-env=*) TARGET_ENV="${1#*=}";;
   -t|--target-env) TARGET_ENV="$2"; shift;;
 
-  -d|--debug) DEBUG="true"; shift;;
+  -d|--debug) DEBUG=true; shift;;
 
-  -st|--skip-tag) SKIP_TAGS="true"; shift;;
+  -st|--skiptags) SKIP_TAGS=true;;
 
   -gb=*|--git-branch=*) GIT_BRANCH="${1#*=}";;
   -gb|--git-branch) GIT_BRANCH="$2"; shift;;

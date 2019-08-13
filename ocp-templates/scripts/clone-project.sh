@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 usage() {
     echo "usage: sh $0 -p <project id> -o <openshift host> -b <bitbucket host> -c <http basic auth credentials \

@@ -25,7 +25,7 @@ while [[ "$#" > 0 ]]; do case $1 in
   -t=*|--target-env=*) TARGET_ENV="${1#*=}";;
   -t|--target-env) TARGET_ENV="$2"; shift;;
 
-  -d|--debug) DEBUG=true; shift;;
+  -d|--debug) DEBUG=true;;
 
   -st|--skiptags) SKIP_TAGS=true;;
 

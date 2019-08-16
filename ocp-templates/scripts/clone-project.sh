@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 usage() {
     echo "usage: sh $0 -p <project id> -o <openshift host> -b <bitbucket host> -c <http basic auth credentials \
@@ -25,7 +25,12 @@ while [[ "$#" > 0 ]]; do case $1 in
   -t=*|--target-env=*) TARGET_ENV="${1#*=}";;
   -t|--target-env) TARGET_ENV="$2"; shift;;
 
-  -d|--debug) DEBUG="true"; shift;;
+  -d|--debug) DEBUG=true;;
+
+  -st|--skiptags) SKIP_TAGS=true;;
+
+  -gb=*|--git-branch=*) GIT_BRANCH="${1#*=}";;
+  -gb|--git-branch) GIT_BRANCH="$2"; shift;;
 
   -st|--skip-tag) SKIP_TAGS="true"; shift;;
 

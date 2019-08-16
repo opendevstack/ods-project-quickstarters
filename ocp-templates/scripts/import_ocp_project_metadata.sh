@@ -230,7 +230,7 @@ if [[ -z ${OD_GIT_BRANCH// } ]]; then
     git_checkout_expression="$git_checkout_expression"     
 else
     # yes
-    git_checkout_expression="$git_checkout_expression -b ${OD_GIT_BRANCH}"     
+    git_checkout_expression="$git_checkout_expression ${OD_GIT_BRANCH}"     
 fi
 # tag set?
 if [[ !  -z ${OD_GIT_TAG// } ]]; then 

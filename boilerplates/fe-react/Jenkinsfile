@@ -50,7 +50,7 @@ def stageBuild(def context) {
 def stageUnitTest(def context) {
     stage('Unit Test') {
       withEnv(["CI=true"]){
-        sh "npm test"
+        sh "JEST_JUNIT_OUTPUT='build/test-results/test/test-results.xml' npm test -- --reporters=default --reporters=jest-junit"
       }
     }
 }

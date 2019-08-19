@@ -11,8 +11,11 @@ RUN cd /tmp && \
     cd - && \
     mkdir /go
 
+ENV PATH $PATH:/usr/local/go/bin
+ENV GOBIN /usr/local/bin
+
 RUN curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.17.1
 
-ENV PATH $PATH:/usr/local/go/bin
+RUN go get -u github.com/jstemmer/go-junit-report
 
 WORKDIR /go

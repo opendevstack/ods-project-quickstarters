@@ -27,7 +27,7 @@ cd $TARGET_DIR
 
 echo "Init react app"
 sudo docker run --rm -v $PWD:/data -w /data node \
-  npm init react-app $COMPONENT --use-npm
+  npm init react-app $COMPONENT --use-npm && npm --prefix $COMPONENT i jest-junit
 
 cd $COMPONENT
 

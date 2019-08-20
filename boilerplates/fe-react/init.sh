@@ -27,8 +27,9 @@ cd $TARGET_DIR
 
 echo "Init react app"
 sudo docker run --rm -v $PWD:/data -w /data node \
-  npm init react-app $COMPONENT --use-npm \
-  npm i jest-junit
+  npm init react-app $COMPONENT --use-npm 
+sudo docker run --rm -v $PWD:/data -w /data node \
+  cd $COMPONENT && npm install jest-junit
 
 cd $COMPONENT
 

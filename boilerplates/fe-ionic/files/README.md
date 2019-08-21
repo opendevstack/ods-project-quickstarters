@@ -22,9 +22,9 @@ the development environment with ionic serve / ionic build.
 ## Ionic Pro
 Steps to enable Ionic Pro builds:
 
-- Create a project in the [Ionic Pro Dashboard](https://dashboard.ionicframework.com) --> make sure you create the app in the *Boehringer Ingelheim* organisation and not in your users account.
+- Create a project in the [Ionic Pro Dashboard](https://dashboard.ionicframework.com) --> make sure you create the app in your organisation and not in your users account.
 - Add the app id to the `ionic.config.json`
-- Open the `Jenkinsfile` and add the username and repo name in Line 73 --> `{{ionic-user}}/{{ionic-project-name}}` (most likely `boehringer-ingelheim/your-project-name-in-lower-case-with-minus-chars-as-spaces.git`)
+- Open the `Jenkinsfile` and add the username and repo name in Line 73 --> `{{ionic-user}}/{{ionic-project-name}}` (most likely `your-organisation-name/your-project-name-in-lower-case-with-minus-chars-as-spaces.git`)
 - Switch the condition in line 62 of the `Jenkinsfile` from `false` to `true` --> it has to be deactivated initially because without the correct setup the initial build would fail
 
 ## Openshift Builds

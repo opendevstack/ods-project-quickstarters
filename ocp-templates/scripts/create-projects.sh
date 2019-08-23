@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+set -ex
 
 # This script creates the 3 OCP projects we currently require for every
 # OD project.

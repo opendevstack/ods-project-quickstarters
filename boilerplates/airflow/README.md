@@ -14,6 +14,8 @@ repository for all workers. As illustrated bellow:
 All Airflow images are based on `shared-service/airflow` image stream. All documentation can be found at
 https://github.com/opendevstack/ods-core/tree/master/shared-images/airflow
 
+To deploy the quickstarter **the component name must be `airflow-worker`** otherwise nothing will be created
+
 ## Contents
 
 These are the OpenShift resources and the repository structure created by 

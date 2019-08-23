@@ -38,14 +38,14 @@
         cd ods-project-quickstarters
         # Here the branch can be changed for testing purposes
         git checkout origin/production
-    - description: clone config project - origin/production
+    - description: clone config project - origin/master
       script: |-
         set -eux
         cd "/tmp/rundeck_@job.id@_@job.execid@"
         git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
         cd ods-configuration
         # Here the branch can be changed for testing purposes
-        git checkout origin/production
+        git checkout origin/master
     - description: create docker container for running script with tailor
       script: |-
         set -eux

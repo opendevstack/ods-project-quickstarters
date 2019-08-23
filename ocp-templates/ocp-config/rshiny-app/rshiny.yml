@@ -78,8 +78,6 @@ objects:
   - apiVersion: v1
     kind: BuildConfig
     metadata:
-      annotations:
-        description: Defines how to build the application
       name: ${COMPONENT}
     spec:
       failedBuildsHistoryLimit: 5
@@ -167,8 +165,6 @@ objects:
   - apiVersion: v1
     kind: ImageStream
     metadata:
-      annotations:
-        description: Keeps track of changes in the application image
       name: '${COMPONENT}'
     spec:
       dockerImageRepository: '${COMPONENT}'

@@ -8,10 +8,7 @@ objects:
     kind: Service
     metadata:
       annotations:
-        description: Exposes and load balances the application pods
         service.alpha.openshift.io/dependencies: '[]'
-      labels:
-        branch: '${BRANCH}'
       name: '${COMPONENT}'
     spec:
       ports:
@@ -27,8 +24,6 @@ objects:
   - apiVersion: v1
     kind: ImageStream
     metadata:
-      annotations:
-        description: Keeps track of changes in the application image
       name: '${COMPONENT}'
     spec:
       dockerImageRepository: '${COMPONENT}'
@@ -37,8 +32,6 @@ objects:
   - apiVersion: v1
     kind: BuildConfig
     metadata:
-      annotations:
-        description: Defines how to build the application
       name: ${COMPONENT}
     spec:
       failedBuildsHistoryLimit: 5
@@ -61,8 +54,6 @@ objects:
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
-      labels:
-        branch: '${BRANCH}'
       name: '${COMPONENT}'
     spec:
       replicas: 1
@@ -130,16 +121,6 @@ parameters:
   - name: ENV
     displayName: Environment
     description: The environment stage.
-    required: true
-  - name: BRANCH
-    displayName: Branch
-    description: The branch (either 'feature' or 'master').
-    value: feature
-    required: true
-  - name: BRANCH
-    displayName: Branch
-    description: The branch (either 'feature' or 'master').
-    value: feature
     required: true
   - name: MEMORY_LIMIT
     displayName: Memory Limit

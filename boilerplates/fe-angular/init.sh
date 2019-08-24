@@ -27,7 +27,7 @@ cd $TARGET_DIR
 sudo chgrp -R 0 .
 echo "generate project"
 sudo docker run --rm -v $PWD:/data \
-  ng new $COMPONENT --style=scss --skip-git --skip-install
+  ng new $COMPONENT --style=scss --skip-git --skip-install && npm --prefix $COMPONENT i jest-junit
 
 cd $COMPONENT
 
@@ -53,6 +53,19 @@ read -r -d "" CHROME_CONFIG << EOM || true
 EOM
 sed -i "s|\s*browsers: \['Chrome'\],|$CHROME_CONFIG|" ./src/karma.conf.js
 sed -i "s|\(browsers:\)|    \1|g" ./src/karma.conf.js
+
+echo "Configure xml unit test reporter in karma.conf.j2"
+read -r -d "" UNIT_TEST_XML_CONFIG << EOM || true
+    reporters: \['progress', 'junit', 'kjhtml'\],\\
+\\
+    junitReporter: {\\
+      outputDir: './build/test-results/test',\\
+      outputFile: 'test-results.xml',\\
+      useBrowserName: false,\\
+      xmlVersion: 1\\
+    },
+EOM
+sed -i "s|\s*reporters: \['progress', 'kjhtml'\],|$UNIT_TEST_XML_CONFIG|" ./src/karma.conf.js
 
 echo "Configure headless chrome in protractor.conf.js"
 read -r -d '' PROTRACTOR_CONFIG << EOM || true

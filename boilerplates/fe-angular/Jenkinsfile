@@ -44,9 +44,13 @@ def stageBuild(def context) {
 }
 
 def stageUnitTest(def context) {
+  try {
     stage('Unit Test') {
-      sh "yarn test -- --single-run --progress false"
+    sh "npm test -- --reporters=jest-junit"
     }
+  } finally {
+    junit 'build/test-results/test/test-results.xml'
+  }
 }
 
 def stageLint(def context) {

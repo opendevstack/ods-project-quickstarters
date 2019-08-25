@@ -34,14 +34,41 @@
     - exec: 'echo openshift_api_token: ${option.openshift_api_token} project_id: ${option.project_id},  component_id:
         ${option.component_id}, git_url_http: ${option.git_url_https}, git_url_ssh:
         ${option.git_url_ssh}, package_name: ${option.package_name}'
-    - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
+    - description: create tmp dir for job
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
+    - description: clone quickstarter project - origin/production
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
+        cd ods-project-quickstarters
+        # Here the branch can be changed for testing purposes
+        git checkout origin/production
+    - description: clone config project - origin/master
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
+        cd ods-configuration
+        # Here the branch can be changed for testing purposes
+        git checkout origin/master
     - description: init DS ML service project
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/ds-ml-service && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: copy custom create components script
       exec: cp /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/ds-ml-service/custom-create-components.sh /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates/scripts
-    - description: create docker container for openshift client
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
+    - description: create docker container for running script with tailor
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        mkdir -p docker/ods-configuration/ods-project-quickstarters
+        cp -r           ods-configuration/ods-project-quickstarters docker/ods-configuration
+        mkdir -p docker/ods-project-quickstarters/ocp-templates/ocp-config
+        cp -r           ods-project-quickstarters/ocp-templates/ocp-config docker/ods-project-quickstarters/ocp-templates
+        mkdir -p docker/ods-project-quickstarters/ocp-templates/scripts
+        cp -r           ods-project-quickstarters/ocp-templates/scripts docker/ods-project-quickstarters/ocp-templates
+        cp ods-project-quickstarters/ocp-templates/Dockerfile docker/
+        cd docker
+        sudo docker build --build-arg OC_IP=@globals.openshift_apihost_lookup@ -t oc .
     - description: create components
       exec: echo "Token --> ${option.openshift_api_token}" && cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./custom-create-components.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -ne "${globals.nexus_host}"'
     - description: add Jenkinsfile to generated project

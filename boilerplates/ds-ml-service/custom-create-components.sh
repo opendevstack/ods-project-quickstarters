@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eux
 
 # This script sets up the resource objects for a certain component:
 # * image streams
@@ -13,7 +14,19 @@
 # some arguments don't have a corresponding value to go with it such
 # as in the --default example).
 # note: if this is set to -gt 0 the /etc/hosts part is not recognized ( may be a bug )
-while [[ $# -gt 1 ]]
+
+# support pointing to patched tailor using TAILOR environment variable
+: ${TAILOR:=tailor}
+
+tailor_exe=$(type -P ${TAILOR})
+tailor_version=$(${TAILOR} version)
+
+echo "Using tailor ${tailor_version} from ${tailor_exe}"
+
+DEBUG=false
+STATUS=false
+
+while [[ $# -gt 0 ]]
 do
 key="$1"
 
@@ -34,12 +47,24 @@ case $key in
     NEXUS_HOST="$2"
     shift # past argument
     ;;
-    *)
-            # unknown option
+    --status)
+    STATUS=true
     ;;
+    -d|--debug)
+    DEBUG=true;
+    ;;
+    *)
+    echo "Unknown option: $1. Exiting."
+    exit 1
 esac
 shift # past argument or value
 done
+
+if $DEBUG; then
+  tailor_verbose="-v"
+else
+  tailor_verbose=""
+fi
 
 if [ -z ${PROJECT+x} ]; then
     echo "PROJECT is unset, but required";
@@ -54,17 +79,44 @@ if [ -z ${NEXUS_HOST+x} ]; then
     exit 1;
 else echo "NEXUS_HOST=${NEXUS_HOST}"; fi
 
+if $STATUS; then
+  echo "NOTE:Invoked with --status:  will use tailor status instead of tailor update."
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+tailor_update_in_dir() {
+    local dir="$1"; shift
+    if [ ${STATUS} = "true" ]; then
+        $DEBUG && echo 'exec:' cd  "$dir" '&&'
+        $DEBUG && echo 'exec:'     ${TAILOR} $tailor_verbose status "$@"
+        set +e  # tailor exits with negative if diffs are found but we want to simply preview them
+        cd "$dir" && ${TAILOR} $tailor_verbose status "$@"
+        set -e
+    else
+        $DEBUG && echo 'exec:' cd "$dir" '&&'
+        $DEBUG && echo 'exec:    ' ${TAILOR} $tailor_verbose --non-interactive update "$@"
+        cd "$dir" && ${TAILOR} $tailor_verbose --non-interactive update "$@"
+    fi
+}
+
+OCP_CONFIG="${SCRIPT_DIR}/../ocp-config/"
 
 # iterate over different environments
 for devenv in dev test ; do
     for type in training-service prediction-service ; do
         # create resources
+        TAILOR_BASE_ARGS=( \
+            "--namespace=${PROJECT}-${devenv}" \
+            "--param=PROJECT=${PROJECT}" \
+            "--param=COMPONENT=${COMPONENT}-${type}" \
+            "--param=ENV=${devenv}"
+            )
+
         echo "${PROJECT} -- ${COMPONENT}-${type} -- ${BITBUCKET_REPO}"
-        oc process cd//component-environment PROJECT=${PROJECT} COMPONENT=${COMPONENT}-${type} ENV=${devenv}  | oc create -n ${PROJECT}-${devenv} -f-
-
-        # create image build configs
-        oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT}-${type} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
-
+        tailor_update_in_dir "${OCP_CONFIG}/component-environment" \
+            "${TAILOR_BASE_ARGS[@]}" \
+            --selector app="${PROJECT}-${COMPONENT}-${type}",template=component-template
         # create component environment variables
         echo "--> setting environment variables for component type ${type} in env ${devenv}";
         if [ ${type} = "training-service" ]; then

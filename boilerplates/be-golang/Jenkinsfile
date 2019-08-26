@@ -51,7 +51,7 @@ def stageCheckFormat(def context) {
 
 def stageLint(def context) {
   stage('Lint') {
-    withEnv(["CGO_ENABLED=0"]) {
+    withEnv(["CGO_ENABLED=0", "GOCACHE=${WORKSPACE}/.cache"]) {
       sh "golangci-lint run"
     }
   }
@@ -60,7 +60,7 @@ def stageLint(def context) {
 def stageBuild(def context) {
   stage('Build') {
     def binary = "app_linux_amd64"
-    withEnv(["CGO_ENABLED=0"]) {
+    withEnv(["CGO_ENABLED=0", "GOCACHE=${WORKSPACE}/.cache"]) {
       sh "go build -o docker/${binary}"
     }
   }
@@ -68,9 +68,18 @@ def stageBuild(def context) {
 
 def stageUnitTest(def context) {
   stage('Unit Test') {
-    def gopkgs = sh(script: 'go list ./... | grep -v /vendor', returnStdout: true)
-    withEnv(["GOPKGS=${gopkgs}", "CGO_ENABLED=0"]) {
-      sh 'go test -v -cover $GOPKGS'
+    withEnv(["CGO_ENABLED=0", "GOCACHE=${WORKSPACE}/.cache"]) {
+      sh 'mkdir -p build/test-results/test'
+      def gopkgs = sh(script: 'go list ./... | grep -v /vendor', returnStdout: true).trim()
+      withEnv(["GOPKGS=${gopkgs}"]) {
+        def status = sh(script: 'go test -v -cover $GOPKGS 2>&1 > test-results.txt', returnStatus: true)
+        sh 'cat test-results.txt | go-junit-report > build/test-results/test/report.xml'
+        junit 'build/test-results/test/report.xml'
+        sh 'rm test-results.txt'
+        if (status != 0) {
+          error "go test -v -cover $GOPKGS failed!"
+        }
+      }
     }
   }
 }

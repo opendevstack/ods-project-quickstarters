@@ -54,6 +54,19 @@ EOM
 sed -i "s|\s*browsers: \['Chrome'\],|$CHROME_CONFIG|" ./karma.conf.js
 sed -i "s|\(browsers:\)|    \1|g" ./karma.conf.js
 
+echo "Configure junit xml reporter in karma.conf.js"
+read -r -d "" UNIT_XML_CONFIG << EOM || true
+    reporters: \['progress', 'junit', 'kjhtml'\],\\
+\\
+    junitReporter: {\\
+      outputDir: './build/test-results/test',\\
+      outputFile: 'test-results.xml',\\
+      useBrowserName: false,\\
+      xmlVersion: 1\\
+    },
+EOM
+sed -i "s|\s*reporters: \['progress', 'kjhtml'\],|$UNIT_XML_CONFIG|" ./karma.conf.js
+
 echo "Configure headless chrome in protractor.conf.js"
 read -r -d '' PROTRACTOR_CONFIG << EOM || true
     'browserName': 'chrome',\\

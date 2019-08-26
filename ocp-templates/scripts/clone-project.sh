@@ -108,7 +108,7 @@ echo "oc_env=$OPENSHIFT_HOST" > ocp_project_config_target
 cd ..
 echo $(pwd)
 
-git_url="https://$CREDENTIALS@$BITBUCKET_HOST/scm/$PROJECT_ID/$PROJECT_ID-occonfig-artifacts.git"
+git_url="https://${CREDENTIALS//@/%40}@$BITBUCKET_HOST/scm/$PROJECT_ID/$PROJECT_ID-occonfig-artifacts.git"
 
 if [[ -z "$DEBUG" ]]; then
   verbose=""

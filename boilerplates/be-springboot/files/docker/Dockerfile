@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 
 COPY app.jar app.jar
 

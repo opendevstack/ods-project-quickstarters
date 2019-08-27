@@ -26,12 +26,39 @@
       exec: 'echo project_id: ${option.project_id} openshift_api_token: bb${option.openshift_api_token}bb'
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
-    - description: clone oc script project
-      exec: cd /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
-    - description: create docker container for openshift client
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates && sudo docker build --build-arg OC_IP=${globals.openshift_apihost_lookup} -t oc .
+    - description: clone quickstarter project - origin/production
+      script: |-
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
+        cd ods-project-quickstarters
+        # Here the branch can be changed for testing purposes
+        git checkout origin/production
+    - description: clone config project - origin/master
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
+        cd ods-configuration
+        # Here the branch can be changed for testing purposes
+        git checkout origin/master
+    - description: create docker container for running script with tailor
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        mkdir -p docker/ods-configuration/ods-project-quickstarters
+        cp -r           ods-configuration/ods-project-quickstarters docker/ods-configuration
+        mkdir -p docker/ods-project-quickstarters/ocp-templates/ocp-config
+        cp -r           ods-project-quickstarters/ocp-templates/ocp-config docker/ods-project-quickstarters/ocp-templates
+        mkdir -p docker/ods-project-quickstarters/ocp-templates/scripts
+        cp -r           ods-project-quickstarters/ocp-templates/scripts docker/ods-project-quickstarters/ocp-templates
+        cp ods-project-quickstarters/ocp-templates/Dockerfile docker/
+        cd docker
+        sudo docker build --build-arg OC_IP=@globals.openshift_apihost_lookup@ -t oc .
     - description: create openshift projects (dev / test / cd with jenkins)
-      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc /bin/bash -c "oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && ./create-projects.sh -p ${option.project_id} -n ${globals.nexus_host} -a ${option.project_admin} -e ${option.project_groups}"
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/ocp-templates"
+        sudo docker run --rm oc /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && ./create-projects.sh -p @option.project_id@ -n @globals.nexus_host@ -a @option.project_admin@ -e @option.project_groups@'
     keepgoing: false
     strategy: node-first
   uuid: 00f767ef-347f-480e-8ad3-bf2aed3abf5d

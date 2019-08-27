@@ -30,9 +30,17 @@
     - exec: 'echo project_id: ${option.project_id},  component_id: ${option.component_id},
         git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
         package_name: ${option.package_name}'
-    - description: checkout quickstart
-      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout origin/production
-    - script: |-
+    - description: create tmp dir for job
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
+    - description: clone quickstarter project - origin/production
+      script: |-
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
+        cd ods-project-quickstarters
+        # Here the branch can be changed for testing purposes
+        git checkout origin/production
+    - description: cp rshiny boilerplate to component_id subdir
+      script: |-
         #!/bin/bash
         mkdir /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@
         cd /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@

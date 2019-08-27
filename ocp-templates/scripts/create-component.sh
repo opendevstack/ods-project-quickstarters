@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eu
 
 # This script sets up the resource objects for a certain component:
 # * image streams
@@ -13,8 +14,19 @@
 # some arguments don't have a corresponding value to go with it such
 # as in the --default example).
 # note: if this is set to -gt 0 the /etc/hosts part is not recognized ( may be a bug )
+
+# support pointing to patched tailor using TAILOR environment variable
+: ${TAILOR:=tailor}
+
+tailor_exe=$(type -P ${TAILOR})
+tailor_version=$(${TAILOR} version)
+
+echo "Using tailor ${tailor_version} from ${tailor_exe}"
+
+DEBUG=false
 ROUTE="false"
-while [[ $# -gt 1 ]]
+STATUS=false
+while [[ $# -gt 0 ]]
 do
 key="$1"
 
@@ -25,10 +37,6 @@ case $key in
     ;;
     -c|--component)
     COMPONENT="$2"
-    shift # past argument
-    ;;
-    -b|--bitbucket)
-    BITBUCKET_REPO="$2"
     shift # past argument
     ;;
     -r|--route)
@@ -42,13 +50,26 @@ case $key in
     -ne|--nexus)
     NEXUS_HOST="$2"
     shift # past argument
-    ;;	
+    ;;
+    --status)
+    STATUS=true
+    ;;
+    -d|--debug)
+    DEBUG=true;
+    ;;
     *)
-            # unknown option
+    echo "Unknown option: $1. Exiting."
+    exit 1
     ;;
 esac
 shift # past argument or value
 done
+
+if $DEBUG; then
+  tailor_verbose="-v"
+else
+  tailor_verbose=""
+fi
 
 if [ -z ${PROJECT+x} ]; then
     echo "PROJECT is unset, but required";
@@ -63,25 +84,42 @@ if [ -z ${NEXUS_HOST+x} ]; then
     exit 1;
 else echo "NEXUS_HOST=${NEXUS_HOST}"; fi
 
-
 echo "Route=${ROUTE}"
 
+if $STATUS; then
+  echo "NOTE:Invoked with --status:  will use tailor status instead of tailor update."
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+tailor_update_in_dir() {
+    local dir="$1"; shift
+    if [ ${STATUS} = "true" ]; then
+        $DEBUG && echo 'exec:' cd  "$dir" '&&'
+        $DEBUG && echo 'exec:'     ${TAILOR} $tailor_verbose status "$@"
+        cd "$dir" && ${TAILOR} $tailor_verbose status "$@"
+    else
+        $DEBUG && echo 'exec:' cd "$dir" '&&'
+        $DEBUG && echo 'exec:    ' ${TAILOR} $tailor_verbose --non-interactive update "$@"
+        cd "$dir" && ${TAILOR} $tailor_verbose --non-interactive update "$@"
+    fi
+}
+
+OCP_CONFIG="${SCRIPT_DIR}/../ocp-config/"
 # iterate over different environments
 for devenv in dev test ; do
     # create resources
-    echo "${PROJECT} -- ${COMPONENT} -- ${BITBUCKET_REPO}"
-    oc process cd//component-environment PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv}  | oc create -n ${PROJECT}-${devenv} -f-
+    TAILOR_BASE_ARGS=( \
+        "--namespace=${PROJECT}-${devenv}" \
+        "--param=PROJECT=${PROJECT}" \
+        "--param=COMPONENT=${COMPONENT}" \
+        "--param=ENV=${devenv}"
+        )
 
-    # create route if required
-    if [ ${ROUTE} = "true" ]; then
-        if [ -z ${ROUTE_NAME+x} ]; then
-            echo "ROUTE_NAME is unset, using default ${COMPONENT}";
-        else
-            echo "ROUTE_NAME=${ROUTE_NAME}";
-        fi
-        oc process cd//component-route PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
-    fi
+    echo "Creating component ${COMPONENT} in environment ${PROJECT}-${devenv}:"
 
-    # create image build configs
-    oc process cd//bc-docker PROJECT=${PROJECT} COMPONENT=${COMPONENT} ENV=${devenv} | oc create -n ${PROJECT}-${devenv} -f-
+    tailor_update_in_dir "${OCP_CONFIG}/component-environment" \
+        "${TAILOR_BASE_ARGS[@]}" \
+        --selector app="${PROJECT}-${COMPONENT}",template=component-template
+
 done

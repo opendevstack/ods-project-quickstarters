@@ -16,12 +16,14 @@ objects:
       app: jenkins-webhook-proxy
     name: webhook-proxy
   spec:
+    host: webhook-proxy-${PROJECT}-cd.${OD_OCP_SOURCE_APP_DOMAIN}
     tls:
       insecureEdgeTerminationPolicy: Redirect
       termination: edge
     to:
       kind: Service
       name: webhook-proxy
+      weight: 100
     wildcardPolicy: None
 - apiVersion: v1
   kind: Service
@@ -50,6 +52,7 @@ objects:
     name: webhook-proxy
   spec:
     replicas: 1
+    revisionHistoryLimit: 10
     selector:
       app: jenkins-webhook-proxy
     strategy:
@@ -72,14 +75,12 @@ objects:
         - env:
           - name: REPO_BASE
             value: '${REPO_BASE}'
-          - name: PROTECTED_BRANCHES
-            value: ${PROTECTED_BRANCHES}
           - name: TRIGGER_SECRET
             valueFrom:
               secretKeyRef:
                 key: trigger-secret
                 name: webhook-proxy
-          image: ''
+          image: ' '
           imagePullPolicy: Always
           name: webhook-proxy
           resources: {}
@@ -89,8 +90,6 @@ objects:
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
-        serviceAccount: jenkins
-        serviceAccountName: jenkins
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
@@ -114,11 +113,13 @@ objects:
   data:
     trigger-secret: ${PIPELINE_TRIGGER_SECRET}
 parameters:
+- name: PROJECT
+  required: true
+- name: OD_OCP_SOURCE_APP_DOMAIN
+  required: true
 - name: NAMESPACE
   value: cd
 - name: REPO_BASE
-  value: REPO_BASE
-- name: PROTECTED_BRANCHES
-  value: "master,develop,production,staging,release/"
+  required: true
 - name: PIPELINE_TRIGGER_SECRET
-  value: PIPELINE_TRIGGER_SECRET
+  required: true

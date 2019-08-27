@@ -23,16 +23,21 @@ ENV MAVEN_VERSION=3.3 \
 ENV JAVA_HOME=/usr/lib/jvm/jre
 
 # Install Maven
-RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    # yum-config-manager --disable epel >/dev/null || : && \
-    yum install -y wget && \
-    alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }') && \
-	wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo && \
-	sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo && \
-    INSTALL_PKGS="java-1.8.0-openjdk-devel.x86_64 apache-maven*" && \
-	yum install -y $INSTALL_PKGS && \
+RUN yum install -y wget && \
+    wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo && \
+    sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo && \
+    INSTALL_PKGS="java-11-openjdk-devel apache-maven*" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     yum clean all -y && \
-    mkdir -p $HOME/.m2
+    mkdir -p $HOME/.m2 && \
+    exactVersion=$(ls -lah /usr/lib/jvm | grep java-11-openjdk-11 | awk '{print $NF}' | head -1) && \
+    alternatives --set java /usr/lib/jvm/${exactVersion}/bin/java && \
+    alternatives --set javac /usr/lib/jvm/${exactVersion}/bin/javac && \
+    java -version && \
+    javac -version
+
+# Container support is now integrated in Java 11, the +UseCGroupMemoryLimitForHeap option has been pruned
+ENV JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true"
 
 # When bash is started non-interactively, to run a shell script, for example it
 # looks for this variable and source the content of this file. This will enable

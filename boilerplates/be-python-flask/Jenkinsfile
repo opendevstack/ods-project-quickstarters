@@ -25,6 +25,7 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-python",
   projectId: projectId,
   componentId: componentId,
+  testResults : 'src/tests',
   branchToEnvironmentMapping: [
     'master': 'test',
     '*': 'dev'

@@ -1,0 +1,5 @@
+namespace cd
+selector app=jenkins-slave-airflow
+param-dir ../../../../ods-configuration/ods-project-quickstarters/jenkins-slaves/airflow/ocp-config
+
+bc,is

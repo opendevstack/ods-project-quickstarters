@@ -1,6 +1,8 @@
-# This image provides a jupyter notebook setup
-
-FROM centos/python-36-centos7
+FROM centos/python-36-centos7:latest
+# If you want to enable the redhat supported version, uncomment the following line
+# and remove the line above
+#
+#FROM registry.access.redhat.com/rhscl/python-36-rhel7
 
 LABEL maintainer="Stefan Klingelschmitt <stefan.klingelschmitt@boehringer-ingelheim.com>"
 

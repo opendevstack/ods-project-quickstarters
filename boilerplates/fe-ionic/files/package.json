@@ -12,7 +12,7 @@
     "serve:e2e": "APP_ENV=e2e ionic-app-scripts serve",
     "serve:prod": "APP_ENV=prod ionic-app-scripts serve",
     "test-coverage": "ng test --code-coverage",
-    "test": "ng test",
+    "test": "ng test --reporters=junit",
     "e2e": "APP_ENV=e2e ionic-app-scripts build && webdriver-manager update --versions.chrome=2.32 && protractor --webdriver-update false"
   },
   "config": {

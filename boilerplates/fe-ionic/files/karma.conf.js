@@ -25,7 +25,13 @@ module.exports = function (config) {
       environment: 'dev',
       sourcemap: false
     },
-    reporters: config.angularCli && config.angularCli.codeCoverage ? ['progress', 'coverage-istanbul'] : ['progress', 'kjhtml'],
+    junitReporter: {
+      outputDir: './build/test-results/test',
+      outputFile: 'test-results.xml',
+      useBrowserName: false,
+      xmlVersion: 1
+    },
+    reporters: config.angularCli && config.angularCli.codeCoverage ? ['progress', 'coverage-istanbul', 'junit'] : ['progress', 'kjhtml', 'junit'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

@@ -26,6 +26,7 @@ odsPipeline(
     image: "${dockerRegistry}/cd/jenkins-slave-python",
     projectId: projectId,
     componentId: componentId,
+    testResults : 'tests-results',
     openshiftBuildTimeout: 25,
     branchToEnvironmentMapping: [
         'master': 'test',
@@ -61,11 +62,9 @@ def stageBuild(def context) {
 
 def stageUnitTestsTraining(def context) {
     stage('Unittests') {
-        trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-        print("Found pod name: ${trainingPodInfo[0]}")
-        if (trainingPodInfo[2] == "Running") {
-            sh(returnStdout: true, script: "oc exec ${trainingPodInfo[0]} bash ./run_unittests.sh -n ${context.targetProject}")
-        }
+        trainingPodInfo = sh(returnStdout: true, script:"oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+        print("Running Unit Tests in pod ${trainingPodInfo[0]}")
+        sh(returnStdout: true, script: "oc exec ${trainingPodInfo[0]} bash ./run_unittests.sh -n ${context.targetProject}")
     }
 }
 
@@ -92,12 +91,12 @@ def stageTraining(def context) {
 
 def stageIntegrationTestTraining(def context) {
     stage('Integration Tests') {
-        trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-        print("Found pod name: ${trainingPodInfo[0]}")
-        if (trainingPodInfo[2] == "Running") {
-            sh(returnStdout: true, script: "oc -n ${context.targetProject} exec ${trainingPodInfo[0]} bash ./run_integration_tests.sh")
-        }
-        print("Pod ${trainingPodInfo[0]} is not running... cannot execute integration tests")
+        trainingPodInfo = sh(returnStdout: true, script:"oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+        print("Running Integration Tests in pod ${trainingPodInfo[0]}")
+        sh(returnStdout: true, script: "oc -n ${context.targetProject} exec ${trainingPodInfo[0]} bash ./run_integration_tests.sh")
+        sh(returnStdout: true, script: "oc -n ${context.targetProject} exec ${trainingPodInfo[0]} cat nosetests.xml > testresults.xml")
+        sh "mkdir -p tests-results && mv testresults.xml tests-results/"
+        junit 'tests-results/testresults.xml'
     }
 }
 
@@ -146,10 +145,10 @@ def stageCustomDeployToOpenshift(def context, def stageName, def buildConfig) {
 
 def waitForTrainingPod(def context, def buildConfig) {
     if(buildConfig.contains('training')) {
-        print("Waiting for training pod to be running...")
+        print("Start waiting for training pod to be running...")
         while(true) {
             trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
-            print("Found pod name: ${trainingPodInfo[0]}")
+            print("Waiting for training pod ${trainingPodInfo[0]} to be running...")
             if (trainingPodInfo[2] == "Running") {
                 print("Pod ${trainingPodInfo[0]} is running!!!")
                 break

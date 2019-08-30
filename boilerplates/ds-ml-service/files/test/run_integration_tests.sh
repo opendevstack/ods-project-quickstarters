@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-PYTHONPATH=. python3 -m unittest discover -s test/integration_tests -t .
+PYTHONPATH=. nosetests -v --with-xunit --with-coverage --cover-xml --cover-erase --cover-inclusive --cover-package=.

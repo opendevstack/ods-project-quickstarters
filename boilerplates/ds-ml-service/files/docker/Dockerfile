@@ -22,8 +22,13 @@ RUN echo "Building ${serviceType} image"
 COPY dist/requirements.txt /app
 USER root
 RUN if [[ ${serviceType} == "training" ]]; \
-    then curl -Lv --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MINICONDA_PACKAGE_VERSION}-Linux-x86_64.sh --output ${DSI_MINICONDA_PACKAGE_PATH}; \
+        then curl -Lv --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MINICONDA_PACKAGE_VERSION}-Linux-x86_64.sh --output ${DSI_MINICONDA_PACKAGE_PATH}; \
+            if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
+                then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} coverage nose; \
+                else pip install --upgrade pip && pip install coverage nose; \
+            fi \
     fi
+
 USER 1001
 RUN if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
     then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} -r requirements.txt; \

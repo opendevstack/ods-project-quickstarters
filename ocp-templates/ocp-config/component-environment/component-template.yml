@@ -34,6 +34,7 @@ objects:
     metadata:
       name: ${COMPONENT}
     spec:
+      completionDeadlineSeconds: ${COMPLETION_DEADLINE_SECONDS}
       failedBuildsHistoryLimit: 5
       nodeSelector: null
       output:
@@ -137,3 +138,9 @@ parameters:
     description: The version to be used.
     value: latest
     required: true
+  - name: COMPLETION_DEADLINE_SECONDS
+    displayName: Completion Deadline Seconds
+    description: how long the docker build of the component can last before it is canceled
+    value: "1800"
+    required: true
+

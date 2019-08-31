@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -ex
-
 # This script creates the 3 OCP projects we currently require for every
 # OD project.
 # * project-cd  : containing jenkins
@@ -22,6 +20,14 @@ case $key in
     PROJECT="$2"
     shift # past argument
     ;;
+    -u|--cd_user)
+    CD_USER="$2"
+    shift # past argument
+    ;;
+    -w|--cd_pwd)
+    CD_USER_PWD="$2"
+    shift # past argument
+    ;;
 	-a|--project_admins)
     OD_PRJ_ADMINS="$2"
     shift # past argument
@@ -35,8 +41,7 @@ case $key in
     shift # past argument
     ;;
     *)
-        echo "Unknown option: $1. Exiting."
-        exit 1
+            # unknown option
     ;;
 esac
 shift # past argument or value
@@ -132,9 +137,13 @@ else
 	oc policy add-role-to-group view system:authenticated -n $PROJECT-cd
 fi
 
-# http://stackoverflow.com/a/12694189
-DIR=$(cd "${BASH_SOURCE%/*}" && pwd)
-if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+# create jenkins in the cd project
+oc process cd//cd-jenkins-master | oc create -f- -n ${PROJECT}-cd
+oc process cd//cd-jenkins-webhook-proxy | oc create -f- -n ${PROJECT}-cd
 
-# create jenkins and secrets in the cd project
-"$DIR/create-cd-jenkins.sh" -p $PROJECT
+# https://access.redhat.com/solutions/2988521
+oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:${PROJECT}-cd:jenkins -n ${PROJECT}-cd
+
+# add secrets for dockerfile build to dev and tes
+oc process cd//secrets PROJECT=${PROJECT} | oc create -f- -n ${PROJECT}-dev
+oc process cd//secrets PROJECT=${PROJECT} | oc create -f- -n ${PROJECT}-test

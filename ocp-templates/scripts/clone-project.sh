@@ -91,19 +91,21 @@ echo "[INFO]: creating workplace: mkdir -p oc_migration_scripts/migration_config
 mkdir -p oc_migration_scripts/migration_config
 cd oc_migration_scripts
 echo $(pwd)
-export_url="https://$BITBUCKET_HOST/projects/opendevstack/repos/ods-project-quickstarters/raw/ocp-templates/scripts/export_ocp_project_metadata.sh?at=refs%2Fheads%2Fproduction"
+export_url="https://$BITBUCKET_HOST/projects/opendevstack/repos/ods-project-quickstarters/raw/ocp-templates/scripts/export_ocp_project_metadata.sh?at=refs%2Fheads%2Ftest-sa-jenkins-create"
 curl --fail -s --user $CREDENTIALS -G $export_url -d raw -o export.sh
-import_url="https://$BITBUCKET_HOST/projects/opendevstack/repos/ods-project-quickstarters/raw/ocp-templates/scripts/import_ocp_project_metadata.sh?at=refs%2Fheads%2Fproduction"
+import_url="https://$BITBUCKET_HOST/projects/opendevstack/repos/ods-project-quickstarters/raw/ocp-templates/scripts/import_ocp_project_metadata.sh?at=refs%2Fheads%2Ftest-sa-jenkins-create"
 curl --fail -s --user $CREDENTIALS -G $import_url -d raw -o import.sh
 
 cd migration_config
 echo $(pwd)
 
 echo "Creating source file"
-echo "oc_env=$OPENSHIFT_HOST" > ocp_project_config_source
+echo "oc_env=$OPENSHIFT_HOST" >> ocp_project_config_source
+echo "OD_OCP_CD_SA_SOURCE=$(oc whoami | sed  -e 's/system:serviceaccount://g')" >> ocp_project_config_source
 
 echo "Creating target file"
-echo "oc_env=$OPENSHIFT_HOST" > ocp_project_config_target
+echo "oc_env=$OPENSHIFT_HOST" >> ocp_project_config_target
+echo "OD_OCP_CD_SA_TARGET=$(oc whoami | sed  -e 's/system:serviceaccount://g')" >> ocp_project_config_target
 
 cd ..
 echo $(pwd)
@@ -115,6 +117,7 @@ if [[ -z "$DEBUG" ]]; then
 else
   verbose="-v true"
 fi
+
 echo "[INFO]: export resources from $SOURCE_ENV"
 sh export.sh -p $PROJECT_ID -h $OPENSHIFT_HOST -e $SOURCE_ENV -g $git_url -gb $GIT_BRANCH -cpj $verbose
 echo "[INFO]: import resources into $TARGET_ENV"

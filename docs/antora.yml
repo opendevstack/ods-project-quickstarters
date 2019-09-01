@@ -2,5 +2,6 @@ name: ods-project-quickstarters
 title: ODS Project Quickstarters
 version: latest
 nav: 
+- modules/jenkins-slaves/nav.adoc
 - modules/ROOT/nav.adoc
 

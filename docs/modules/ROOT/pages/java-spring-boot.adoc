@@ -92,7 +92,7 @@ This file is copied to the `docker` folder to be included in the docker image wh
 == Builder Slave used
 
 This quickstarter uses
-https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/maven[Maven builder slave] Jenkins builder slave.
+xref:jenkins-slaves:maven.adoc[Maven builder slave] Jenkins builder slave.
 
 == Known limitations
 

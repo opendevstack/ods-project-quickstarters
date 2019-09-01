@@ -1,0 +1,2 @@
+.Provided Jenkins Slaves
+* xref:jenkins-slaves:maven.adoc[Maven]

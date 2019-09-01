@@ -1,0 +1,27 @@
+= Maven / Gradle Slave
+
+This slave is used to build java code, both thru `maven` and `gradle`
+
+== Features
+
+* Nexus configuration for `Maven` and `Gradle`
+* HTTP Proxy awareness for `Maven` and `Gradle`
+* Default Installation maven 3.3 based on https://www.softwarecollections.org/en/scls/rhscl/rh-maven33/[rh-maven33]
+* Default Gradle Installation 5.6.1
+
+== What if I want to use a different Gradle version?
+
+The Spring Quickstarter for example uses its own gradle wrapper (gradlew).
+Now two things can happen:
+
+=== You specify the same version as installed in the slave
+
+In this case the cached version is reused. Thus your build is faster, but you are tight to the version of the slave.
+
+=== You specify another version as installed in the slave
+
+This is completley valid. As with gradlew, it will download the version, install it and use the version.
+This allows to have your gradle version completely decoupled from the pre-installed one.
+But on the other hand, your build lasts longer, because your project specific version is downloaded first.
+
+

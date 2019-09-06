@@ -1,10 +1,13 @@
 #!/bin/bash
+set -ex
+
 # this script imports OCP project from metadata file located in a specified Git repo (input)
 # for OpenDevStack in OpenShift
-# 
+#
 ## settings
 #
-eval_oc_artifact_status() 
+
+eval_oc_artifact_status()
 {
 	local oc_command="oc "
 
@@ -14,26 +17,29 @@ eval_oc_artifact_status()
 
 	#extract type from filename <type>_<filename>
 	artifact_type=$(basename $artifact_name | cut -d '_' -f1)
-	#remove artifact prefix 
+	#remove artifact prefix
 	artifact_name=$(echo "${artifact_name}" | sed -e "s/${artifact_type}_//g")
 
+	# react to fail
+	set +e
 	oc get $artifact_type $artifact_name >& /dev/null
-	if [ $? -ne 0 ]; then		
-		oc_command="$oc_command create -f " 		
+	if [ $? -ne 0 ]; then
+		oc_command="$oc_command create -f "
 	else
 		# skip replace set? ...
 		if [[ ${skip_replace} == "true" || ${OD_USE_ADDONLY} == "true" ]]; then
-			oc_command="echo !!! NOT replacing $artifact_name with " 
+			oc_command="echo !!! NOT replacing $artifact_name with "
 		else
-			oc_command="$oc_command replace -f " 
+			oc_command="$oc_command replace -f "
 		fi
-	fi	
+	fi
+	set -e
 	#the reason to only return the command here - is that we may use a tmp file later
 	#with replaced content
 	echo "$oc_command"
 }
 
-eval_oc_artifact_name() 
+eval_oc_artifact_name()
 {
 	local oc_artifact=""
 
@@ -43,11 +49,11 @@ eval_oc_artifact_name()
 
 	#extract type from filename <type>_<filename>
 	artifact_type=$(basename $artifact_name | cut -d '_' -f1)
-	#remove artifact prefix 
+	#remove artifact prefix
 	artifact_name=$(echo "${artifact_name}" | sed -e "s/${artifact_type}_//g")
 
-	oc_artifact="$artifact_name" 
-	
+	oc_artifact="$artifact_name"
+
 	echo "$oc_artifact"
 }
 #
@@ -66,7 +72,7 @@ case $key in
 	-h|--ocp_host)
     OD_OCP_TARGET_HOST="$2"
     shift # past argument
-    ;;	
+    ;;
     -t|--ocp_token)
     OD_OCP_TARGET_TOKEN="$2"
     shift # past argument
@@ -78,23 +84,23 @@ case $key in
     -e|--env)
     OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES="$2"
     shift # past argument
-    ;;	
+    ;;
     -g|--git)
     OD_GIT_URL="$2"
     shift # past argument
-    ;;	
+    ;;
     -gb|--gitbranch)
     OD_GIT_BRANCH="$2"
     shift # past argument
-    ;;		
+    ;;
     -gt|--gittag)
     OD_GIT_TAG="$2"
     shift # past argument
-    ;;		
+    ;;
 	-a|--project_admins)
     OD_PRJ_ADMINS="$2"
     shift # past argument
-    ;;    
+    ;;
 	-n|--target_project)
     OD_TO_PROJECT="$2"
     shift # past argument
@@ -110,7 +116,7 @@ case $key in
     --force)
     FORCE_PROJECT="$2"
     shift # past argument
-    ;;        
+    ;;
     -v|--verbose)
     OD_VERBOSE="$2"
     shift # past argument
@@ -126,7 +132,7 @@ esac
 shift # past argument or value
 done
 
-if [[ -z ${OD_PRJ_ADMINS} ]]; then 
+if [[ -z ${OD_PRJ_ADMINS} ]]; then
     # fallback
 	echo ">>> no project admins set - setting clemens :)"
 	echo
@@ -136,11 +142,11 @@ else
     OD_PRJ_ADMINS=utschig,${OD_PRJ_ADMINS}
 fi
 
-if [[ -z ${OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES} ]]; then 
+if [[ -z ${OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES} ]]; then
     # fallback
 	echo ">>> no project envs set - setting cd_test_dev"
 	echo
-    OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES=cd_test_dev    
+    OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES=cd_test_dev
 fi
 
 if [ -z "${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG+x}" -o -z "${OD_GIT_URL+x}" -o -z "${OD_OCP_TARGET_HOST}" ]; then
@@ -160,7 +166,7 @@ else
 	echo "git branch / tag: ${OD_GIT_BRANCH} / ${OD_GIT_TAG}"
 	echo "namespaces: ${OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES}"
 	echo "admins : ${OD_PRJ_ADMINS}"
-	echo "new project name : ${OD_TO_PROJECT}" 
+	echo "new project name : ${OD_TO_PROJECT}"
 	if [[ ${OD_USE_ADDONLY} == "true" ]]; then
 		echo "-- adding missing artifacts only"
 	fi
@@ -186,7 +192,7 @@ else
 	exit 1
 fi
 
-if [[ -z ${OD_EXCLUDE_NAMESPACES} ]]; then 
+if [[ -z ${OD_EXCLUDE_NAMESPACES} ]]; then
     # fallback
 	echo ">>> no namespace exclusions set - cd / shared-images / openshift and rhscl"
 	echo
@@ -204,14 +210,14 @@ fi
 temp_dir=$( mktemp -d )
 cd $temp_dir
 echo " -- cloning git repo $git_repo into $temp_dir"
-echo 
+echo
 git clone $git_repo
-echo 
+echo
 if [ $? -ne 0 ]; then
     # little housekeeping
     rm -rf $temp_dir
     # error
-    echo "ERROR: could not clone the git repo $git_repo" 
+    echo "ERROR: could not clone the git repo $git_repo"
     exit 1
 fi
 # step inside clonned git repo
@@ -225,17 +231,17 @@ fi
 # switch to another git branch?
 git_checkout_expression="git checkout "
 # branch set in config
-if [[ -z ${OD_GIT_BRANCH// } ]]; then 
+if [[ -z ${OD_GIT_BRANCH// } ]]; then
     # no -> set to default master branch
-    git_checkout_expression="$git_checkout_expression"     
+    git_checkout_expression="$git_checkout_expression"
 else
     # yes
-    git_checkout_expression="$git_checkout_expression ${OD_GIT_BRANCH}"     
+    git_checkout_expression="$git_checkout_expression ${OD_GIT_BRANCH}"
 fi
 # tag set?
-if [[ !  -z ${OD_GIT_TAG// } ]]; then 
+if [[ !  -z ${OD_GIT_TAG// } ]]; then
     # yes
-    git_checkout_expression="$git_checkout_expression tags/${OD_GIT_TAG}"    
+    git_checkout_expression="$git_checkout_expression tags/${OD_GIT_TAG}"
 fi
 #
 echo " -- check out git for $git_checkout_expression"
@@ -243,9 +249,9 @@ echo " -- check out git for $git_checkout_expression"
 eval ${git_checkout_expression}
 echo
 #
-echo 
+echo
 if [ $? -ne 0 ]; then
-    echo "ERROR: could not clone the git repo $git_repo - trying with a hot clone" 
+    echo "ERROR: could not clone the git repo $git_repo - trying with a hot clone"
 	# little housekeeping
 	rm -rf $temp_dir
 fi
@@ -254,13 +260,13 @@ fi
 if [[ -f "ocp_config" ]]; then
 	sourceHost=$(grep export ocp_config | cut -d '=' -f2)
 	sourceconfig=$(grep -H $sourceHost $scriptdir/migration_config/ocp_project_config_source | cut -d ':' -f1)
-	
+
 	echo "sourcehost : $sourceHost sourceconfig : $sourceconfig"
-	
+
 	if [[ -f "$sourceconfig" ]]; then
 		echo "> sourcing env source config from $sourceconfig"
 		source $sourceconfig
-	else 
+	else
 		echo "Cannot find $sourceconfig aborting"
 		exit  1
 	fi
@@ -410,7 +416,7 @@ fi
 # HINT: folder name should look like <project_name>-occonfig-artifacts
 project_name=$( echo $clonned_git_fld_name | cut -d '-' -f1 )
 #
-if [ -z $project_name ] && [[ ! ${FORCE_PROJECT} == "true" ]]; then 
+if [ -z $project_name ] && [[ ! ${FORCE_PROJECT} == "true" ]]; then
     echo "ERROR: could not extract project_name from a folder name $clonned_git_fld_name"
     exit 1
 fi
@@ -426,72 +432,103 @@ do
     else
     	curr_ocp_namespace=${project_name}-${ocp_proj_namespace_suffix}
     fi
-		
+
     cd $ocp_proj_namespace_suffix
     echo "current source folder: ${PWD}"
-	
+
 	if [[ ! -z ${OD_TO_PROJECT} ]]; then
 		curr_ocp_namespace=${OD_TO_PROJECT}
 		echo " ----> cloning ${project_name}-${ocp_proj_namespace_suffix} into ${curr_ocp_namespace}"
 	else
 	    echo " -- creating new project ${curr_ocp_namespace} in OpenShift (${OD_OCP_TARGET_HOST})"
 	fi
-	
+
+	# react to fail
+	set +e
 	oc project ${curr_ocp_namespace} >& /dev/null
-	
+	result=$?
+	set -e
+
 	# assumption : if the project is there - it was created via opendevstack ...
-    if [ $? -ne 0 ]; then 
+    if [ $result -ne 0 ]; then
         echo "Could not find project ${curr_ocp_namespace} - creating"
-        
-		if [ ! -s project.yml ]; then 
+
+		if [ ! -s project.yml ]; then
 			echo "!! Project export is empty - as errors occured above, hence aborting"
 			exit 1
-		fi        
-        
+		fi
+
 		oc new-project ${curr_ocp_namespace} || exit 1
 		# create the baseline with service accounts, role bindings - and switch SA account
 		cp project.yml project.yml$tmp_postfix
+		cp rolebindings.yml rolebindings.yml$tmp_postfix
 		if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
 		    sed -i -e "s|$OD_OCP_CD_SA_SOURCE|$OD_OCP_CD_SA_TARGET|g" project.yml$tmp_postfix
+		    sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$curr_ocp_namespace|g" project.yml$tmp_postfix
+			sed -i -e '/^ *uid: /d' project.yml$tmp_postfix
+			sed -i -e '/^ *resourceVersion: /d' project.yml$tmp_postfix
+
+		    sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$curr_ocp_namespace|g" rolebindings.yml$tmp_postfix
+			sed -i -e '/^ *uid: /d' rolebindings.yml$tmp_postfix
+			sed -i -e '/^ *resourceVersion: /d' rolebindings.yml$tmp_postfix
+			sed -i -e '/^ *selfLink: /d' rolebindings.yml$tmp_postfix
+			sed -i -e '/^ *creationTimestamp: /d' rolebindings.yml$tmp_postfix
+			sed -i -e '/^ *namespace: /d' rolebindings.yml$tmp_postfix
+		else
+			echo "OD_OCP_CD_SA_SOURCE is empty! can't continue..."
+			exit 1
 		fi
 
-
+		# removing fail on error due to trying to promote cluster deployer role:
+		# Error from server (Forbidden): rolebindings.authorization.openshift.io "system:deployers" is forbidden: attempt to grant extra privileges
+		set +e
 		if [ "$OD_USE_APPLY" = true ]; then
+			# https://access.redhat.com/solutions/4272322
 			oc apply -f project.yml$tmp_postfix
 		else
-			oc create -f project.yml$tmp_postfix
+			oc create --save-config -f project.yml$tmp_postfix
 		fi
-		
+		oc create --save-config -f rolebindings.yml$tmp_postfix -n ${curr_ocp_namespace} || true
+		set -e
+
+		if [[ $ocp_proj_namespace_suffix == "cd" ]]; then
+			oc create sa jenkins -n ${project_name}-${ocp_proj_namespace_suffix}
+		fi
+
 		# admin for the creating SA and image pull rights
 		oc policy add-role-to-user admin system:serviceaccount:${OD_OCP_CD_SA_TARGET}
 		oc policy add-role-to-user system:image-puller system:serviceaccount:${OD_OCP_CD_SA_TARGET}
 		# everyone authenticated can see
-		oc policy add-role-to-user view system:authenticated
+		oc policy add-role-to-group view system:authenticated
 
-		# if jenkins CD is NOT part of the import it does not make sense to try to create the linking SA 
+		# if jenkins CD is NOT part of the import it does not make sense to try to create the linking SA
 		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"cd"* ]];
 		then
 			echo "creating service account jenkins to modify build configs during jenkins build"
 			oc policy add-role-to-user admin system:serviceaccount:${project_name}-cd:jenkins -n ${project_name}-${ocp_proj_namespace_suffix}
 			echo
 		fi
-		
+
 		# add pull rights against ocp OD dedicated - for NON CD projects - otherwise we even pull the jenkins image and that we dont want
-		if [[ $ocp_proj_namespace_suffix == "cd" ]]; then 
+		if [[ $ocp_proj_namespace_suffix == "cd" ]]; then
 			echo "--  not creating pull secret to OCP, this is CD - just adding image pull rights"
 			oc policy add-role-to-user system:image-puller system:serviceaccount:${project_name}-cd:jenkins -n cd
 		fi
+
 	else
 		echo "!!! Project ${curr_ocp_namespace} already exists - skipping creation"
     fi
 
+	# allow it to fail
+	set +e
 	secretkey=odocp
 	secretexists=$(oc get secret | grep "$secretkey")
+	set -e
 
-	if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ ! $secretexists == *"$secretkey"* ]]; then 
+	if [[ ! -z ${OD_OCP_SOURCE_TOKEN} ]] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]] && [[ ! $secretexists == *"$secretkey"* ]]; then
 		echo "Creating OCP OD pull secret for ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}"
-		oc create secret docker-registry ${secretkey} --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com     
-		oc secrets link deployer ${secretkey} --for=pull                                   
+		oc create secret docker-registry ${secretkey} --docker-server=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST} --docker-username=cd/cd-integration --docker-password=${OD_OCP_SOURCE_TOKEN} --docker-email=a@b.com
+		oc secrets link deployer ${secretkey} --for=pull
 		oc secrets link default ${secretkey} --for=pull
 	else
 		echo "OCP OD Token not set - assuming local build"
@@ -499,59 +536,59 @@ do
 
 	# add admins
 	for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
-	do		
+	do
 		oc policy add-role-to-user admin ${admin_user}
 	done
-		
+
 	echo
     echo "    importing persistent volume claims"
     for pvc_config_json in ./pvc/pvc_*.json; do
 		if [ ! -f "$pvc_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $pvc_config_json"
 			break
 		fi
-		
+
 		artifact_file=${pvc_config_json}
 		skip_replace=true
-		
+
 		occomm=$(eval_oc_artifact_status)$pvc_config_json
-	
+
 		eval ${occomm}
-		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $pvc_config_json  
+		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $pvc_config_json
         echo
     done
 
 	echo "    importing image streams"
     for is_config_json in ./imagestream/is_*.json; do
 		if [ ! -f "$is_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $is_config_json"
 			break
 		fi
 
 		artifact_file=${is_config_json}
 		skip_replace=true
-	
+
 		cat $is_config_json | sed -e "s|$project_name-$ocp_proj_namespace_suffix|$OD_TO_PROJECT|g" > $is_config_json$tmp_postfix
-	
+
 		occomm=$(eval_oc_artifact_status)$is_config_json$tmp_postfix
-	
+
 		eval ${occomm}
-		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $is_config_json  
+		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $is_config_json
         echo
     done
 
 	echo "    importing templates"
     for template_config_json in ./template/template_*.yml; do
 		if [ ! -f "$template_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $template_config_json"
 			break
 		fi
 		artifact_file=${template_config_json}
 		skip_replace=false
-		
+
 		# replace hosts
 		cp $template_config_json $template_config_json$tmp_postfix
 		if [[ ! -z "$OD_OCP_SOURCE_APP_DOMAIN" ]]; then
@@ -563,22 +600,22 @@ do
 		fi
 
 		occomm=$(eval_oc_artifact_status)$template_config_json$tmp_postfix
-	
+
 		eval ${occomm}
-		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $template_config_json  
+		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $template_config_json
         echo
-    done	
-	
+    done
+
 	echo "    importing config maps"
     for cmap_config_json in ./config/configmap_*.yml; do
 		if [ ! -f "$cmap_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $cmap_config_json"
 			break
 		fi
 		artifact_file=${cmap_config_json}
 		skip_replace=false
-		
+
 		# replace hosts
 
 		cp $cmap_config_json $cmap_config_json$tmp_postfix
@@ -591,17 +628,17 @@ do
 		fi
 
 		occomm=$(eval_oc_artifact_status)$cmap_config_json$tmp_postfix
-	
+
 		eval ${occomm}
-		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $cmap_config_json  
+		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $cmap_config_json
         echo
     done
-	
+
 	echo "    importing deploy configs"
 	# replace nexus host and also an image ns reference to ODjenkins
     for dc_config_json in ./dc/dc_*.yml; do
 		if [ ! -f "$dc_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $dc_config_json"
 			break
 		fi
@@ -629,22 +666,22 @@ do
 
 		artifact_file=${dc_config_json}
 		artifactName=$(eval_oc_artifact_name)
-		
+
 		skip_replace=false
 		occomm=$(eval_oc_artifact_status)$dc_config_json$tmp_postfix
-	
+
 		eval ${occomm}
 		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $dc_config_json
 
-		# grab the stream data so we can import later 
+		# grab the stream data so we can import later
 		ref_imagestreamWithRegistry=$( cat $dc_config_json | grep image: | sed -e 's/ //g' | cut -d ':' -f2,3 | cut -d '@' -f1  | head -1)
 		ref_imagestreamOwningProject=$(echo $ref_imagestreamWithRegistry | cut -d '/' -f2)
 		ref_imagestreamName=$(echo $ref_imagestreamWithRegistry | cut -d '/' -f3)
-		
+
 		echo " --> checking for referenced project image - stream: $ref_imagestreamWithRegistry"
-		
+
 		exlude_this_namespace=false
-		
+
 		# check for any exclusions
 		for exclude_namespace in $(echo $OD_EXCLUDE_NAMESPACES | sed -e 's/,/ /g');
 		do
@@ -653,7 +690,7 @@ do
 				echo "... setting exclusion for image $ref_imagestreamWithRegistry based on $OD_EXCLUDE_NAMESPACES"
 			fi
 		done
-		
+
 		# dont do any import on shared images from shared-image namespace and from CD
 		if [ "$exlude_this_namespace" = false ] && [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]]; then
 			echo "Importing remote images ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} into ${ref_imagestreamName}"
@@ -661,34 +698,34 @@ do
 		else
 		    echo "Leaving referenced image $ref_imagestreamWithRegistry as is!"
 		fi
-			
+
         echo
     done
-		
+
 	echo "    importing services"
     for svc_config_json in ./service/svc_*.yml; do
 		if [ ! -f "$svc_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $svc_config_json"
 			break
 		fi
-	
+
 		artifact_file=${svc_config_json}
 		skip_replace=true
-		
+
 		occomm=$(eval_oc_artifact_status)$svc_config_json
-	
+
 		eval ${occomm}
 		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $svc_config_json
         echo
     done
-	
+
 	# for cd this has to be done AFTER the deployment config and services - as it pulls the image straight away and starts a deployment
 	# in case nothing else was created yet
 	echo "    importing build configs"
     for bc_config_json in ./bc/bc_*.yml; do
 		if [ ! -f "$bc_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $bc_config_json"
 			break
 		fi
@@ -705,21 +742,21 @@ do
 		     sed -i -e "s|$OD_OCP_SOURCE_BITBUCKET_URL|$OD_OCP_TARGET_BITBUCKET_URL|g"  $bc_config_json$tmp_postfix
 		fi
 
-		
+
 		occomm=$(eval_oc_artifact_status)$bc_config_json$tmp_postfix
 		eval ${occomm}
 		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $bc_config_json
 		echo
 	done
-	
+
 	echo "    importing routes"
     for route_config_json in ./route/route_*.json; do
 		if [ ! -f "$route_config_json" ]
-		then	
+		then
 			echo "No artifacts fround that match $route_config_json"
 			break
 		fi
-	
+
 		artifact_file=${route_config_json}
 		skip_replace=false
 
@@ -731,17 +768,17 @@ do
 		if [ ! -z "$OD_TO_PROJECT" ]; then
 			sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$OD_TO_PROJECT|g" $route_config_json$tmp_postfix
 		fi
-		
+
 		occomm=$(eval_oc_artifact_status)$route_config_json$tmp_postfix
 		eval ${occomm}
 		git log -n 1 --format="commit: %H by: %aN on: %aD" -- $route_config_json
         echo
-    done	
-		
+    done
+
     cd ..
 done
 cd - >& /dev/null
-# little housekeeping in host OS 
+# little housekeeping in host OS
 echo " -- removing temp directory ${temp_dir}"
 rm -rf ${temp_dir}
 echo " -- finished"

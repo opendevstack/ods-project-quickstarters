@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
+set -ex
+
 # this script exports project templates for OpenDevStack in OpenShift
-# 
+#
 ## settings
 ## functions
+
 save_pvc_json_config()
 {
    cat << EOF > ${pvc_json_conf_output_path}
@@ -82,7 +85,7 @@ save_route_json_config ()
 					},
 					"spec": {
 					    "host": "$host",
-                        "path" : "$api_path", 
+                        "path" : "$api_path",
 						"to": {
 							"kind": "Service",
 							"name": "$service",
@@ -119,19 +122,19 @@ case $key in
  	-h|--ocp_host)
     OD_OCP_SOURCE_HOST="$2"
     shift # past argument
-    ;;	
+    ;;
 	-e|--env)
     OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES="$2"
     shift # past argument
-    ;;	
+    ;;
     -g|--git)
     OD_GIT_URL="$2"
     shift # past argument
-    ;;	
+    ;;
     -gb|--gitbranch)
     OD_GIT_BRANCH="$2"
     shift # past argument
-    ;;		
+    ;;
     -gt|--gittag)
     OD_GIT_TAG="$2"
     shift # past argument
@@ -139,7 +142,7 @@ case $key in
     --force)
     FORCE_PROJECT="$2"
     shift # past argument
-    ;;    
+    ;;
     -v|--verbose)
     OD_VERBOSE="$2"
     shift # past argument
@@ -155,11 +158,11 @@ done
 if [[ ${FORCE_PROJECT} == "true" ]]; then
 	echo ">>> force project name: "${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG}
 	OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES=${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG}
-elif [[ -z ${OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES} ]]; then 
+elif [[ -z ${OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES} ]]; then
     # fallback
 	echo ">>> no project envs set - setting cd_test_dev"
 	echo
-    OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES=cd_test_dev    
+    OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES=cd_test_dev
 fi
 
 if [ -z "${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG+x}" -o -z "${OD_GIT_URL+x}" -o -z "${OD_OCP_SOURCE_HOST}" ]; then
@@ -168,7 +171,7 @@ if [ -z "${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG+x}" -o -z "${OD_GIT_URL+x}" -o -z
 	echo "-t|--ocp_token: <blinded>"
 	echo "-p|--project: ${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG}"
 	echo "-e|--env: ${OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES}"
-	echo "-g|--git: ${OD_GIT_URL}"	    
+	echo "-g|--git: ${OD_GIT_URL}"
 	exit 1
 else
 	echo "USING .... "
@@ -182,7 +185,6 @@ if [[ $OD_VERBOSE != "" ]]; then
   set -x
 fi
 
-# 
 project_name=$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG
 local_git_repo_fld=${project_name}-occonfig-artifacts
 
@@ -195,7 +197,6 @@ else
   if [ $? -ne 0 ]; then
       echo "ERROR: could not login into ${OD_OCP_SOURCE_HOST} with oc"
       exit 1
-  
   fi
 fi
 
@@ -210,14 +211,14 @@ fi
 temp_dir=$( mktemp -d )
 cd $temp_dir
 echo " -- cloning git repo $git_repo into $temp_dir"
-echo 
+echo
 git clone $git_repo
-echo 
+echo
 if [ $? -ne 0 ]; then
     # little housekeeping
     rm -rf $temp_dir
     # error
-    echo "ERROR: could not clone the git repo $git_repo" 
+    echo "ERROR: could not clone the git repo $git_repo"
     exit 1
 fi
 # step inside clonned git repo
@@ -231,30 +232,30 @@ fi
 # switch to another git branch?
 git_checkout_expression="git checkout "
 # branch set in config
-if [[ -z ${OD_GIT_BRANCH// } ]]; then 
+if [[ -z ${OD_GIT_BRANCH// } ]]; then
     # no -> set to default master branch
-    OD_GIT_BRANCH=master  
+    OD_GIT_BRANCH=master
 else
     # yes
-    git_checkout_expression="$git_checkout_expression -b ${OD_GIT_BRANCH}"     
+    git_checkout_expression="$git_checkout_expression -b ${OD_GIT_BRANCH}"
 fi
 # tag set?
-if [[ ! -z ${OD_GIT_TAG// } ]]; then 
+if [[ ! -z ${OD_GIT_TAG// } ]]; then
     # yes
-    git_checkout_expression="$git_checkout_expression tags/${OD_GIT_TAG}"    
+    git_checkout_expression="$git_checkout_expression tags/${OD_GIT_TAG}"
 fi
 #
 echo " -- check out git for $git_checkout_expression"
 eval ${git_checkout_expression}
 echo
 
-# create config file with source API OCP hostname ... 
+# create config file with source API OCP hostname ...
 echo "export_source_host=${OD_OCP_SOURCE_HOST}" > ocp_config
 
 #
 # export templates
 echo " -- exporting metadata"
-for ocp_proj_namespace_suffix in $(echo $OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES | sed -e 's/_/ /g'); # ${OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES[@]}; 
+for ocp_proj_namespace_suffix in $(echo $OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES | sed -e 's/_/ /g'); # ${OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES[@]};
 do
 
 	if [[ ${FORCE_PROJECT} == "true" ]]; then
@@ -263,28 +264,26 @@ do
     else
     	curr_ocp_namespace=${project_name}-${ocp_proj_namespace_suffix}
     fi
-    
+
     oc project ${curr_ocp_namespace}
-	
+
     echo " >>>>>>>>>>> -- exporting ocp project namespace ${curr_ocp_namespace} from (${OD_OCP_SOURCE_HOST}) -- <<<<<<<<<<<<<<<<<"
 	echo
     mkdir -p ${ocp_proj_namespace_suffix}
-	
-	oc export --namespace $curr_ocp_namespace secret,rolebindings,sa > ${ocp_proj_namespace_suffix}/project.yml
-	
-	echo "dump project.yml"
-	cat ${ocp_proj_namespace_suffix}/project.yml
-	
-	if [ ! -s ${ocp_proj_namespace_suffix}/project.yml ]; then 
+
+	oc get --export -o yaml secret,sa --namespace $curr_ocp_namespace > ${ocp_proj_namespace_suffix}/project.yml
+	oc get --export -o yaml rolebindings --namespace $curr_ocp_namespace > ${ocp_proj_namespace_suffix}/rolebindings.yml
+
+	if [ ! -s ${ocp_proj_namespace_suffix}/project.yml ]; then
 		echo "!! Project export is empty - as errors occured above, hence aborting - do you have full rights on ${curr_ocp_namespace} ?"
 		exit 1
 	fi
-    mkdir -p ${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}	
-#	
-    echo "    exporting config maps  for $curr_ocp_namespace" 
+    mkdir -p ${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}
+#
+    echo "    exporting config maps  for $curr_ocp_namespace"
     configmap_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/configmap.tsv
     oc get configmap --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${configmap_file}
-#   
+#
     echo "-- generating config map yaml configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/config
     while IFS= read line
@@ -292,14 +291,14 @@ do
         #echo "    $line"
         cmap_config=($line)
         cmap_name=${cmap_config[0]}
-		oc export configmap ${cmap_name} -oyaml > ${ocp_proj_namespace_suffix}/config/configmap_${cmap_name}.yml
+		oc get --export -o yaml configmap ${cmap_name} > ${ocp_proj_namespace_suffix}/config/configmap_${cmap_name}.yml
         echo "   created configurationmap in cmap_${cmap_name}.yml"
     done <"${configmap_file}";
 #
-    echo "    exporting service accounts for $curr_ocp_namespace" 
+    echo "    exporting service accounts for $curr_ocp_namespace"
     sa_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/serviceaccounts.tsv
     oc get sa --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${sa_file}
-#   
+#
     echo "-- generating service account yaml configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/sa
     while IFS= read line
@@ -307,14 +306,14 @@ do
         #echo "    $line"
         sa_config=($line)
         sa_name=${sa_config[0]}
-		oc export sa ${sa_name} -oyaml > ${ocp_proj_namespace_suffix}/sa/sa_${sa_name}.yml
+		oc get --export -o yaml sa ${sa_name} > ${ocp_proj_namespace_suffix}/sa/sa_${sa_name}.yml
         echo "   created service account in sa_${sa_name}.yml"
     done <"${sa_file}";
 #
-    echo "    exporting templates for $curr_ocp_namespace" 
+    echo "    exporting templates for $curr_ocp_namespace"
     template_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/templates.tsv
     oc get template --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${template_file}
-#   
+#
     echo "-- generating template yaml configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/template
     while IFS= read line
@@ -322,14 +321,14 @@ do
         #echo "    $line"
         template_config=($line)
         template_name=${template_config[0]}
-		oc export template ${template_name} -oyaml > ${ocp_proj_namespace_suffix}/template/template_${template_name}.yml
+		oc get --export -o yaml template ${template_name} > ${ocp_proj_namespace_suffix}/template/template_${template_name}.yml
         echo "   created template in template_${template_name}.yml"
     done <"${template_file}";
 #
-    echo "    exporting build configs for $curr_ocp_namespace" 
+    echo "    exporting build configs for $curr_ocp_namespace"
     build_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/buildconfigs.tsv
     oc get bc --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${build_file}
-#   
+#
     echo "-- generating build yaml configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/bc
     while IFS= read line
@@ -337,14 +336,14 @@ do
         #echo "    $line"
         bc_config=($line)
         bc_name=${bc_config[0]}
-		oc export bc ${bc_name} -oyaml > ${ocp_proj_namespace_suffix}/bc/bc_${bc_name}.yml
+		oc get --export -o yaml bc ${bc_name} > ${ocp_proj_namespace_suffix}/bc/bc_${bc_name}.yml
         echo "   created bc configuration in bc_${bc_name}.yml"
     done <"${build_file}";
-#	
-    echo "    exporting deployment configs for $curr_ocp_namespace" 
+#
+    echo "    exporting deployment configs for $curr_ocp_namespace"
     deploy_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/deployconfigs.tsv
     oc get dc --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${deploy_file}
-#   
+#
     echo "-- generating deployment yaml configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/dc
     while IFS= read line
@@ -352,14 +351,14 @@ do
         #echo "    $line"
         dc_config=($line)
         dc_name=${dc_config[0]}
-		oc export dc ${dc_name} -oyaml > ${ocp_proj_namespace_suffix}/dc/dc_${dc_name}.yml
+		oc get --export -o yaml dc ${dc_name} > ${ocp_proj_namespace_suffix}/dc/dc_${dc_name}.yml
         echo "   created dc configuration in dc_${dc_name}.yml"
     done <"${deploy_file}";
-#	
-    echo "    exporting services for $curr_ocp_namespace" 
+#
+    echo "    exporting services for $curr_ocp_namespace"
     service_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/service.tsv
     oc get service --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${service_file}
-#   
+#
     echo "-- generating service yaml configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/service
     while IFS= read line
@@ -367,14 +366,14 @@ do
         #echo "    $line"
         svc_config=($line)
         svc_name=${svc_config[0]}
-		oc export svc ${svc_name} -oyaml > ${ocp_proj_namespace_suffix}/service/svc_${svc_name}.yml
+		oc get --export -o yaml svc ${svc_name} > ${ocp_proj_namespace_suffix}/service/svc_${svc_name}.yml
         echo "   created svc configuration in svc_${svc_name}.yml"
     done <"${service_file}";
-#	
-    echo "    exporting persistent volume claims for $curr_ocp_namespace" 
+#
+    echo "    exporting persistent volume claims for $curr_ocp_namespace"
     tsv_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/pvc.tsv
     oc get pvc --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1,4,5 > ${tsv_file}
-#   
+#
     echo "-- generating pvc json configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/pvc
 
@@ -394,11 +393,11 @@ do
         save_pvc_json_config
         echo "   created pvc configuration in $pvc_json_conf_output_path"
     done <"$tsv_file";
-#    
-    echo "    exporting imagestreams for $curr_ocp_namespace" 
+#
+    echo "    exporting imagestreams for $curr_ocp_namespace"
     is_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/is.tsv
     oc get is --export=true --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1 > ${is_file}
-#   
+#
     echo "-- generating is json configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/imagestream
 
@@ -413,11 +412,11 @@ do
         save_is_json_config
         echo "   created is configuration in $is_json_conf_output_path"
     done <"$is_file";
-#    
-    echo "    exporting routes for $curr_ocp_namespace" 
+#
+    echo "    exporting routes for $curr_ocp_namespace"
 	route_file=${temp_dir}/${clonned_git_fld_name}/${ocp_proj_namespace_suffix}/route.tsv
 	oc get route --no-headers |  sed 's/  */ /g' | cut -d ' ' -f1,2,3,4,5,6,7 >${route_file}
-#   
+#
     echo "-- generating route json configs"
 	mkdir -p ${ocp_proj_namespace_suffix}/route
 
@@ -431,7 +430,7 @@ do
 		app=${project_name}
         env=${ocp_proj_namespace_suffix}
 		host=${route_config[1]}
-		
+
         # The size of the array is 7 when we have the path
         if [ "${#route_config[@]}" = "7" ]; then
             termination=$( echo ${route_config[5]} | sed -e 's/edge/edge/g' | cut -d '/' -f1 )
@@ -454,20 +453,20 @@ do
 
     done <"$route_file";
 
-	echo 
-    echo " ... DONE exporting project ${curr_ocp_namespace}" 
-	echo 
+	echo
+    echo " ... DONE exporting project ${curr_ocp_namespace}"
+	echo
 
     temp_dir_with_updated_files=$( mktemp -d )
-    if [ "$OD_REPLACE_EXPORTED_DATA_ENABLED" = true ] ; then     
+    if [ "$OD_REPLACE_EXPORTED_DATA_ENABLED" = true ] ; then
         cd $temp_dir_with_updated_files
-        
+
         # checkout git repo
         git_repo=$OD_GIT_URL
         temp_dir=$( mktemp -d )
         cd $temp_dir
         echo " -- cloning git repo $git_repo into $temp_dir"
-        echo 
+        echo
         git clone $git_repo
         # step inside clonned git repo
         basename=$(basename $git_repo)
@@ -476,17 +475,17 @@ do
         # switch to another git branch?
         git_checkout_expression="git checkout "
         # branch set in config
-        if [[ -z ${OD_GIT_BRANCH// } ]]; then 
+        if [[ -z ${OD_GIT_BRANCH// } ]]; then
             # no -> set to default master branch
-            OD_GIT_BRANCH=master  
+            OD_GIT_BRANCH=master
         else
             # yes
-            git_checkout_expression="$git_checkout_expression -b ${OD_GIT_BRANCH}"     
+            git_checkout_expression="$git_checkout_expression -b ${OD_GIT_BRANCH}"
         fi
         # tag set?
-        if [[ !  -z ${OD_GIT_TAG// } ]]; then 
+        if [[ !  -z ${OD_GIT_TAG// } ]]; then
             # yes
-            git_checkout_expression="$git_checkout_expression tags/${OD_GIT_TAG}"    
+            git_checkout_expression="$git_checkout_expression tags/${OD_GIT_TAG}"
         fi
         #
         echo " -- check out git for $git_checkout_expression"
@@ -523,6 +522,10 @@ git config --local user.name "CD System"
 
 git add --all >& /dev/null
 commit_msg="Automatic export from ${OD_OCP_SOURCE_HOST}"
+
+# allowed to fail
+set +e
+
 git commit -m "$commit_msg" -q
 #git remote add origin $OD_GIT_URL
 git push --set-upstream origin $OD_GIT_BRANCH

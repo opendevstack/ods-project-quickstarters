@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 # this script imports OCP project from metadata file located in a specified Git repo (input)
 # for OpenDevStack in OpenShift

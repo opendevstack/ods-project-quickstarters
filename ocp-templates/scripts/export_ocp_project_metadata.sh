@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
 # this script exports project templates for OpenDevStack in OpenShift
 #

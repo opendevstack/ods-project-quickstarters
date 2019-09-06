@@ -1,3 +1,19 @@
+buildscript {
+    ext
+            {
+                nexus_url = "${project.findProperty('nexus_url') ?: System.getenv('NEXUS_HOST')}"
+                nexus_user = "${project.findProperty('nexus_user') ?: System.getenv('NEXUS_USERNAME')}"
+                nexus_pw = "${project.findProperty('nexus_pw') ?: System.getenv('NEXUS_PASSWORD')}"
+                nexus_folder = "${project.findProperty('nexus_folder') ?: System.getenv('NEXUS_FOLDER')}"
+                nexus_folder = nexus_folder == "null" ? "candidates" : nexus_folder
+                no_nexus = nexus_url == "null" || nexus_user == "null" || nexus_pw == "null"
+                if (no_nexus) {
+                    println("Do not use nexus, since at least one of properties nexus_url, nexus_user or nexus_pw is not configured")
+                }
+                snippetsDir = file('build/generated-snippets')
+            }
+}
+
 plugins {
 	id 'org.asciidoctor.convert' version '1.5.3'
 	id 'org.springframework.boot' version '2.1.3.RELEASE'
@@ -6,15 +22,6 @@ plugins {
     id 'jacoco'
 }
 
-project.ext
-{
-		nexus_url =  "${project.findProperty('nexus_url') ?: System.getenv('NEXUS_HOST')}"
-		nexus_user =  "${project.findProperty('nexus_user') ?: System.getenv('NEXUS_USERNAME')}"
-		nexus_pw =  "${project.findProperty('nexus_pw') ?: System.getenv('NEXUS_PASSWORD')}"  
-        nexus_folder = "candidates"
-  
-        snippetsDir = file('build/generated-snippets')
-}
 
 ext['spring-restdocs.version'] = '2.0.2.RELEASE'
 
@@ -25,7 +32,11 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
-	maven () {
+    if (no_nexus) {
+        jcenter()
+        mavenCentral()
+    } else {
+        maven() {
         url "${nexus_url}/repository/jcenter/"
         credentials {
           username = "${nexus_user}"
@@ -33,7 +44,7 @@ repositories {
         }
       }
 
-      maven () {
+        maven() {
         url "${nexus_url}/repository/maven-public/"
         credentials {
           username = "${nexus_user}"
@@ -41,14 +52,14 @@ repositories {
         }
       }
 
-      maven () {
+        maven() {
         url "${nexus_url}/repository/atlassian_public/"
         credentials {
           username = "${nexus_user}"
           password = "${nexus_pw}"
         }
       }
-
+    }
 }
 
 dependencies {

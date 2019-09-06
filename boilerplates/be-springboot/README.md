@@ -38,6 +38,9 @@ NOTE: gradle.properties is missing. This is on purpose. You´ll need to create i
 + ```nexus_user=<YOUR_NEXUS_USERNAME>```
 + ```nexus_pw=<YOUR_NEXUS_PASSWORD>```
 
+If at least one of the properties `nexus_url`, `nexus_user` or  `nexus_pw` is missing, the build falls back by using repository `jcenter` and `mavenCentral`, so that at least the build compiles.
+If property `nexus_folder` is not defined, the build sets `nexus_folder=candidates`.
+
 The quickstarter uses the latest available spring boot cli version to generate the spring boot project.
 
 Run ```gradlew -v``` to verify the installed version of gradle wrapper.

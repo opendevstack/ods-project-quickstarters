@@ -24,7 +24,7 @@ None, except the ODS https://github.com/opendevstack/ods-jenkins-shared-library[
 
 Amend the generated `Dockerfile` as needed.
 
-== How this quickstarter is built thru jenkins
+== How this quickstarter is built through jenkins
 
 The shared library is used as is - whatever is in the `/docker` folder is passed to `oc start build` as docker context.
 In case you want to run testing, plug into `stageUnitTest`.

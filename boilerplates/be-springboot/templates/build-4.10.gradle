@@ -34,7 +34,7 @@ ext['spring-restdocs.version'] = '2.0.2.RELEASE'
 
 apply plugin: 'io.spring.dependency-management'
 
-group = 'org.opendevstack.tstsla03'
+group = '__GROUP__'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 

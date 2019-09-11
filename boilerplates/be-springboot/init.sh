@@ -118,7 +118,7 @@ fi
 rm build.gradle.bak
 
 if [[ $USE_LEGACY_NEXUS_UPLOAD_SCRIPT == 1 ]]; then
-  echo "add legacy nexus upload scirpt to build.gradle"
+  echo "add legacy nexus upload script to build.gradle"
 cat >> build.gradle <<EOL
 uploadArchives {
     repositories{
@@ -134,7 +134,7 @@ uploadArchives {
 }
 EOL
 else
-  echo "do not add legacy nexus upload scirpt to build.gradle"
+  echo "do not add legacy nexus upload script to build.gradle"
 fi
 
 echo "fix nexus repo path"

@@ -49,11 +49,17 @@ You´ll need to create `gradle.properties` yourself and add following properties
 
 ```
 nexus_url=<URL_OF_YOUR_NEXUS_SERVER>
-nexus_folder_releases=<FOLDER_TO_UPLOAD_RELEASE_ARTEFACTS> (ie. maven-releases)
-nexus_folder_snapshot=<FOLDER_TO_UPLOAD_SNAPSHOT_ARTEFACTS> (ie. maven-snapshots)
 nexus_user=<YOUR_NEXUS_USERNAME>
 nexus_pw=<YOUR_NEXUS_PASSWORD>
 ```
+
+Optionaly you can add
+
+```
+nexus_folder_releases=<FOLDER_TO_UPLOAD_RELEASE_ARTEFACTS> (ie. maven-releases)
+nexus_folder_snapshot=<FOLDER_TO_UPLOAD_SNAPSHOT_ARTEFACTS> (ie. maven-snapshots)
+```
+
 
 If you do not want to use Nexus at all, just define the following property:
 ```
@@ -106,7 +112,7 @@ Basically, the tasks implemented by this pipeline are:
 . run the java build by calling method `stageBuild`
 . execute sonarqube analysis (via calling shared library method `stageScanForSonarqube`)
 . Optionally: deploy to nexus (via calling method `stageUploadToNexus`). Note that this is disabled per default. To enable, please remove the
-omment on line `stageUploadToNexus` in  `Jenkinsfile`
+comment on line `stageUploadToNexus` in  `Jenkinsfile`
 . build a docker image (via shared library method `stageStartOpenshiftBuild`)
 . deploy the docker image to openshift (via shared library method `stageDeployToOpenshift`)
 

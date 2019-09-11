@@ -7,6 +7,7 @@ It will provide a java 8 project with preconfigured gradle build and CI/CD integ
 
 ## What files / architecture is generated?
 Under the hook this quickstarter runs the [spring boot cli init command](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#cli-init).
+The quickstarter uses the *latest* available spring boot cli version to generate the spring boot project.
 
 This is implemented in the script ```init.sh``` (open it to understand the internal of the code generation of this quickstarter).
 
@@ -20,10 +21,11 @@ The generated spring boot project contains following folders:
 + ```gradle``` (gradle wrapper portable distribution)
 + ```docker``` (include the ```Dockerfile``` used to build the image to be deployed during CI/CD to openshift)
 
-### Gradle Support
+## Gradle Support
 The generated project includes a gradlew wrapper which is a portable distribution of gradle.
 It allows you to easily build the project without any further tool installation other than java.    
 
+### Gradle Artifacts
 You´ll find in the project following gradle artifacts:
 + ```build.gradle``` (build definition)
 + ```gradlew.bat```
@@ -32,19 +34,32 @@ You´ll find in the project following gradle artifacts:
 + ```gradle/wrapper/gradle.properties```
 + ```settings.gradlew```
 
-NOTE: gradle.properties is missing. This is on purpose. You´ll need to create it yourself and add following properties:
-+ ```nexus_url=<URL_OF_YOUR_NEXUS_SERVER>```
-+ ```nexus_folder=<FOLDER_TO_UPLOAD_ARTIFACTS>``` (ie. snapshots, candidate)
-+ ```nexus_user=<YOUR_NEXUS_USERNAME>```
-+ ```nexus_pw=<YOUR_NEXUS_PASSWORD>```
+NOTE: gradle.properties is missing. 
+This is on purpose, because you need to define it on your own by providing your nexus configuration.
 
-If at least one of the properties `nexus_url`, `nexus_user` or  `nexus_pw` is missing, the build falls back by using repository `jcenter` and `mavenCentral`, so that at least the build compiles.
-If property `nexus_folder` is not defined, the build sets `nexus_folder=candidates`.
-
-The quickstarter uses the latest available spring boot cli version to generate the spring boot project.
-
+### Nexus configuration in gradle.properties 
+You´ll need to create `gradle.properties` yourself and add following properties:
+```
+nexus_url=<URL_OF_YOUR_NEXUS_SERVER>
+nexus_folder=<FOLDER_TO_UPLOAD_ARTIFACTS> (ie. snapshots, candidate)
+nexus_user=<YOUR_NEXUS_USERNAME>
+nexus_pw=<YOUR_NEXUS_PASSWORD>
+```
+If you do not want to use Nexus at all, just define the following property:
+```
+no_nexus=true
+```
 Run ```gradlew -v``` to verify the installed version of gradle wrapper.
 
+### Uploading artifacts via gradle
+The build is prepared to upload generated artifacts to a nexus repository via the gradle ```maven-puplish``` plugin.
+If the artifact has a SNAPSHOT-Version, the nexus folder ```maven-snapshots``` is used, - otherwise it uses the folder ```maven-releases```.
+This folders are used per default. 
+
+You can override this default configuraiton by specifing the properties ```nexus_folder_releases``` and ```nexus_folder_releases```
+in ```gradle.properties```. Overriding this configuration can also be achieved by setting the  environment variables ```NEXUS_FOLDER_RELEASES``` and ```NEXUS_FOLDER_SNAPSHOTS```.    
+
+NOTE: Upload to nexus is prepared in Jenkinsfile, but disabled per default. See section _How this quickstarter is built thru jenkins_ below for details. 
 ## Dependencies and Frameworks used
 The generated spring boot project is preconfigured with some third party dependencies (i.e. ```--dependencies="web,jersey,data-jpa,h2,lombok,data-rest,restdocs,security"```), which are defined in the script ```init.sh``` (open it to understand the internal of the code generation of this quickstarter).
 
@@ -73,9 +88,12 @@ It is highly recommended that you familiarize with this file and library.
 It is executed in Jenkins every time a push to your git repository is done.
 Basically, the tasks implemented by this pipeline are:
 1. clone the branch in the Jenkins environment
-1. run the java build
-1. build a docker image
-1. deploy the docker image to openshift
+1. run the java build by calling method ```stageBuild```
+1. execute sonarqube analysis (via calling shared library method ```stageScanForSonarqube```)
+1. Optionally: deploy to nexus (via calling method ```stageUploadToNexus```). Note that this is disabled per default. To enable, please remove the
+comment on line ```stageUploadToNexus``` in  ```Jenkinsfile```
+1. build a docker image (via shared library method ```stageStartOpenshiftBuild```)
+1. deploy the docker image to openshift (via shared library method ```stageDeployToOpenshift```)
 
 NOTE: The 2nd step executes ```gradlew build``` to compile your project and create a distribution as ```jar``` file. 
 This file is copied to the ```docker``` folder to be included in the docker image when the image is built in step 3.  

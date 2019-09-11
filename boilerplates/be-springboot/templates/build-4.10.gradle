@@ -4,8 +4,7 @@ buildscript {
                 nexus_url = "${project.findProperty('nexus_url') ?: System.getenv('NEXUS_HOST')}"
                 nexus_user = "${project.findProperty('nexus_user') ?: System.getenv('NEXUS_USERNAME')}"
                 nexus_pw = "${project.findProperty('nexus_pw') ?: System.getenv('NEXUS_PASSWORD')}"
-                def noNexusString = (String) (project.findProperty('no_nexus') ?: System.getenv('NO_NEXUS'))
-                no_nexus = noNexusString == null ? false : noNexusString.toBoolean()
+                no_nexus = (project.findProperty('no_nexus') ?: System.getenv('NO_NEXUS') ?: false).toBoolean()
                 if (!no_nexus && (nexus_url == "null" || nexus_user == "null" || nexus_pw == "null")) {
                     throw new GradleException("property no_nexus='false' (or not defined) but at least one of the properties nexus_url, nexus_user or nexus_pw is not configured. Please configure those properties!")
                 }

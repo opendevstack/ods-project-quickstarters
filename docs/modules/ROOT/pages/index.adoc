@@ -4,17 +4,17 @@
 
 This repository contains quickstarters, which are basically templates that help to start out with a component quickly. The available quickstarters are:
 
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-springboot/README.md[Backend - Java/SpringBoot]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-python-flask/README.md[Backend - Python/Flask]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-scala-akka/README.md[Backend - Scala/Akka]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-node-express/README.md[Backend - NodeJS/Express]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-angular/README.md[Frontend - Angular]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-react/README.md[Frontend - React]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/e2e-cypress/README.md[E2E test - Cypress]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/fe-ionic/README.md[Mobile - Ionic]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/ds-ml-service/README.md[Data Science - Machine Learning]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/jupyter-notebook/README.md[Data Science - Jupyter Notebook]
-* https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/rshiny-app/README.md[Data Science - R-Shiny]
+* xref::be-springboot.adoc[Backend - Java/SpringBoot]
+* xref::be-python-flask.adoc[Backend - Python/Flask]
+* xref::be-scala-akka.adoc[Backend - Scala/Akka]
+* xref::be-node-express.adoc[Backend - NodeJS/Express]
+* xref::fe-angular.adoc[Frontend - Angular]
+* xref::fe-react.adoc[Frontend - React]
+* xref::e2e-cypress.adoc[E2E test - Cypress]
+* xref::fe-ionic.adoc[Mobile - Ionic]
+* xref::ds-ml-service.adoc[Data Science - Machine Learning]
+* xref::jupyter-notebook.adoc[Data Science - Jupyter Notebook]
+* xref::rshiny-app.adoc[Data Science - R-Shiny]
 
 Next to those, there is a https://github.com/opendevstack/ods-project-quickstarters/blob/master/boilerplates/be-docker-plain/README.md["blank" quickstarter] allowing to start from scratch, while still providing all the OCP resources / Jenkins / SonarQube conveniences described in the following sections.
 
@@ -23,7 +23,7 @@ All quickstarters are used by the https://github.com/opendevstack/ods-provisioni
 This repository in BitBucket will contain:
 
 * Some boilerplate code
-* A `Jenkinsfile` describing how to build the component, delegating most of the work to the https://github.com/opendevstack/ods-jenkins-shared-library[shared library]
+* A `Jenkinsfile` describing how to build the component, delegating most of the work to the xref:ods-jenkins-shared-library:ROOT:index.adoc[shared library]
 * A `sonar-project.properties` file configuring how the source code is analyzed by SonarQube
 
 Next to those, each quickstarter can also provide its own https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves[Jenkins slave images].
@@ -32,7 +32,7 @@ Next to those, each quickstarter can also provide its own https://github.com/ope
 
 The quickstarters are not used directly, but triggered via the https://github.com/opendevstack/ods-provisioning-app[provisioning app]. Login there to pick
 a quickstarter, give it a name and provision it. The provisioning app delegates the executation to a
-job in Rundeck (defined in YML files in the link:rundeck[rundeck] folder), which then clones this repository and executes the files (e.g. `init.sh`) within.
+job in Rundeck (defined in YML files in the rundeck folder), which then clones this repository and executes the files (e.g. `init.sh`) within.
 
 == Changing existing quickstarters
 

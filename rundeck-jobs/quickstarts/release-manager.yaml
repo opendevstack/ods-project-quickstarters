@@ -1,0 +1,73 @@
+- defaultTab: summary
+  description: Release manager (with multi-repo orchestration and document generation)
+  executionEnabled: true
+  group: quickstarts
+  id: 48c077f7-8bda-4f05-af5a-6fe085c9d405
+  loglevel: INFO
+  name: release-manager
+  nodeFilterEditable: false
+  options:
+  - description: id of the project (i.e. bhw for basic hello world)
+    name: project_id
+    required: true
+  - description: group id for maven style projects (i.e. org.opendevstack.bhw for bhw project)
+    name: group_id
+  - description: id of the component to create (i.e. bhw-be for bhw backend)
+    name: component_id
+    required: true
+  - description: git url to access target repository via http
+    name: git_url_http
+    required: true
+  - description: git url to access target repository via ssh
+    name: git_url_ssh
+    required: true
+  - description: name of the source code root package
+    name: package_name
+  - description: openshift api token to log on to open shift
+    name: openshift_api_token
+    required: true
+    secure: true
+    storagePath: keys/openshift-api-token
+    valueExposed: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: 'echo project_id: ${option.project_id},  component_id: ${option.component_id},
+        git_url_https: ${option.git_url_https}, git_url_ssh: ${option.git_url_ssh},
+        package_name: ${option.package_name}'
+    - description: checkout quickstart
+      exec: mkdir /tmp/rundeck_${job.id}_${job.execid} && cd  /tmp/rundeck_${job.id}_${job.execid} && git clone ${globals.bitbucket_sshhost}/opendevstack/ods-project-quickstarters.git && cd ods-project-quickstarters && git checkout -b production origin/production
+    - description: init docker plain project
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/release-manager && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
+    - description: clone config project - origin/master
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        git clone @globals.bitbucket_sshhost@/opendevstack/ods-configuration.git
+        cd ods-configuration
+        # Here the branch can be changed for testing purposes
+        git checkout origin/master
+    - description: create docker container for running script with tailor
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@"
+        mkdir -p docker/ods-configuration/ods-project-quickstarters
+        cp -r           ods-configuration/ods-project-quickstarters docker/ods-configuration
+        mkdir -p docker/ods-project-quickstarters/ocp-templates/ocp-config
+        cp -r           ods-project-quickstarters/ocp-templates/ocp-config docker/ods-project-quickstarters/ocp-templates
+        mkdir -p docker/ods-project-quickstarters/ocp-templates/scripts
+        cp -r           ods-project-quickstarters/ocp-templates/scripts docker/ods-project-quickstarters/ocp-templates
+        cp ods-project-quickstarters/boilerplates/release-manager/create-ocp-resources.sh docker/ods-project-quickstarters/ocp-templates/scripts/
+        cp ods-project-quickstarters/ocp-templates/Dockerfile-with-config docker/
+        cd docker
+        sudo docker build -f Dockerfile-with-config --build-arg OC_IP=@globals.openshift_apihost_lookup@ -t oc-cfg .
+    - description: create openshift components within projects
+      script: |-
+        set -eux
+        cd "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/ocp-templates"
+        sudo docker run --rm oc-cfg /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && oc project @option.project_id@-cd && ./create-ocp-resources.sh -c @option.component_id@ -p @option.project_id@'
+    - description: Push to Bitbucket
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates && ./git_push.sh --dir /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} --url ${option.git_url_ssh}
+    keepgoing: false
+    strategy: node-first
+  uuid: 48c077f7-8bda-4f05-af5a-6fe085c9d405

@@ -465,15 +465,8 @@ do
 		if [[ ! -z "$OD_OCP_CD_SA_SOURCE" ]]; then
 		    sed -i -e "s|$OD_OCP_CD_SA_SOURCE|$OD_OCP_CD_SA_TARGET|g" project.yml$tmp_postfix
 		    sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$curr_ocp_namespace|g" project.yml$tmp_postfix
-			sed -i -e '/^ *uid: /d' project.yml$tmp_postfix
-			sed -i -e '/^ *resourceVersion: /d' project.yml$tmp_postfix
 
 		    sed -i -e "s|$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG-$OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES|$curr_ocp_namespace|g" rolebindings.yml$tmp_postfix
-			sed -i -e '/^ *uid: /d' rolebindings.yml$tmp_postfix
-			sed -i -e '/^ *resourceVersion: /d' rolebindings.yml$tmp_postfix
-			sed -i -e '/^ *selfLink: /d' rolebindings.yml$tmp_postfix
-			sed -i -e '/^ *creationTimestamp: /d' rolebindings.yml$tmp_postfix
-			sed -i -e '/^ *namespace: /d' rolebindings.yml$tmp_postfix
 		else
 			echo "OD_OCP_CD_SA_SOURCE is empty! can't continue..."
 			exit 1

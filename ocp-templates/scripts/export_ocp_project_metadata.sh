@@ -271,8 +271,8 @@ do
 	echo
     mkdir -p ${ocp_proj_namespace_suffix}
 
-	oc get --export -o yaml secret,sa --namespace $curr_ocp_namespace > ${ocp_proj_namespace_suffix}/project.yml
-	oc get --export -o yaml rolebindings --namespace $curr_ocp_namespace > ${ocp_proj_namespace_suffix}/rolebindings.yml
+	oc export -o yaml secret,sa --namespace $curr_ocp_namespace > ${ocp_proj_namespace_suffix}/project.yml
+	oc export -o yaml rolebindings --namespace $curr_ocp_namespace > ${ocp_proj_namespace_suffix}/rolebindings.yml
 
 	if [ ! -s ${ocp_proj_namespace_suffix}/project.yml ]; then
 		echo "!! Project export is empty - as errors occured above, hence aborting - do you have full rights on ${curr_ocp_namespace} ?"
@@ -291,7 +291,7 @@ do
         #echo "    $line"
         cmap_config=($line)
         cmap_name=${cmap_config[0]}
-		oc get --export -o yaml configmap ${cmap_name} > ${ocp_proj_namespace_suffix}/config/configmap_${cmap_name}.yml
+		oc export -o yaml configmap ${cmap_name} > ${ocp_proj_namespace_suffix}/config/configmap_${cmap_name}.yml
         echo "   created configurationmap in cmap_${cmap_name}.yml"
     done <"${configmap_file}";
 #
@@ -306,7 +306,7 @@ do
         #echo "    $line"
         sa_config=($line)
         sa_name=${sa_config[0]}
-		oc get --export -o yaml sa ${sa_name} > ${ocp_proj_namespace_suffix}/sa/sa_${sa_name}.yml
+		oc export -o yaml sa ${sa_name} > ${ocp_proj_namespace_suffix}/sa/sa_${sa_name}.yml
         echo "   created service account in sa_${sa_name}.yml"
     done <"${sa_file}";
 #
@@ -321,7 +321,7 @@ do
         #echo "    $line"
         template_config=($line)
         template_name=${template_config[0]}
-		oc get --export -o yaml template ${template_name} > ${ocp_proj_namespace_suffix}/template/template_${template_name}.yml
+		oc export -o yaml template ${template_name} > ${ocp_proj_namespace_suffix}/template/template_${template_name}.yml
         echo "   created template in template_${template_name}.yml"
     done <"${template_file}";
 #
@@ -336,7 +336,7 @@ do
         #echo "    $line"
         bc_config=($line)
         bc_name=${bc_config[0]}
-		oc get --export -o yaml bc ${bc_name} > ${ocp_proj_namespace_suffix}/bc/bc_${bc_name}.yml
+		oc export -o yaml bc ${bc_name} > ${ocp_proj_namespace_suffix}/bc/bc_${bc_name}.yml
         echo "   created bc configuration in bc_${bc_name}.yml"
     done <"${build_file}";
 #
@@ -351,7 +351,7 @@ do
         #echo "    $line"
         dc_config=($line)
         dc_name=${dc_config[0]}
-		oc get --export -o yaml dc ${dc_name} > ${ocp_proj_namespace_suffix}/dc/dc_${dc_name}.yml
+		oc export -o yaml dc ${dc_name} > ${ocp_proj_namespace_suffix}/dc/dc_${dc_name}.yml
         echo "   created dc configuration in dc_${dc_name}.yml"
     done <"${deploy_file}";
 #
@@ -366,7 +366,7 @@ do
         #echo "    $line"
         svc_config=($line)
         svc_name=${svc_config[0]}
-		oc get --export -o yaml svc ${svc_name} > ${ocp_proj_namespace_suffix}/service/svc_${svc_name}.yml
+		oc export -o yaml svc ${svc_name} > ${ocp_proj_namespace_suffix}/service/svc_${svc_name}.yml
         echo "   created svc configuration in svc_${svc_name}.yml"
     done <"${service_file}";
 #

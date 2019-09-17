@@ -16,7 +16,7 @@
   sequence:
     commands:
     - description: echo input parameters
-      exec: 'echo openshift_api_token: bb${option.openshift_api_token}bb host: ${globals.openshift_apihost}'
+      exec: 'echo "openshift_api_token: <blinded> host: ${globals.openshift_apihost}"'
     - description: verify openshift registry access
       exec: sudo docker login -u ${globals.openshift_user} -p ${option.openshift_api_token} ${globals.openshift_dockerregistry}
     - description: Pull and tag jenkins slave

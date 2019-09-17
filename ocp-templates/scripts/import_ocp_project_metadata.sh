@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+# Not using -x (tracing) to avoid disclosure of passwords/tokens when
+# processing arguments.
 
 # this script imports OCP project from metadata file located in a specified Git repo (input)
 # for OpenDevStack in OpenShift
@@ -514,6 +516,9 @@ do
 		echo "!!! Project ${curr_ocp_namespace} already exists - skipping creation"
     fi
 
+	SAVED_OPTIONS=$-
+	set +x  # switch off tracing to not disclose secrets or token
+
 	# allow it to fail
 	set +e
 	secretkey=odocp
@@ -528,6 +533,7 @@ do
 	else
 		echo "OCP OD Token not set - assuming local build"
 	fi
+	set $SAVED_OPTIONS
 
 	# add admins
 	for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');
@@ -687,13 +693,15 @@ do
 		done
 
 		# dont do any import on shared images from shared-image namespace and from CD
+		SAVED_OPTIONS=$-
+		set +x  # switch off tracing to not disclose secrets or token
 		if [ "$exlude_this_namespace" = false ] && [ ! -z ${OD_OCP_SOURCE_TOKEN// } ] && [[ ! "$ocp_proj_namespace_suffix" == "cd" ]]; then
 			echo "Importing remote images ${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} into ${ref_imagestreamName}"
 			oc import-image ${ref_imagestreamName} --from=${OD_OCP_DOCKER_REGISTRY_SOURCE_HOST}/${ref_imagestreamOwningProject}/${ref_imagestreamName} --confirm
 		else
 		    echo "Leaving referenced image $ref_imagestreamWithRegistry as is!"
 		fi
-
+		set $SAVED_OPTIONS
         echo
     done
 

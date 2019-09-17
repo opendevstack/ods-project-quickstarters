@@ -23,7 +23,7 @@
   sequence:
     commands:
     - description: echo input parameters
-      exec: 'echo project_id: ${option.project_id} openshift_api_token: bb${option.openshift_api_token}bb'
+      exec: 'echo project_id: ${option.project_id} openshift_api_token: <blinded>'
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone quickstarter project - origin/production
@@ -56,7 +56,7 @@
         sudo docker build -f Dockerfile-with-config --build-arg OC_IP=@globals.openshift_apihost_lookup@ -t oc-cfg .
     - description: create openshift projects (dev / test / cd with jenkins)
       script: |-
-        set -eux
+        set -eu # not using -x (tracing) to avoid disclosure of passwords/tokens
         cd "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/ocp-templates"
         sudo docker run --rm oc-cfg /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && ./create-projects.sh -p @option.project_id@ -n @globals.nexus_host@ -a @option.project_admin@ -e @option.project_groups@'
     keepgoing: false

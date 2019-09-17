@@ -1,5 +1,6 @@
 #!/bin/bash
-set -ex
+set -e
+# removing option -x to avoid disclosure of passwords/tokens
 
 usage() {
     echo "usage: sh $0 -p <project id> -o <openshift host> -b <bitbucket host> -c <http basic auth credentials \
@@ -80,7 +81,7 @@ echo "Provided params: \
 - PROJECT_ID: $PROJECT_ID \
 - OPENSHIFT_HOST: $OPENSHIFT_HOST \
 - BITBUCKET_HOST: $BITBUCKET_HOST \
-- CREDENTIALS: **** \
+- CREDENTIALS: <blinded> \
 - SOURCE_ENV: $SOURCE_ENV \
 - TARGET_ENV: $TARGET_ENV"
 

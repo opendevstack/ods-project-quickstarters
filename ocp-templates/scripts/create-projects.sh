@@ -78,6 +78,10 @@ oc policy add-role-to-user edit -z jenkins -n ${PROJECT}-cd
 # allow test users to pull dev images
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${PROJECT}-test -n $PROJECT-dev
 
+# image-builder for sa default needed to import images from other cluster
+oc policy add-role-to-user system:image-builder -z default -n ${PROJECT}-dev
+oc policy add-role-to-user system:image-builder -z default -n ${PROJECT}-test
+
 # seed admins, by default only role dedicated-admin has admin rights
 if [[ ! -z ${OD_PRJ_ADMINS} ]]; then
 	for admin_user in $(echo $OD_PRJ_ADMINS | sed -e 's/,/ /g');

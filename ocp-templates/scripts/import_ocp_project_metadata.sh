@@ -493,6 +493,8 @@ do
 		oc policy add-role-to-user system:image-puller system:serviceaccount:${OD_OCP_CD_SA_TARGET}
 		# everyone authenticated can see
 		oc policy add-role-to-group view system:authenticated
+		# image-builder for sa default needed to import images from other cluster
+		oc policy add-role-to-user system:image-builder -z default -n ${project_name}-${ocp_proj_namespace_suffix}
 
 		# if jenkins CD is NOT part of the import it does not make sense to try to create the linking SA
 		if [[ $OD_PROJ_OCP_NAMESPACE_TARGET_SUFFIXES == *"cd"* ]];

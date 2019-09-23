@@ -3,7 +3,7 @@ FROM cd/jenkins-slave-base
 MAINTAINER Michael Sauter <michael.sauter@boehringer-ingelheim.com>
 
 ENV PYTHON_VERSION=3.6.0
-ENV INSTALL_PKGS="yum-utils groupinstall development gcc make openssl-devel zlib-devel"
+ENV INSTALL_PKGS="yum-utils gcc make openssl-devel zlib-devel"
 
 RUN set -x \
     && yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS \
@@ -31,7 +31,7 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
 RUN pip3 install --upgrade pip \
     && pip3 -V \
     && pip3 install virtualenv pycodestyle
-        
+
 # Configure PIP SSL validation
 RUN pip config set global.cert /etc/ssl/certs/ca-bundle.crt \
     && pip config list

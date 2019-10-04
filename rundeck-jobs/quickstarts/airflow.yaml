@@ -47,11 +47,11 @@
         git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
         cd ods-project-quickstarters
         # Here the branch can be changed for testing purposes
-        git checkout origin/feature/DSI-64-create-quickstart-from-shared-images
+        git checkout origin/production
     - description: Init Project
       script: |-
         cd "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/airflow"
-        ./init.sh --project "@option.project_id@" --component "airflow" --target-dir "/tmp/rundeck_@job.id@_@job.execid@" --owner "@globals.rundeck_os_user@"
+        ./init.sh --project "@option.project_id@" --component "airflow-worker" --target-dir "/tmp/rundeck_@job.id@_@job.execid@" --owner "@globals.rundeck_os_user@"
     - description: Copy create components script
       script: cp "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates/airflow/custom-create-components.sh" "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/ocp-templates/scripts"
     - description: Create docker image to run creation
@@ -70,27 +70,27 @@
         oc /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && oc project cd && cd /ods-project-quickstarters/boilerplates/airflow && ./custom-create-components.sh -p @option.project_id@ -b "@option.git_url_http@" -ne "@globals.nexus_host@" -h "your.main.openshift.app.route.uri.host"  -oa "@globals.openshift_apihost@" -r "your-registry-host:your-registry-port" -oc "https://your-openshift-console"'
     - description: add Jenkinsfile to generated project
       script: |-
-        sudo chown @globals.rundeck_os_user@ -R /tmp/rundeck_@job.id@_@job.execid@/airflow
+        sudo chown @globals.rundeck_os_user@ -R /tmp/rundeck_@job.id@_@job.execid@/airflow-worker
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
         ./renderJenkinsTemplate.sh \
-          --target /tmp/rundeck_@job.id@_@job.execid@/airflow/Jenkinsfile \
+          --target /tmp/rundeck_@job.id@_@job.execid@/airflow-worker/Jenkinsfile \
           --url @option.git_url_http@ \
           --project-id @option.project_id@ \
-          --component-id airflow  \
+          --component-id airflow-worker  \
           --component-type airflow
     - description: add sonar-project.properties to generated project
       script: |-
-        sudo chown @globals.rundeck_os_user@ -R /tmp/rundeck_@job.id@_@job.execid@/airflow
+        sudo chown @globals.rundeck_os_user@ -R /tmp/rundeck_@job.id@_@job.execid@/airflow-worker
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
         ./renderSonarqubeTemplate.sh \
-          --target /tmp/rundeck_@job.id@_@job.execid@/airflow/sonar-project.properties \
+          --target /tmp/rundeck_@job.id@_@job.execid@/airflow-worker/sonar-project.properties \
           --project-id @option.project_id@ \
           --component-id airflow-worker  \
-          --component-type airflow-worker
+          --component-type airflow
     - description: Push to Bitbucket
       script: |-
         cd /tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/boilerplates
-        ./git_push.sh --dir /tmp/rundeck_@job.id@_@job.execid@/airflow --url @option.git_url_ssh@
+        ./git_push.sh --dir /tmp/rundeck_@job.id@_@job.execid@/airflow-worker --url @option.git_url_ssh@
     keepgoing: false
     pluginConfig:
       WorkflowStrategy:

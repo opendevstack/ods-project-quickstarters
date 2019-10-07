@@ -143,7 +143,9 @@ objects:
             timeoutSeconds: 1
           resources:
             limits:
-              memory: ${MEMORY_LIMIT}
+              memory: 1Gi
+            requests:
+              memory: 500Mi
           securityContext:
             capabilities: {}
             privileged: false
@@ -171,11 +173,6 @@ objects:
     - type: ConfigChange
   status: {}
 parameters:
-- description: Maximum amount of memory the container can use.
-  displayName: Memory Limit
-  name: MEMORY_LIMIT
-  required: true
-  value: 512Mi
 - description: The OpenShift Namespace where the ImageStream resides.
   displayName: Namespace
   name: NAMESPACE

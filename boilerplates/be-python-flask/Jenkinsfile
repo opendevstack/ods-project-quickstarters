@@ -25,7 +25,6 @@ odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-python",
   projectId: projectId,
   componentId: componentId,
-  testResults : 'src/tests',
   branchToEnvironmentMapping: [
     'master': 'test',
     '*': 'dev'
@@ -39,6 +38,7 @@ odsPipeline(
 def stageBuild(def context) {
   withEnv(["TAGVERSION=${context.tagversion}"]) {
       stage('Test') {
+        String testLocation = 'build/test-results/test';
         def status = sh(
           script: """
             pip install --user virtualenv &&
@@ -46,12 +46,13 @@ def stageBuild(def context) {
             . \$(pwd)/venv/bin/activate &&
             pip install -r src/test_requirements.txt &&
             export PYTHONPATH="src" &&
+            mkdir -p ${testLocation} && 
             cd src/tests &&
-            nosetests -v --with-xunit --with-coverage --cover-xml --cover-erase --cover-inclusive --cover-package=..
+            nosetests -v --with-xunit --xunit-file=../../${testLocation}/nosetests.xml --with-coverage --cover-xml --cover-xml-file=../../${testLocation}/coverage.xml --cover-erase --cover-inclusive --cover-package=..
           """,
           returnStatus: true
         )
-        junit 'src/tests/*.xml'
+        junit 'build/test-results/test/*.xml'
         stageScanForSonarqube(context)
         if (status != 0) {
           error "One or more unit tests failed!"

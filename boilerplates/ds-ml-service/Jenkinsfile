@@ -8,8 +8,8 @@ def trainingRoute
 def trainingPodInfo
 def trainingPassword
 def trainingUsername
-def trainingConfig = "${componentId}-training-service"
-def predictionConfig = "${componentId}-prediction-service"
+def trainingComponentId = "${componentId}-training-service"
+def predictionComponentId = "${componentId}-prediction-service"
 
 node {
     sharedLibraryRepository = env.SHARED_LIBRARY_REPOSITORY
@@ -35,13 +35,13 @@ odsPipeline(
 ) { context ->
     stageScanForSonarqube(context)
     stageBuild(context)
-    stageCustomStartOpenshiftBuild(context, "Build Training Image" ,trainingConfig)
-    stageCustomDeployToOpenshift(context, "Deploy Training Pod", trainingConfig)
+    stageCustomStartOpenshiftBuild(context, "Build Training Image" ,trainingComponentId)
+    stageCustomDeployToOpenshift(context, "Deploy Training Pod", trainingComponentId)
     stageUnitTestsTraining(context)
     stageTraining(context)
     stageIntegrationTestTraining(context)
-    stageCustomStartOpenshiftBuild(context, "Build Prediction Image", predictionConfig)
-    stageCustomDeployToOpenshift(context, "Deploy Prediction Pod", predictionConfig)
+    stageCustomStartOpenshiftBuild(context, "Build Prediction Image", predictionComponentId)
+    stageCustomDeployToOpenshift(context, "Deploy Prediction Pod", predictionComponentId)
 }
 
 def stageLinter(def context) {
@@ -100,54 +100,133 @@ def stageIntegrationTestTraining(def context) {
     }
 }
 
-def stageCustomStartOpenshiftBuild(def context, def stageName, def buildConfig) {
+def stageCustomStartOpenshiftBuild(def context, def stageName, def componentId) {
     stage(stageName) {
         if (!context.environment) {
             println("Skipping for empty environment ...")
             return
         }
         timeout(context.openshiftBuildTimeout) {
-            patchBuildConfig(context, buildConfig)
-            sh "oc start-build ${buildConfig} --from-dir docker --follow -n ${context.targetProject}"
+            patchBuildConfig(context, componentId)
+            sh (script: "oc start-build ${componentId} --from-dir docker --follow -n ${context.targetProject}", label : "start openshift build")
+        }
+
+        if(componentId.contains('prediction')) {
+            def ocpbuild = sh(returnStdout: true, script:"oc get build --sort-by=.status.startTimestamp -o jsonpath='{.items[-1:].metadata.name},{.items[-1:].status.phase}' -n ${context.targetProject} -l buildconfig=${componentId}", label : "find last build").trim().split(',')
+
+            def ocpbuildId = ocpbuild[0]
+            def ocpbuildStatus = ocpbuild[1]
+
+            if (ocpbuildStatus.toString().trim().toLowerCase() != "complete") {
+                error "OCP Build ${ocpbuildId} was not successfull - status ${ocpbuildStatus}"
+            }
+
+            def ocpCurrentImage = sh(returnStdout: true, script:"oc get istag ${componentId}:${context.getTagversion()} -n ${context.targetProject} -o jsonpath='{.image.dockerImageReference}'", label : "find new image sha").trim()
+
+            context.addArtifactURI("OCP Build Id", ocpbuildId)
+            context.addArtifactURI("OCP Docker image", ocpCurrentImage)
         }
     }
 }
 
 private void patchBuildConfig(def context, def componentId) {
     def splitComponentId = componentId.tokenize('-')
-    sh """oc patch bc ${componentId} --type=json --patch '[
-    {"op": "replace", "path": "/spec/source", "value":{"type":"Binary"}},
-    {"op": "replace", "path": "/spec/output/to/name", "value":"${componentId}:${context.tagversion}"},
-    {"op": "replace", "path": "/spec/strategy/dockerStrategy", "value":{"buildArgs":[
-            {"name": "nexusHostWithBasicAuth" ,"value": "${context.nexusHostWithBasicAuth}"},
-            {"name": "nexusHostWithoutScheme" ,"value": "${context.nexusHost.tokenize('//')[1]}"},
-            {"name": "serviceType" ,"value": "${splitComponentId[ splitComponentId.size() - 2 ]}"}
-        ]}},
-    ]' -n ${context.targetProject}"""
+    // sanitize commit message
+    def sanitizedGitCommitMessage = context.gitCommitMessage.replaceAll("[\r\n]+", " ").trim().replaceAll("[\"']+", "")
+    //remove apostrophe in committer name
+    def sanitizedGitCommitAuthor = context.gitCommitAuthor.trim().replaceAll("'","")
+
+    // create the default ODS driven labels
+    def odsImageLabels = []
+    odsImageLabels.push("{\"name\":\"ods.build.source.repo.url\",\"value\":\"${context.gitUrl}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.source.repo.commit.sha\",\"value\":\"${context.gitCommit}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.source.repo.commit.msg\",\"value\":\"${sanitizedGitCommitMessage}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.source.repo.commit.author\",\"value\":\"${sanitizedGitCommitAuthor}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.source.repo.commit.timestamp\",\"value\":\"${context.gitCommitTime}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.source.repo.branch\",\"value\":\"${context.gitBranch}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.jenkins.job.url\",\"value\":\"${context.buildUrl}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.timestamp\",\"value\":\"${context.buildTime}\"}")
+    odsImageLabels.push("{\"name\":\"ods.build.lib.version\",\"value\":\"${context.odsSharedLibVersion}\"}")
+
+    // write the file - so people can pick it up in the Dockerfile
+    writeFile file: 'docker/release.json', text: "[" + odsImageLabels.join(",") + "]"
+
+    // Normally we want to replace the imageLabels, but in case they are not
+    // present yet, we need to add them this time.
+    def imageLabelsOp = "replace"
+    def imageLabelsValue = sh(
+        script: "oc -n ${context.targetProject} get bc/${componentId} -o jsonpath='{.spec.output.imageLabels}'",
+        returnStdout: true,
+        label: "Test existance of path .spec.output.imageLabels"
+    ).trim()
+    if (imageLabelsValue.length() == 0) {
+        imageLabelsOp = "add"
+    }
+
+    def patches = [
+        '{"op": "replace", "path": "/spec/source", "value": {"type":"Binary"}}',
+        """{"op": "replace", "path": "/spec/output/to/name", "value": "${componentId}:${context.tagversion}"}""",
+        """{"op": "${imageLabelsOp}", "path": "/spec/output/imageLabels", "value": [
+            ${odsImageLabels.join(",")}
+        ]}""",
+        """{"op": "replace", "path": "/spec/strategy/dockerStrategy",
+            "value":{"buildArgs":[
+                {"name": "nexusHostWithBasicAuth" ,"value": "${context.nexusHostWithBasicAuth}"},
+                {"name": "nexusHostWithoutScheme" ,"value": "${context.nexusHost.tokenize('//')[1]}"},
+                {"name": "serviceType" ,"value": "${splitComponentId[ splitComponentId.size() - 2 ]}"}
+        ]}}"""
+    ]
+
+    sh """oc patch bc ${componentId} --type=json --patch '[${patches.join(",")}]' -n ${context.targetProject}"""
 }
 
-def stageCustomDeployToOpenshift(def context, def stageName, def buildConfig) {
+def stageCustomDeployToOpenshift(def context, def stageName, def componentId) {
     stage(stageName) {
         if (!context.environment) {
             println("Skipping for empty environment ...")
             return
         }
         openshiftTag(
-            srcStream: buildConfig,
+            srcStream: componentId,
             srcTag: context.tagversion,
-            destStream: buildConfig,
+            destStream: componentId,
             destTag: "latest",
             namespace: context.targetProject
         )
+
+        waitForTrainingPod(context, componentId)
+
+        if(componentId.contains('prediction')) {
+            def ocpLatestImage = sh(returnStdout: true, script:"oc get istag ${componentId}:latest -n ${context.targetProject} -o jsonpath='{.image.dockerImageReference}'", label : "find last image").trim()
+
+            def ocpDeployment
+            timeout(context.openshiftBuildTimeout) {
+                while(true) {
+                    ocpDeployment = sh(returnStdout: true, script:"sleep 10 && oc describe dc ${componentId} -n ${context.targetProject} | grep -e ${ocpLatestImage} -e Status -e 'Latest Version'", label : "find new deployment").trim().split(/\s+/)
+
+                    echo ("Found last deployment id: ${ocpDeployment[2]} - status ${ocpDeployment[6]}")
+                    if (ocpDeployment[6] != "Pending" && ocpDeployment[6] != "Running") {
+                        echo "OCP Deployment done - reporting status"
+                        break
+                    }
+                }
+            }
+
+            if (ocpDeployment == null || ocpDeployment[6] != "Complete") {
+                error "Deployment ${componentId}${ocpDeployment[2]} failed (status: ${ocpDeployment[6]}), please check the error in the OCP console"
+            }
+
+            deploymentId = "${componentId}-${ocpDeployment[2]}"
+            context.addArtifactURI("OCP Deployment Id", deploymentId)
+        }
     }
-    waitForTrainingPod(context, buildConfig)
 }
 
-def waitForTrainingPod(def context, def buildConfig) {
-    if(buildConfig.contains('training')) {
+def waitForTrainingPod(def context, def componentId) {
+    if(componentId.contains('training')) {
         print("Start waiting for training pod to be running...")
         while(true) {
-            trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${context.componentId}-training-service | tail -n1").trim().split(/\s+/)
+            trainingPodInfo = sh(returnStdout: true, script:"sleep 5 && oc get pods --sort-by=.status.startTime --no-headers -n ${context.targetProject} | grep ${componentId} | grep -v deploy | tail -n1").trim().split(/\s+/)
             print("Waiting for training pod ${trainingPodInfo[0]} to be running...")
             if (trainingPodInfo[2] == "Running") {
                 print("Pod ${trainingPodInfo[0]} is running!!!")

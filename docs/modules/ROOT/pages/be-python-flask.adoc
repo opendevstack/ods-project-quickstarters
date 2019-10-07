@@ -1,4 +1,4 @@
-= Python Flask Quickstarter (be-python-flask)
+= Backend Python Flask Quickstarter (be-python-flask)
 
 The project supports generation of Python Flask project boilerplate and quick
 installation and integration of it with OpenShift CD pipelines.

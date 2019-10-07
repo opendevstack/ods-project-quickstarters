@@ -15,7 +15,7 @@
 * xref:ROOT:fe-vue.adoc[FE Vue]
 
 // Data Science Quickstarters
-* xref:ROOT:ds-ml-service.adoc[Data Science Machine Learing Service]
+* xref:ROOT:ds-ml-service.adoc[Data Science Machine Learning Service]
 * xref:ROOT:ds-jupyter-notebook.adoc[Data Science Jupyter Notebook]
 * xref:ROOT:ds-rshiny-app.adoc[Data Science RShiny app]
 //Other Quickstarters

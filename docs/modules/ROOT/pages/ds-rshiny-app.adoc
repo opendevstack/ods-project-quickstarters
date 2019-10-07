@@ -1,4 +1,4 @@
-= Rshiny Application
+= Data Science Rshiny Application
 
 == Purpose of this quickstarter
 

@@ -29,7 +29,7 @@ odsPipeline(
     stageUnitTest(context)
     stageBuild(context)
     stageStartOpenshiftBuild(context)
-    stageDeployToOpenshift(context)
+    stageTagImage(context)
     stagePublishDAGs(context)
 }
 
@@ -50,6 +50,22 @@ def stageUnitTest(def context) {
 def stageBuild(def context) {
     stage('Build') {
         sh './build.sh'
+    }
+}
+
+def stageTagImage(def context) {
+    stage('Tag build') {
+        if (!context.environment) {
+            println("Skipping for empty environment ...")
+            return
+        }
+        openshiftTag(
+            srcStream: context.componentId,
+            srcTag: context.tagversion,
+            destStream: context.componentId,
+            destTag: "latest",
+            namespace: context.targetProject
+        )
     }
 }
 

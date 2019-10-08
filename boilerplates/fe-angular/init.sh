@@ -55,11 +55,7 @@ sed -i "s|\s*browsers: \['Chrome'\],|$CHROME_CONFIG|" ./karma.conf.js
 sed -i "s|\(browsers:\)|    \1|g" ./karma.conf.js
 
 echo "Configure required plugins in karma.conf.js"
-read -r -d "" KARMA_PLUGIN_CONFIG << EOM || true
-      plugins: \[\\
-          require('karma-junit-reporter'),\\
-EOM
-sed -i "s|\s*plugins: \[, |$KARMA_PLUGIN_CONFIG|" ./karma.conf.js
+sed -i "/plugins: \[/a\     \ require('karma-junit-reporter')," ./karma.conf.js
 
 echo "Configure junit xml reporter in karma.conf.js"
 read -r -d "" UNIT_XML_CONFIG << EOM || true

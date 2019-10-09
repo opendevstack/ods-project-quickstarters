@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+# Not using -x (tracing) to avoid disclosure of passwords/tokens when
+# processing arguments.
 
 # this script exports project templates for OpenDevStack in OpenShift
 #
@@ -180,11 +182,6 @@ else
 	echo "git url: ${OD_GIT_URL}"
 fi
 
-# Enable debug mode
-if [[ $OD_VERBOSE != "" ]]; then
-  set -x
-fi
-
 project_name=$OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG
 local_git_repo_fld=${project_name}-occonfig-artifacts
 
@@ -198,6 +195,11 @@ else
       echo "ERROR: could not login into ${OD_OCP_SOURCE_HOST} with oc"
       exit 1
   fi
+fi
+
+# Enable tracing only after token would be disclosed
+if [[ $OD_VERBOSE != "" ]]; then
+  set -x
 fi
 
 # checkout git repo (standard naming)

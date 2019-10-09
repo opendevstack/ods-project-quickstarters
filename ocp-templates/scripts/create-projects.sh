@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -ex
+set -e
+# Not using -x (tracing) to avoid disclosure of passwords/tokens when
+# processing unknown arguments.
 
 # This script creates the 3 OCP projects we currently require for every
 # OD project.
@@ -41,6 +43,8 @@ case $key in
 esac
 shift # past argument or value
 done
+
+set -x  # no passwords/tokens are used below
 
 # check required parameters
 if [ -z ${PROJECT+x} ]; then

@@ -60,6 +60,7 @@ echo "gradle version: $version"
 USE_LEGACY_NEXUS_UPLOAD_SCRIPT=0
 
 if [[ $version == "4.9" ]]; then
+	set +x # avoid disclosure passwords/tokens
 	sed -i.bak '/springBootVersion =/a \
 	    nexus_url = "\${project.findProperty("nexus_url") ?: System.getenv("NEXUS_HOST")}"\
 	    nexus_folder = "candidates"\
@@ -97,6 +98,7 @@ if [[ $version == "4.9" ]]; then
 	        }\
 	      }\
 	/g' build.gradle
+	set -x
 	USE_LEGACY_NEXUS_UPLOAD_SCRIPT=1
 else
 	templateFile=$SCRIPT_DIR/templates/build-$version.gradle

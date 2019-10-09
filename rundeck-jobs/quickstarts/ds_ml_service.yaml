@@ -31,9 +31,9 @@
   scheduleEnabled: true
   sequence:
     commands:
-    - exec: 'echo openshift_api_token: ${option.openshift_api_token} project_id: ${option.project_id},  component_id:
+    - exec: 'echo "openshift_api_token: <blinded> project_id: ${option.project_id},  component_id:
         ${option.component_id}, git_url_http: ${option.git_url_https}, git_url_ssh:
-        ${option.git_url_ssh}, package_name: ${option.package_name}'
+        ${option.git_url_ssh}, package_name: ${option.package_name}"'
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone quickstarter project - origin/production
@@ -70,7 +70,7 @@
         cd docker
         sudo docker build -f Dockerfile-with-config --build-arg OC_IP=@globals.openshift_apihost_lookup@ -t oc-cfg .
     - description: create components
-      exec: echo "Token --> ${option.openshift_api_token}" && cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc-cfg /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./custom-create-components.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -ne "${globals.nexus_host}"'
+      exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/ocp-templates  && sudo docker run --rm oc-cfg /bin/bash -c 'oc login ${globals.openshift_apihost} --token=${option.openshift_api_token} && oc project cd && ./custom-create-components.sh -p ${option.project_id} -c "${option.component_id}" -b "${option.git_url_http}" -ne "${globals.nexus_host}"'
     - description: add Jenkinsfile to generated project
       script: |-
         sudo chown @globals.rundeck_os_user@ -R /tmp/rundeck_@job.id@_@job.execid@/@option.component_id@

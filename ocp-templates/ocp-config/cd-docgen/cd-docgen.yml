@@ -66,12 +66,15 @@ objects:
                 - name: BITBUCKET_URL
                   value: 'https://${BITBUCKET_HOST}'
                 - name: BITBUCKET_USERNAME
-                  value: cd_user
+                  valueFrom:
+                    secretKeyRef:
+                      key: username
+                      name: cd-user-with-password
                 - name: BITBUCKET_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       key: password
-                      name: cd-user-token
+                      name: cd-user-with-password
                 - name: BITBUCKET_DOCUMENT_TEMPLATES_PROJECT
                   value: opendevstack
                 - name: BITBUCKET_DOCUMENT_TEMPLATES_REPO

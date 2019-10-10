@@ -1,15 +1,11 @@
 apiVersion: v1
 kind: Template
 metadata:
-  annotations: {}
-  creationTimestamp: null
   name: jenkins-slave-nodejs8-angular
 objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
-    annotations: {}
-    creationTimestamp: null
     name: jenkins-slave-nodejs8-angular
     labels:
       app: jenkins-slave-nodejs8-angular

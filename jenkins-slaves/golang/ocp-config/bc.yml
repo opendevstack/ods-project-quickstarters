@@ -1,19 +1,16 @@
 apiVersion: v1
 kind: Template
 metadata:
-  annotations: {}
-  creationTimestamp: null
   name: jenkins-slave-golang
 objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata:
-    annotations: {}
-    creationTimestamp: null
     name: jenkins-slave-golang
     labels:
       app: jenkins-slave-golang
   spec:
+    failedBuildsHistoryLimit: 5
     nodeSelector: null
     output:
       to:
@@ -37,6 +34,7 @@ objects:
           kind: ImageStreamTag
           name: jenkins-slave-base:latest
       type: Docker
+    successfulBuildsHistoryLimit: 5
     triggers: []
 parameters:
 - name: REPO_BASE

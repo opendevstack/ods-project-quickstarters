@@ -1,8 +1,42 @@
 # Changelog
 
-## [Unreleased]
+## [1.2.0] - 2019-10-10
+
+### Added
+
+- Add Go Quickstarter ([#255](https://github.com/opendevstack/ods-project-quickstarters/issues/255)).
+- Enable xml unit - unit test results on all quickstarters and refactor build stage ([#299](https://github.com/opendevstack/ods-project-quickstarters/issues/299)).
+- Airflow Cluster Quickstarter - pipeline ([#307](https://github.com/opendevstack/ods-project-quickstarters/issues/307)).
+- ds-ml-service MRO ready ([#373](https://github.com/opendevstack/ods-project-quickstarters/issues/373)).
+- Support Java 11 ([#309](https://github.com/opendevstack/ods-project-quickstarters/issues/309)).
+- Clone-environment script should allow to pass branch and skip tagging flags ([#292](https://github.com/opendevstack/ods-project-quickstarters/issues/292)).
+- ds-ml-service unified docker file ([#272](https://github.com/opendevstack/ods-project-quickstarters/issues/272)).
+- Improve SonarQube support on FE quickstarters ([#212](https://github.com/opendevstack/ods-project-quickstarters/issues/212)).
+
+### Changed
+
 - Quickstarter `be-docker-plain` now builds a running container based on alpine instead of RHEL ([#260](https://github.com/opendevstack/ods-project-quickstarters/issues/260)).
 - Quickstarter `ds-ml-service` with unified docker file ([#272](https://github.com/opendevstack/ods-project-quickstarters/issues/272)).
+- Update jenkins slave for 1.2.x release ([#356](https://github.com/opendevstack/ods-project-quickstarters/issues/356)).
+- Airflow quickstarter needs rundeck and resource limits update ([#358](https://github.com/opendevstack/ods-project-quickstarters/issues/358)).
+- ds-ml-service - Train model pipeline step can fail after port forwarding of training service ([#269](https://github.com/opendevstack/ods-project-quickstarters/issues/269)).
+- R quickstarter: standard keyserver port 11371 often blocked ([#298](https://github.com/opendevstack/ods-project-quickstarters/issues/298)).
+- Replace upload-templates.sh with tailor ([#38](https://github.com/opendevstack/ods-project-quickstarters/issues/38)).
+- Polish be-docker-plain ([#264](https://github.com/opendevstack/ods-project-quickstarters/issues/264)).
+
+### Fixed
+
+- Import of images into other cluster fails - because of missing role for default user ([#345](https://github.com/opendevstack/ods-project-quickstarters/issues/345)).
+- fe-react: Make sure npm i is run within node docker image ([#363](https://github.com/opendevstack/ods-project-quickstarters/issues/363)).
+- fe-react fails to install jest-junit dependency ([#361](https://github.com/opendevstack/ods-project-quickstarters/issues/361)).
+- Enable Junit XML output for unit tests fo Vue QS ([#369](https://github.com/opendevstack/ods-project-quickstarters/issues/369)).
+- Fix fe-angular quick starter karma config file manipulation ([#378](https://github.com/opendevstack/ods-project-quickstarters/issues/378)).
+- Go quickstarter fails with no tests when collecting test results via junit ([#388](https://github.com/opendevstack/ods-project-quickstarters/issues/388)).
+- Jupyter quickstarter app: Kernel won't start ([#268](https://github.com/opendevstack/ods-project-quickstarters/issues/268)).
+- Error building Python based Quickstarters on OKD ([#295](https://github.com/opendevstack/ods-project-quickstarters/issues/295)).
+- Reduce memory ratio ([#277](https://github.com/opendevstack/ods-project-quickstarters/issues/277)).
+- be-docker-plain quickstarter fails in initial deployment ([#260](https://github.com/opendevstack/ods-project-quickstarters/issues/260)).
+- be-python-flask: build fails when "python-ldap" is added to requirements.txt ([#250](https://github.com/opendevstack/ods-project-quickstarters/issues/250)).
 
 ## [1.1.0] - 2019-05-28
 

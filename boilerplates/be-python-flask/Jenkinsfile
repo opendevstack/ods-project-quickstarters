@@ -39,6 +39,7 @@ def stageBuild(def context) {
   withEnv(["TAGVERSION=${context.tagversion}"]) {
       stage('Test') {
         String testLocation = 'build/test-results/test';
+        String coverageLocation = 'build/test-results/coverage';
         def status = sh(
           script: """
             pip install --user virtualenv &&

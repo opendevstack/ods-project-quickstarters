@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: '${PROJECT}-pipeline-master'
+  app: '${PROJECT}-${COMPONENT}'
+objects:
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      name: '${PROJECT}-pipeline-master'
+    spec:
+      source:
+        git:
+          ref: master
+          uri: '${REPO_BASE}/${PROJECT}/${PROJECT}-${COMPONENT}.git'
+        sourceSecret:
+          name: cd-user-with-password
+        type: Git
+      strategy:
+        jenkinsPipelineStrategy:
+          env:
+            - name: changeId
+              value: ''
+            - name: configItem
+              value: ''
+            - name: changeDescription
+              value: ''
+            - name: environment
+              value: dev
+            - name: version
+              value: WIP
+            - name: sourceEnvironment
+              value: dev
+          jenkinsfilePath: Jenkinsfile
+        type: JenkinsPipeline
+parameters:
+  - name: COMPONENT
+    displayName: Component
+    description: The name of the application component.
+    required: true
+  - name: PROJECT
+    displayName: Application
+    description: The name of the application project.
+    required: true
+  - name: REPO_BASE
+    displayName: Repository Base
+    description: The base URI to your application project.
+    required: true

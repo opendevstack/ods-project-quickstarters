@@ -46,13 +46,14 @@ def stageBuild(def context) {
             . \$(pwd)/venv/bin/activate &&
             pip install -r src/test_requirements.txt &&
             export PYTHONPATH="src" &&
-            mkdir -p ${testLocation} && 
+            mkdir -p ${testLocation} &&
+            mkdir -p ${coverageLocation} &&
             cd src/tests &&
-            nosetests -v --with-xunit --xunit-file=../../${testLocation}/nosetests.xml --with-coverage --cover-xml --cover-xml-file=../../${testLocation}/coverage.xml --cover-erase --cover-inclusive --cover-package=..
+            nosetests -v --with-xunit --xunit-file=../../${testLocation}/nosetests.xml --with-coverage --cover-xml --cover-xml-file=../../${coverageLocation}/coverage.xml --cover-erase --cover-inclusive --cover-package=..
           """,
           returnStatus: true
         )
-        junit 'build/test-results/test/*.xml'
+        junit "${testLocation}/nosetests.xml"
         stageScanForSonarqube(context)
         if (status != 0) {
           error "One or more unit tests failed!"

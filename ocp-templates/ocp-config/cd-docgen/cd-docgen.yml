@@ -98,6 +98,10 @@ parameters:
     displayName: Application
     description: The name of the application project.
     required: true
+  - name: BITBUCKET_HOST
+    displayName: Application
+    description: The host of your bitbucket server.
+    required: true
   - name: MEMORY_LIMIT
     displayName: Memory Limit
     description: Maximum amount of memory available for the container.
@@ -108,4 +112,3 @@ parameters:
     description: Minimum amount of memory requested for the container.
     value: 256Mi
     required: true
-    

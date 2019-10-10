@@ -12,6 +12,7 @@
 - Clone-environment script should allow to pass branch and skip tagging flags ([#292](https://github.com/opendevstack/ods-project-quickstarters/issues/292)).
 - ds-ml-service unified docker file ([#272](https://github.com/opendevstack/ods-project-quickstarters/issues/272)).
 - Improve SonarQube support on FE quickstarters ([#212](https://github.com/opendevstack/ods-project-quickstarters/issues/212)).
+- Create release manager quickstarter ([#391](https://github.com/opendevstack/ods-project-quickstarters/issues/391)). 
 
 ### Changed
 

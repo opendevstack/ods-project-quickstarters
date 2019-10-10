@@ -1,6 +1,6 @@
-@Library('ods-mro-jenkins-shared-library@production')
+@Library('ods-mro-jenkins-shared-library@v0.1.0')
 
-@Library('ods-jenkins-shared-library@production')
+@Library('ods-jenkins-shared-library@v1.2.0')
 
 def project = [:]
 def repos   = []
@@ -8,7 +8,7 @@ def repos   = []
 /*
  * Use classic pipeline here because of blue ocean (1.18+) rendering bugs
  * with declarative pipelines.
- */ 
+ */
 node {
 
     checkout scm

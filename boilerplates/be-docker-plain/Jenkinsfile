@@ -9,7 +9,7 @@ node {
   dockerRegistry = env.DOCKER_REGISTRY
 }
 
-library identifier: 'ods-library@production', retriever: modernSCM(
+library identifier: 'ods-library@1.2.x', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: sharedLibraryRepository,
    credentialsId: credentialsId])
@@ -17,10 +17,10 @@ library identifier: 'ods-library@production', retriever: modernSCM(
 /*
   See readme of shared library for usage and customization
   @ https://github.com/opendevstack/ods-jenkins-shared-library/blob/master/README.md
-  eg. to create and set your own builder slave instead of 
+  eg. to create and set your own builder slave instead of
   the base slave used here - the code of the base slave can be found at
   https://github.com/opendevstack/ods-core/tree/master/jenkins/slave-base
- */ 
+ */
 odsPipeline(
   image: "${dockerRegistry}/cd/jenkins-slave-base",
   projectId: projectId,
@@ -34,9 +34,9 @@ odsPipeline(
   stageUnitTest(context)
   /*
    * if you want to introduce scanning, uncomment
-   * 
+   *
    * stageScanForSonarqube(context)
-   */ 
+   */
   stageStartOpenshiftBuild(context)
   stageDeployToOpenshift(context)
 }

@@ -51,8 +51,12 @@ def stageBuild(def context) {
 }
 
 def stageUnitTest(def context) {
-  stage('Unit Test') {
-    sh "yarn test"
+  try {
+    stage('Unit Test') {
+      sh "yarn test"
+    }
+  } finally {
+    junit 'build/test-results/test/test-results.xml'
   }
 }
 

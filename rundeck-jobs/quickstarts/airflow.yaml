@@ -34,7 +34,7 @@
     commands:
     - description: Printing input information
       script: |-
-        echo "openshift_api_token: <blinded>"
+        echo "openshift_api_token: ********"
         echo "project_id: @opoption.project_id@"
         echo "component_id: @option.component_id@"
         echo "git_url_http: @option.git_url_https@"

@@ -170,7 +170,7 @@ fi
 if [ -z "${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG+x}" -o -z "${OD_GIT_URL+x}" -o -z "${OD_OCP_SOURCE_HOST}" ]; then
 	echo "!!!! mandatory params are unset !!! ";
 	echo "-h|--ocp_host: ${OD_OCP_SOURCE_HOST}"
-	echo "-t|--ocp_token: <blinded>"
+	echo "-t|--ocp_token: ********"
 	echo "-p|--project: ${OD_OCP_PROJECT_NAMESPACE_PREFIX_ORG}"
 	echo "-e|--env: ${OD_PROJ_OCP_NAMESPACE_SOURCE_SUFFIXES}"
 	echo "-g|--git: ${OD_GIT_URL}"

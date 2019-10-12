@@ -19,7 +19,7 @@
   sequence:
     commands:
     - description: echo input parameters
-      exec: 'echo project_id: ${option.project_id} openshift_api_token: <blinded>'
+      exec: 'echo project_id: ${option.project_id} openshift_api_token: ********'
     - description: create tmp dir for job
       exec: mkdir /tmp/rundeck_${job.id}_${job.execid}
     - description: clone oc script project

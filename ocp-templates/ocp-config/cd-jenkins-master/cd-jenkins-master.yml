@@ -72,7 +72,7 @@ objects:
     resources:
       requests:
         storage: '${VOLUME_CAPACITY}'
-    storageClassName: gp2-encrypted
+    storageClassName: '${STORAGE_CLASS_DATA}'
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -87,7 +87,7 @@ objects:
     resources:
       requests:
         storage: 1Gi
-    storageClassName: gp2-encrypted
+    storageClassName: '${STORAGE_CLASS_DATA}'
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -281,6 +281,8 @@ parameters:
   value: jenkins
 - name: JNLP_SERVICE_NAME
   value: jenkins-jnlp
+- name: STORAGE_CLASS_DATA
+  required: true
 - name: ENABLE_OAUTH
   value: "true"
 - name: MEMORY_LIMIT

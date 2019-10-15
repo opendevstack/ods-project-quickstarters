@@ -27,4 +27,8 @@ oc -n ${PROJECT}-cd set triggers dc/jenkins --from-config # re-deploys Jenkins
 
 echo "create docgen service"
 cd ${SCRIPT_DIR}/../ocp-config/cd-docgen
-tailor --non-interactive update --namespace=${PROJECT}-cd --param=COMPONENT=${COMPONENT} --param=PROJECT=${PROJECT} --selector app="${PROJECT}-docgen",template=cd-docgen
+
+echo "create trigger secret"
+SECRET=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo '')
+
+tailor --non-interactive update --namespace=${PROJECT}-cd --param=COMPONENT=${COMPONENT} --param=PROJECT=${PROJECT} --param=TRIGGER_SECRET=${SECRET} --selector app="${PROJECT}-docgen",template=cd-docgen

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: '${PROJECT}-pipeline-master'
-  app: '${PROJECT}-${COMPONENT}'
+  template: cd-docgen
+  app: '${PROJECT}-docgen'
 objects:
   - apiVersion: v1
     kind: BuildConfig
     metadata:
-      name: '${PROJECT}-pipeline-master'
+      name: '${PROJECT}-mro-pipeline-master'
     spec:
       source:
         git:
@@ -33,6 +33,11 @@ objects:
               value: dev
           jenkinsfilePath: Jenkinsfile
         type: JenkinsPipeline
+      triggers:
+      - generic:
+          allowEnv: true
+          secret: '${TRIGGER_SECRET}'
+        type: Generic
 parameters:
   - name: COMPONENT
     displayName: Component
@@ -46,3 +51,7 @@ parameters:
     displayName: Repository Base
     description: The base URI to your application project.
     required: true
+  - name: TRIGGER_SECRET
+    displayName: Trigger secret
+    description: The trigger secret for the pipeline.
+    required: true    

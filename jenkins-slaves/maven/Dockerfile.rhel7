@@ -55,7 +55,7 @@ RUN mv $HOME/.m2/settings.xml $HOME/.m2/settings.xml.orig && \
  xpr=$(cat /tmp/mvn_proxy) && \
  xpr="${xpr//\//\\/}" && \
  xpr="${xpr//|/\\|}" && \
- cat $HOME/.m2/settings.xml.orig | sed -e "s|<proxies>|<proxies>$xpr|g" > $HOME/.m2/settings.xml && \
+ cat $HOME/.m2/settings.xml.orig | sed -e "s/<proxies>/<proxies>$xpr/g" > $HOME/.m2/settings.xml && \
  sed -i "s/__NEXUS_USER/$NEXUS_USERNAME/gi" $HOME/.m2/settings.xml && \
  sed -i "s/__NEXUS_PW/$NEXUS_PASSWORD/gi" $HOME/.m2/settings.xml && \
  sed -i "s/__NEXUS_HOST/$NEXUS_HOST/gi" $HOME/.m2/settings.xml && \

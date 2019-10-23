@@ -8,7 +8,13 @@ ARG nexusHostWithBasicAuth
 ARG nexusHostWithoutScheme
 ARG serviceType
 
+ARG httpProxy
+ARG httpsProxy
+
 WORKDIR /app
+
+ENV HTTP_PROXY "${httpProxy}"
+ENV HTTPS_PROXY "${httpsProxy}"
 
 ENV DSI_MINICONDA_PACKAGE_VERSION="3.6.0"
 ENV DSI_MINICONDA_PACKAGE_PATH=/app/miniconda3.sh

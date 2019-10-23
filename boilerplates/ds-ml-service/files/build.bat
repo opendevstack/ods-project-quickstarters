@@ -24,8 +24,8 @@ del temp.txt
 del docker\dist\ /S /Q
 
 xcopy /s src docker\dist\
-xcopy /s resources docker\dist\
-xcopy /s .dvc docker\dist\
+xcopy /s resources docker\dist\resources
+xcopy /s .dvc docker\dist\.dvc
 
 copy test\run_integration_tests.sh docker\dist
 copy test\run_unittests.sh docker\dist

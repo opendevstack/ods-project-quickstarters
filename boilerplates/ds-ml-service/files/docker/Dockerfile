@@ -27,8 +27,9 @@ RUN echo "Building ${serviceType} image"
 # Front load pip install, miniconda download for caching docker build layers
 COPY dist/requirements.txt /app
 USER root
+#  In the case of building the docker image from behind a proxy and encountering certificate issues, adding a -k to the curl command can mitigate that, consider however the implications of disabling certificate verification!
 RUN if [[ ${serviceType} == "training" ]]; \
-        then curl -Lv -k --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MINICONDA_PACKAGE_VERSION}-Linux-x86_64.sh --output ${DSI_MINICONDA_PACKAGE_PATH}; \
+        then curl -Lv --fail https://repo.anaconda.com/miniconda/Miniconda3-${DSI_MINICONDA_PACKAGE_VERSION}-Linux-x86_64.sh --output ${DSI_MINICONDA_PACKAGE_PATH}; \
             if [[ ! -z ${nexusHostWithBasicAuth} ]]; \
                 then  pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} --upgrade pip && pip install -i ${nexusHostWithBasicAuth}/repository/pypi-all/simple --trusted-host ${nexusHostWithoutScheme} coverage nose; \
                 else pip install --upgrade pip && pip install coverage nose; \

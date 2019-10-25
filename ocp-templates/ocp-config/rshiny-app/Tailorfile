@@ -2,4 +2,4 @@ param-file  ../../../../ods-configuration/ods-project-quickstarters/ocp-template
 
 ignore-unknown-parameters true
 
-secret,svc,route,bc,is,dc
+serviceaccount,secret,svc,route,bc,is,dc

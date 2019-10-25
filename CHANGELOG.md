@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Switch to OAuth proxy in jupyter-notebook and r-shiny quickstarters ([#424](https://github.com/opendevstack/ods-project-quickstarters/issues/424)).
+
+
 ## [1.2.0] - 2019-10-10
 
 ### Added
@@ -12,7 +19,7 @@
 - Clone-environment script should allow to pass branch and skip tagging flags ([#292](https://github.com/opendevstack/ods-project-quickstarters/issues/292)).
 - ds-ml-service unified docker file ([#272](https://github.com/opendevstack/ods-project-quickstarters/issues/272)).
 - Improve SonarQube support on FE quickstarters ([#212](https://github.com/opendevstack/ods-project-quickstarters/issues/212)).
-- Create release manager quickstarter ([#391](https://github.com/opendevstack/ods-project-quickstarters/issues/391)). 
+- Create release manager quickstarter ([#391](https://github.com/opendevstack/ods-project-quickstarters/issues/391)).
 
 ### Changed
 

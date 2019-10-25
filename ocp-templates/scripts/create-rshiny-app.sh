@@ -104,10 +104,6 @@ for devenv in dev test ; do
 
     tailor_update_in_dir "${OCP_CONFIG}/rshiny-app" \
         "${TAILOR_BASE_ARGS[@]}" \
-        --selector "app=${PROJECT}-${COMPONENT},template=rshiny-secrets"
-
-    tailor_update_in_dir "${OCP_CONFIG}/rshiny-app" \
-        "${TAILOR_BASE_ARGS[@]}" \
         --selector "app=${PROJECT}-${COMPONENT},template=rshiny"
 
     tailor_update_in_dir "${OCP_CONFIG}/rshiny-app" \

@@ -84,12 +84,12 @@ objects:
           - name: CROWD_SERVICE
             valueFrom:
               secretKeyRef:
-                name: crowd-service
+                name: 'crowd-service-${COMPONENT}'
                 key: username
           - name: CROWD_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: crowd-service
+                name: 'crowd-service-${COMPONENT}'
                 key: password
           name: ${COMPONENT}-authproxy
           image: shared-services/nginx-authproxy:3.0

@@ -35,6 +35,7 @@ odsPipeline(
 ) { context ->
     stageScanForSonarqube(context)
     stageBuild(context)
+    stageLinter(context)
     stageCustomStartOpenshiftBuild(context, "Build Training Image" ,trainingComponentId)
     stageCustomDeployToOpenshift(context, "Deploy Training Pod", trainingComponentId)
     stageUnitTestsTraining(context)
@@ -48,8 +49,12 @@ def stageLinter(def context) {
     stage('Linter') {
         // PEP8
         sh '''
-        pycodestyle --show-source --show-pep8 src/*
-        pycodestyle --statistics -qq src/*
+        pycodestyle --show-source --show-pep8 --max-line-length 100 src/model/*
+        pycodestyle --statistics -qq --max-line-length 100 src/model/*
+        pycodestyle --show-source --show-pep8 --max-line-length 100 src/services/*
+        pycodestyle --statistics -qq --max-line-length 100 src/services/*
+        pycodestyle --show-source --show-pep8 --max-line-length 100 jenkinsfile_helper.py
+        pycodestyle --statistics -qq --max-line-length 100 jenkinsfile_helper.py
         '''
     }
 }

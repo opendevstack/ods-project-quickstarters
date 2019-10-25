@@ -74,4 +74,3 @@ if __name__ == '__main__':
         app.config['USERS'][username] = password
 
     app.run('0.0.0.0', flask_args.port, debug=debug_mode() or flask_args.debug)
-

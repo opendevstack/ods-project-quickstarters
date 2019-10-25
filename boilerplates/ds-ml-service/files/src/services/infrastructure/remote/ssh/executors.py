@@ -102,7 +102,7 @@ class SSHRemoteExecutor(object):
                               result=self._connection.run(
                                   command="""
 if [ -d {0} ];
-    then rm -r {0} 
+    then rm -r {0}
 fi
 mkdir {0}""".strip().format(self._target_folder),
                                   hide=not self._debug_mode, warn=True))
@@ -134,13 +134,13 @@ mkdir {0}""".strip().format(self._target_folder),
         """
         # remote training with remote dvc repository
         if self._dvc_remote:
-            train_script = "{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0} " \
-                           "--debug {1} --dvc_remote {2} --dvc_user {3} --dvc_password {4}". \
+            train_script = """{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0}
+            --debug {1} --dvc_remote {2} --dvc_user {3} --dvc_password {4}""". \
                 strip().format(self._target_folder, self._debug_mode, self._dvc_remote,
                                self._dvc_user, self._dvc_password)
         else:
-            train_script = "{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0} " \
-                           "--debug {1}".strip().\
+            train_script = """{0}/services/infrastructure/remote/scripts/remote_trainer.py --env {0}
+            --debug {1}""".strip().\
                 format(self._target_folder, self._debug_mode)
 
         result = self._connection.run(
@@ -157,8 +157,7 @@ mkdir {0}""".strip().format(self._target_folder),
     def save_model_locally(self) -> None:
         """Saves the remote trained model in the local machine/pod as GIT_COMMIT"""
 
-        model_file = "{0}/{1}/{2}".format(self._home_folder, self._environment_name,
-                                                GIT_COMMIT)
+        model_file = "{0}/{1}/{2}".format(self._home_folder, self._environment_name, GIT_COMMIT)
         self._logger.info("Downloading the model from {0}...".format(model_file))
         self._connection.get(model_file, "/app/{0}".format(os.path.basename(model_file)))
         self._logger.info("Downloading the model from {0}... Done!".format(model_file))
@@ -263,7 +262,7 @@ mkdir {0}""".strip().format(self._target_folder),
             self._environment_name)
         )
 
-        ## install pip in conda
+        # install pip in conda
         self._logger.info("Installing pip {} environment...".format(self._environment_name))
         activate = "source {0}/miniconda/bin/activate {1}".format(self._home_folder,
                                                                   self._environment_name)

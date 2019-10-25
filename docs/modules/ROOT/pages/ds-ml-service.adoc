@@ -183,28 +183,6 @@ To enable remote training set the `DSI_EXECUTE_ON` variable in OpenShift to _SSH
  connection information in the environment variables: `DSI_SSH_HOST`, `DSI_SSH_PORT`,
  `DSI_SSH_USERNAME` and `DSI_SSH_PASSWORD`.
 
-The easiest approach to use the docker-compose and ssh remote training is to create a yml with environment variables for training. E.g.:
-
-`docker-compose.ssh.yml`
-
-[source,yml]
-----
-version: '3'
-services:
-  training:
-    environment:
-      DSI_EXECUTE_ON: SSH
-      DSI_SSH_HOST: my.remote.ssh.server.com
-      DSI_SSH_USERNAME: ssh_username
-      DSI_SSH_PASSWORD: ssh_password
-      DSI_SSH_HTTP_PROXY: http://proxy
-      DSI_SSH_HTTPS_PROXY: https://proxy
-----
-
-`docker-compose -f docker-compose.yml -f docker-compose.ssh.yml up`
-
-The training pod starts an asynchronous training task. Only one
-training task can run at a time.
 
 == Endoints
 
@@ -332,3 +310,5 @@ https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-sl
 == Known limitions
 
 * Not ready for R models yet
+* In the case of building the docker image from behind a proxy and encountering certificate issues, adding a -k to the curl command can mitigate that, consider however the implications of disabling certificate
+* Consider moving to ssh remote server training, if you expect high and long computational load during training phase. It might cause unnecessary stress on the openshift cluster, otherwise.

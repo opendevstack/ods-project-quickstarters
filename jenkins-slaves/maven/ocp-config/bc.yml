@@ -14,7 +14,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: jenkins-slave-maven:latest
+        name: jenkins-slave-maven:2
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -38,7 +38,7 @@ objects:
             value: ${NEXUS_PASSWORD}
         from:
           kind: ImageStreamTag
-          name: jenkins-slave-base:latest
+          name: jenkins-slave-base:2
       type: Docker
     triggers: []
 parameters:

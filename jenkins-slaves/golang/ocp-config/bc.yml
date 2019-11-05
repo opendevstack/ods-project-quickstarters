@@ -15,7 +15,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: jenkins-slave-golang:latest
+        name: jenkins-slave-golang:2
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -32,7 +32,7 @@ objects:
         dockerfilePath: Dockerfile.rhel7
         from:
           kind: ImageStreamTag
-          name: jenkins-slave-base:latest
+          name: jenkins-slave-base:2
       type: Docker
     successfulBuildsHistoryLimit: 5
     triggers: []

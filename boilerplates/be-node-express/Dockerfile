@@ -1,4 +1,4 @@
-FROM cd/jenkins-slave-nodejs8-angular
+FROM cd/jenkins-slave-nodejs8-angular:2
 
 MAINTAINER "Andreas Bellmann" <andreas.bellmann@opitz-consulting.com>
 

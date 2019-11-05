@@ -22,7 +22,7 @@ library identifier: 'ods-library@2', retriever: modernSCM(
   https://github.com/opendevstack/ods-core/tree/master/jenkins/slave-base
  */
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-base",
+  image: "${dockerRegistry}/cd/jenkins-slave-base:2",
   projectId: projectId,
   componentId: componentId,
   branchToEnvironmentMapping: [

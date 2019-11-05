@@ -15,7 +15,7 @@ library identifier: 'ods-library@2', retriever: modernSCM(
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-    image: "${dockerRegistry}/cd/jenkins-slave-airflow",
+    image: "${dockerRegistry}/cd/jenkins-slave-airflow:2",
     projectId: projectId,
     componentId: componentId,
     openshiftBuildTimeout: 25,

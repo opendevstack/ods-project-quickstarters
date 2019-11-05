@@ -1,6 +1,6 @@
 #!/bin/bash
 SPRING_CLI_VERSION=2.0.2.RELEASE
-JENKINS_SLAVE=cd/jenkins-slave-maven:latest
+JENKINS_SLAVE=cd/jenkins-slave-maven:2
 
 while [[ $# -gt 1 ]]
 do

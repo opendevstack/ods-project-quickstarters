@@ -130,7 +130,7 @@ objects:
           - ${COMPONENT}
           from:
             kind: ImageStreamTag
-            name: ${COMPONENT}:latest
+            name: ${COMPONENT}:2
             namespace: ${PROJECT}-${ENV}
         type: ImageChange
     status: {}

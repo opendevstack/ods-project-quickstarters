@@ -1,4 +1,4 @@
-FROM cd/jenkins-slave-base
+FROM cd/jenkins-slave-base:2
 
 MAINTAINER "Andreas Bellmann" <andreas.bellmann@opitz-consulting.com>
 

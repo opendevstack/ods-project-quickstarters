@@ -1,4 +1,4 @@
-FROM cd/jenkins-slave-base
+FROM cd/jenkins-slave-base:2
 
 LABEL maintainer="Gerard Castillo <gerard.castillo@boehringer-ingelheim.com>"
 

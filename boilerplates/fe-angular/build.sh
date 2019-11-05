@@ -5,7 +5,7 @@
 # see details on bottom of "./init.sh"
 ANGULAR_CLI_VERSION=8.0.3
 
-JENKINS_SLAVE=cd/jenkins-slave-nodejs10-angular:latest
+JENKINS_SLAVE=cd/jenkins-slave-nodejs10-angular:2
 
 while [[ $# -gt 1 ]]
 do

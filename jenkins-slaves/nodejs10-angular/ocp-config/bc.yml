@@ -15,7 +15,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: jenkins-slave-nodejs10-angular:latest
+        name: jenkins-slave-nodejs10-angular:2
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -37,7 +37,7 @@ objects:
             value: ${NEXUS_AUTH}
         from:
           kind: ImageStreamTag
-          name: jenkins-slave-base:latest
+          name: jenkins-slave-base:2
       type: Docker
     successfulBuildsHistoryLimit: 5
     triggers: []

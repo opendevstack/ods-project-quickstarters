@@ -1,6 +1,6 @@
 #1/bin/bash
 YO_VERSION=2.0.0
-JENKINS_SLAVE=cd/jenkins-slave-nodejs8-angular:latest
+JENKINS_SLAVE=cd/jenkins-slave-nodejs8-angular:2
 
 while [[ $# -gt 1 ]]
 do

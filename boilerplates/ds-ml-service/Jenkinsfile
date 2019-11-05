@@ -23,7 +23,7 @@ library identifier: 'ods-library@2', retriever: modernSCM(
 
 // See readme of shared library for usage and customization.
 odsPipeline(
-    image: "${dockerRegistry}/cd/jenkins-slave-python",
+    image: "${dockerRegistry}/cd/jenkins-slave-python:2",
     projectId: projectId,
     componentId: componentId,
     testResults : 'tests-results',

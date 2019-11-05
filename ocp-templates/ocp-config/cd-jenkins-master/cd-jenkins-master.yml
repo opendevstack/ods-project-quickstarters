@@ -294,7 +294,7 @@ parameters:
 - name: NAMESPACE
   value: cd
 - name: JENKINS_IMAGE_STREAM_TAG
-  value: jenkins-master:latest
+  value: jenkins-master:2
 - name: CD_USER_ID
   required: true
 - name: CD_USER_PWD

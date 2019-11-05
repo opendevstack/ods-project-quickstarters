@@ -1,6 +1,6 @@
 #1/bin/bash
 SCALA_VERSION=2.11.8
-JENKINS_SLAVE=cd/jenkins-slave-scala:latest
+JENKINS_SLAVE=cd/jenkins-slave-scala:2
 
 while [[ $# -gt 1 ]]
 do

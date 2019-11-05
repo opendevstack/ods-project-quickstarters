@@ -14,7 +14,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: jenkins-slave-python:latest
+        name: jenkins-slave-python:2
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -31,7 +31,7 @@ objects:
         dockerfilePath: Dockerfile.rhel7
         from:
           kind: ImageStreamTag
-          name: jenkins-slave-base:latest
+          name: jenkins-slave-base:2
       type: Docker
     triggers: []
 parameters:

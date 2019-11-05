@@ -22,7 +22,7 @@ library identifier: 'ods-library@2', retriever: modernSCM(
   https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves/python
  */
 odsPipeline(
-  image: "${dockerRegistry}/cd/jenkins-slave-python",
+  image: "${dockerRegistry}/cd/jenkins-slave-python:2",
   projectId: projectId,
   componentId: componentId,
   branchToEnvironmentMapping: [

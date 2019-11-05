@@ -49,7 +49,7 @@ objects:
             env: 'cd'
         spec:
           containers:
-            - image: 'cd/docgen:latest'
+            - image: 'cd/docgen:2'
               imagePullPolicy: IfNotPresent
               name: 'docgen'
               ports:
@@ -93,7 +93,7 @@ objects:
               - 'docgen'
             from:
               kind: ImageStreamTag
-              name: 'docgen:latest'
+              name: 'docgen:2'
               namespace: cd
           type: ImageChange
 parameters:

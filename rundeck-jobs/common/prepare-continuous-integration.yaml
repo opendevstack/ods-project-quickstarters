@@ -23,6 +23,7 @@
     - be-docker-plain
     - be-golang
     - fe-vue
+    - be-gateway
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true

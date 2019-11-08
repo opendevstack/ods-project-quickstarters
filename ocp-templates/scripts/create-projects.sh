@@ -72,6 +72,7 @@ oc policy add-role-to-user ${JENKINS_ROLE} system:serviceaccount:${PROJECT}-cd:j
 
 # allow jenkins in <project>-cd to pull images (e.g. slave) from cd project
 oc policy add-role-to-user system:image-puller system:serviceaccount:${PROJECT}-cd:jenkins -n cd
+oc policy add-role-to-user system:image-puller system:serviceaccount:${PROJECT}-cd:default -n cd
 
 # allow webhook proxy to create a pipeline BC in the +cd project
 oc policy add-role-to-user edit -z default -n ${PROJECT}-cd

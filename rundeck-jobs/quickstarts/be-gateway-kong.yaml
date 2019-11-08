@@ -1,10 +1,9 @@
 - defaultTab: summary
-  description: kong with declarative integration
+  description: Kong gateway integration
   executionEnabled: true
   group: quickstarts
-  id: e59e71f5-76e0-4b8c-b040-a526197ee84d
   loglevel: INFO
-  name: be-gateway
+  name: be-gateway-kong
   nodeFilterEditable: false
   options:
   - description: id of the project (i.e. bhw for basic hello world)
@@ -41,9 +40,9 @@
       exec: cd /tmp/rundeck_${job.id}_${job.execid}/ods-project-quickstarters/boilerplates/be-gateway && ./init.sh --project "${option.project_id}" --component "${option.component_id}" --group "${option.group_id}" --target-dir "/tmp/rundeck_${job.id}_${job.execid}" --owner "${globals.rundeck_os_user}"
     - description: setup quickstarter for continuous integration
       jobref:
-        args: -component_type be-gateway -component_id ${option.component_id} -project_id ${option.project_id} -group_id ${option.group_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}
+        args: -component_type be-gateway-kong -component_id ${option.component_id} -project_id ${option.project_id} -group_id ${option.group_id} -quickstarter_directory /tmp/rundeck_${job.id}_${job.execid}/${option.component_id} -git_url_ssh ${option.git_url_ssh} -git_url_http ${option.git_url_http}
         group: common
-        name: prepare-continuous-integration-gateway
+        name: prepare-continuous-integration-gateway-kong
         nodeStep: 'true'
     keepgoing: false
     strategy: node-first

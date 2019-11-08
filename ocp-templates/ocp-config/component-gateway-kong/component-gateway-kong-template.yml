@@ -128,6 +128,86 @@ objects:
               name: '${COMPONENT}:${TAGVERSION}'
               namespace: '${PROJECT}-${ENV}'
           type: ImageChange
+  - kind: ConfigMap
+    metadata:
+      labels:
+        app: '${PROJECT}-${COMPONENT}'
+      name: kong.yml
+    apiVersion: v1
+    data:
+      properties: |
+        _format_version: "1.1"
+
+        services:
+          - name: test-service
+            url: http://localhost:5555
+            path: /
+            plugins:
+              - name: prometheus
+            routes:
+              - name: test-route
+                paths:
+                  - /pepsi
+                strip_path: false
+                methods:
+                  - GET
+                  - POST
+                  - OPTIONS
+          - name: botframework-service
+            url: http://localhost:8080
+            path: /api/sendRequest/botframework
+            plugins:
+              - name: prometheus
+            routes:
+              - name: botframework-route
+                paths:
+                  - /bot
+                strip_path: true
+                methods:
+                  - GET
+          - name: coke-service
+            url: http://localhost:5555
+            path: /
+            routes:
+              - name: coke-route
+                paths:
+                  - /coke
+                strip_path: false
+                methods:
+                  - GET
+                  - POST
+                  - OPTIONS
+
+        plugins:
+          - name: prometheus
+          - name: cors
+            config:
+              origins: "localhost"
+              methods:
+                - GET
+                - HEAD
+                - PUT
+                - PATCH
+                - POST
+                - DELETE
+              headers:
+                - Origin
+                - Accept
+                - Content-Type
+                - X-Auth-Token
+                - Authorization
+                - X-Userinfo
+                - X-Access-Token
+                - X-Id-Token
+              max_age: 3600
+              preflight_continue: false
+          - name: oidc
+            config:
+              client_id: kong
+              client_secret: "d7fe4e81-c10b-4a18-84cd-557b41fc49d3"
+              discovery: http://localhost:8180/auth/realms/master/.well-known/openid-configuration
+              introspection_endpoint: http://localhost:8180/auth/realms/master/protocol/openid-connect/token/introspect
+              bearer_only: "yes"
 parameters:
   - name: PROJECT
     displayName: Application

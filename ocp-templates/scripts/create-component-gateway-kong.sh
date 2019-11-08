@@ -118,7 +118,7 @@ for devenv in dev test ; do
 
     echo "Creating component ${COMPONENT} in environment ${PROJECT}-${devenv}:"
 
-    tailor_update_in_dir "${OCP_CONFIG}/component-gateway" \
+    tailor_update_in_dir "${OCP_CONFIG}/component-gateway-kong" \
         "${TAILOR_BASE_ARGS[@]}" \
         --selector app="${PROJECT}-${COMPONENT}",template=component-template
 

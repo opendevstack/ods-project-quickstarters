@@ -2,7 +2,7 @@
   executionEnabled: true
   group: common
   loglevel: INFO
-  name: prepare-continuous-integration-gateway
+  name: prepare-continuous-integration-gateway-kong
   nodeFilterEditable: false
   options:
   - description: |-
@@ -12,7 +12,7 @@
     name: component_type
     required: true
     values:
-    - be-gateway
+    - be-gateway-kong
   - description: location of the generated quickstarter project
     name: quickstarter_directory
     required: true
@@ -52,7 +52,7 @@
       jobref:
         args: -project_id ${option.project_id} -component_id ${option.component_id} -git_url_http ${option.git_url_http}
         group: openshift
-        name: create-gateway-component
+        name: create-component-gateway-kong
         nodeStep: 'true'
     - description: add Jenkinsfile to generated project
       script: |-

@@ -4,7 +4,7 @@
   executionEnabled: true
   group: openshift
   loglevel: INFO
-  name: create-gateway-component
+  name: create-component-gateway-kong
   nodeFilterEditable: false
   options:
   - description: the global project id (i.e. bhw for basic hello world)
@@ -67,7 +67,7 @@
     - description: create openshift components within projects
       script: |-
         cd "/tmp/rundeck_@job.id@_@job.execid@/ods-project-quickstarters/ocp-templates"
-        sudo docker run --rm oc-cfg /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && oc project cd && ./create-gateway-component.sh -p @option.project_id@ -c "@option.component_id@" -r @option.route@ -ne "@globals.nexus_host@"'
+        sudo docker run --rm oc-cfg /bin/bash -c 'oc login @globals.openshift_apihost@ --token=@option.openshift_api_token@ && oc project cd && ./create-component-gateway-kong.sh -p @option.project_id@ -c "@option.component_id@" -r @option.route@ -ne "@globals.nexus_host@"'
     keepgoing: false
     strategy: node-first
 

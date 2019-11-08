@@ -111,11 +111,22 @@ objects:
                   memory: '${MEMORY_REQUEST}'
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /config
+                  name: kong-config
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
+          volumes:
+          - configMap:
+              defaultMode: 420
+              items:
+                - key: properties
+                  path: kong.yml
+              name: kong.yml
+            name: kong-config
       test: false
       triggers:
         - type: ConfigChange

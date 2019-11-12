@@ -84,7 +84,7 @@ do
 		termi=${route_config[1]}
 		# hack for bad returns from OC cli
 		termi2=${route_config[2]}
-		if [[ ! "$termi" ==  *"edge"* && ! "$termi2" ==  *"edge"* && ! "$termi" ==  *"passthrough"* && ! "$termi2" ==  *"passthrough"* ]]; then
+		if [[ ! "$termi" ==  *"edge"* && ! "$termi2" ==  *"edge"* && ! "$termi" ==  *"passthrough"* && ! "$termi2" ==  *"passthrough"* && ! "$termi" ==  *"reencrypt"* && ! "$termi2" ==  *"reencrypt"* ]]; then
 			echo " !!!! Route: ${route} is INSECURE! setting: ${termi} / ${termi2}"
 			allsecure=false
 		fi

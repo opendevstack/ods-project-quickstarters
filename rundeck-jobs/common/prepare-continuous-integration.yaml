@@ -54,6 +54,7 @@
         set -eux
         mkdir "/tmp/rundeck_@job.id@_@job.execid@"
         cd "/tmp/rundeck_@job.id@_@job.execid@"
+        echo "globals.bitbucket_sshhost=@globals.bitbucket_sshhost@"
         git clone @globals.bitbucket_sshhost@/opendevstack/ods-project-quickstarters.git
         cd ods-project-quickstarters
         # Here the branch can be changed for testing purposes

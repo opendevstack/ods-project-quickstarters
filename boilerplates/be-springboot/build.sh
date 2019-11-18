@@ -1,5 +1,5 @@
 #!/bin/bash
-SPRING_CLI_VERSION=2.0.2.RELEASE
+SPRING_CLI_VERSION=2.2.1.RELEASE
 JENKINS_SLAVE=cd/jenkins-slave-maven:latest
 
 while [[ $# -gt 1 ]]

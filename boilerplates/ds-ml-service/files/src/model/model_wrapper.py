@@ -139,7 +139,7 @@ class ModelWrapper(object):
 
     @classmethod
     def load(cls, filename):
-        """Custom load function for loading an instance of a saved `ModelWrapper`
+        """Custom load function for loading an instance of a saved `ModelWrapper`.
 
         Parameters
         ----------
@@ -154,4 +154,3 @@ class ModelWrapper(object):
         with open(filename, "rb") as f:
             loaded_modelwrapper = joblib.load(f)
             return loaded_modelwrapper
-

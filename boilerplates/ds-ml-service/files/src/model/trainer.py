@@ -72,8 +72,3 @@ if __name__ == "__main__":
     print(res, test_df['Species'].values)
 
     print(accuracy_score(res['prediction'], test_df["Species"].values))
-
-
-
-
-

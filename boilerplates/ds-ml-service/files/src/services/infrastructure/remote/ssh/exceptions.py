@@ -19,7 +19,7 @@ class RemoteExecutionException(Exception):
         self.remote_result = result
 
     def __str__(self):
-        return """{message}        
+        return """{message}
 CMD: {remote_result.command}
 Exit Code: {remote_result.exited}
 

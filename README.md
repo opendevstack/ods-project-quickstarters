@@ -1,5 +1,7 @@
 # ODS Quickstarters
 
+**CAUTION! This repo is DEPRECATED. For ODS 2+, please see [ods-quickstarters](https://github.com/opendevstack/ods-quickstarters) repository.**
+
 ## Introduction
 
 This repository contains quickstarters, which are basically templates that help to start out with a component quickly.

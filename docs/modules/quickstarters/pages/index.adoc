@@ -39,7 +39,7 @@ All quickstarters are used by the https://github.com/opendevstack/ods-provisioni
 This repository in BitBucket will contain:
 
 * Some boilerplate code
-* A `Jenkinsfile` describing how to build the component, delegating most of the work to the xref:ods-jenkins-shared-library:ROOT:index.adoc[shared library]
+* A `Jenkinsfile` describing how to build the component, delegating most of the work to the xref:jenkins-shared-library:index.adoc[shared library]
 * A `sonar-project.properties` file configuring how the source code is analyzed by SonarQube
 
 Next to those, each quickstarter can also provide its own https://github.com/opendevstack/ods-project-quickstarters/tree/master/jenkins-slaves[Jenkins slave images].

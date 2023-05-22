@@ -1,5 +1,5 @@
 flask==1.0.2
-requests==2.21.0
+requests==2.31.0
 flask-executor==0.8.3
 pandas==0.23.4
 scikit-learn==0.20.2
